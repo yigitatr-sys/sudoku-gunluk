@@ -1574,7 +1574,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">6. İletişim</div>
-        <div style="font-size:13px;color:var(--text-soft);line-height:1.7;">Gizlilik politikasıyla ilgili sorularınız için: <span style="color:var(--accent);font-weight:600;">destek@sudokugunluk.com</span></div>
+        <div style="font-size:13px;color:var(--text-soft);line-height:1.7;">Gizlilik politikasıyla ilgili sorularınız için: <span style="color:var(--accent);font-weight:600;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0a6e6f797e6f614a797f6e65617f6d7f64667f6124696567">[email&#160;protected]</a></span></div>
       </div>
     </div>
     <button class="primary-btn" onclick="hideModal('privacyModal')">Anladım</button>
@@ -1703,7 +1703,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════════
 //  SUPABASE BAĞLANTISI
@@ -4543,7 +4543,7 @@ function closeDuelScreen() {
 
 async function loadLeagueStats() {
   if (!currentUser || !sb) return;
-  const { data } = await sb.from('league_stats').select('*').eq('user_id', currentUser.id).single();
+  const { data } = await sb.from('league_stats').select('*').eq('user_id', currentUser.id).maybeSingle();
   if (data) {
     duelState.myElo = data.elo || 0;
     duelState.wins = data.wins || 0;
@@ -4598,6 +4598,27 @@ function generateDuelCode() {
   let code = '';
   for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
+}
+
+function generateSudokuPuzzle(givens) {
+  const seed = Date.now();
+  const solution = generateSolution(seed);
+  const puzzle = [...solution];
+  const toRemove = 81 - givens;
+  const order = seededShuffle([...Array(81).keys()], seed);
+  let removed = 0;
+  for (const idx of order) {
+    if (removed >= toRemove) break;
+    const backup = puzzle[idx];
+    puzzle[idx] = 0;
+    const copy = [...puzzle];
+    if (countSolutions(copy) === 1) {
+      removed++;
+    } else {
+      puzzle[idx] = backup;
+    }
+  }
+  return { puzzle, solution };
 }
 
 function getDuelGivens(elo) {
@@ -4958,16 +4979,4 @@ function closeDuelResult() {
 
 function cancelDuel() {
   if (duelState.duelId) sb.from('duels').delete().eq('id', duelState.duelId);
-  if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
-  hideModal('duelWaitModal');
-  duelState.duelId = null;
-}
-
-function copyDuelCode() {
-  navigator.clipboard?.writeText(duelState.code).then(() => showToast('✅ Kod kopyalandı!'));
-}
-
-</script>
-
-</body>
-</html>
+  if (duelState.realtimeChannel) sb.removeChannel(duelSt
