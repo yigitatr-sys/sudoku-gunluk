@@ -4229,7 +4229,7 @@ function updateProfilePanel() {
   const lgBadge = document.getElementById('profileLeagueBadge');
   if (lgBadge && appState.supabaseId) {
     lgBadge.style.display = 'block';
-    const elo = (typeof duelState !== 'undefined' ? duelState.myElo : 0) || 0;
+    const elo = duelState.myElo || 0;
     const league = getLeague(elo);
     const leagueBase = league.name.split(' ')[0];
     const style = LEAGUE_STYLES[leagueBase] || LEAGUE_STYLES['Bronz'];
@@ -4307,7 +4307,7 @@ function updateNumpadPencilState() {
 //  DÜELLO STATE (init'ten önce tanımlanmalı)
 // ═══════════════════════════════════════════════
 
-let duelState = {
+var duelState = {
   duelId: null,
   code: null,
   opponentId: null,
