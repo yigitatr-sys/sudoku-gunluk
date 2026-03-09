@@ -1211,7 +1211,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
 </div>
 
 <!-- Düello Sıralama Ekranı -->
-<div id="duelLeaderboardScreen" style="display:none;position:fixed;inset:0;z-index:55;background:var(--bg);flex-direction:column;max-width:480px;margin:0 auto;">
+<div id="duelLeaderboardScreen" style="display:none;position:fixed;inset:0;z-index:65;background:var(--bg);flex-direction:column;max-width:480px;margin:0 auto;">
   <div class="panel-header">
     <button onclick="closeDuelLeaderboard()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;">←</button>
     <div class="panel-header-title">🏆 Lig Sıralaması</div>
@@ -1501,8 +1501,8 @@ body.dark .cell.same-num { background:#3a2e1a; }
       </div>
       <div class="diff-section-title legend-title" style="margin-top:8px;">✦ Efsaneler Yolu ✦</div>
       <div class="diff-grid" style="margin-bottom:4px;">
-        <div class="diff-btn" data-diff="grandmaster" onclick="startGame('grandmaster')"><div class="diff-icon">🌠</div><div class="diff-name">Şampiyon</div></div>
-        <div class="diff-btn" data-diff="legend"      onclick="startGame('legend')"     ><div class="diff-icon">✨</div><div class="diff-name">Efsane</div></div>
+        <div class="diff-btn" data-diff="grandmaster" onclick="startGame('grandmaster')"><div class="diff-icon">🌠</div><div class="diff-name">Üstat</div></div>
+        <div class="diff-btn" data-diff="legend"      onclick="startGame('legend')"     ><div class="diff-icon">✨</div><div class="diff-name">Şampiyon</div></div>
         <div class="diff-btn" data-diff="tanri"       onclick="startGame('tanri')"      ><div class="diff-icon">⚡</div><div class="diff-name">Efsane</div></div>
       </div>
     </div>
@@ -4476,25 +4476,52 @@ async function loadDuelLeaderboard() {
 
 async function showDuelProfile(userId) {
   if (!sb) return;
-  const { data: p } = await sb.from('profiles').select('username, avatar').eq('id', userId).single();
+  // Artık kullanıcının serisini (streak) ve rozetlerini (earned_badges) de çekiyoruz
+  const { data: p } = await sb.from('profiles').select('username, avatar, streak, earned_badges').eq('id', userId).single();
   const { data: s } = await sb.from('league_stats').select('*').eq('user_id', userId).single();
   if (!p || !s) return;
+  
   const league = getLeague(s.elo || 0);
   const total = (s.wins || 0) + (s.losses || 0);
   const wr = total > 0 ? Math.round((s.wins / total) * 100) : 0;
+  
+  const badgeCount = p.earned_badges ? p.earned_badges.length : 0;
+  const streak = p.streak || 0;
+
   const avatar = p.avatar && p.avatar.startsWith('http')
     ? `<img src="${p.avatar}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);">`
     : `<div style="width:72px;height:72px;border-radius:50%;background:var(--surface2);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:40px;">${p.avatar || '🧩'}</div>`;
+    
   showModal('genericModal');
   document.getElementById('genericModalContent').innerHTML = `
-    <div style="text-align:center;padding:8px 0 16px;">
+    <div style="text-align:center;padding:8px 0 4px;">
       <div style="display:flex;justify-content:center;margin-bottom:12px;">${avatar}</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);">${p.username}</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;">${getLeagueSvg(league.name,20)}<span style="font-size:12px;color:var(--text-muted);">${league.name} · ${s.elo} ELO</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;">
-        <div style="background:var(--surface2);border-radius:12px;padding:12px;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:#22c55e;">${s.wins||0}</div><div style="font-size:9px;color:var(--text-muted);">GALİBİYET</div></div>
-        <div style="background:var(--surface2);border-radius:12px;padding:12px;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:#ef4444;">${s.losses||0}</div><div style="font-size:9px;color:var(--text-muted);">MAĞLUBIYET</div></div>
-        <div style="background:var(--surface2);border-radius:12px;padding:12px;"><div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);">${wr}%</div><div style="font-size:9px;color:var(--text-muted);">GALİBİYET%</div></div>
+      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);">${p.username}</div>
+      
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:4px;background:var(--accent-light);padding:6px 14px;border-radius:20px;">
+          <span style="font-size:16px;">🔥</span>
+          <span style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--accent);">${streak}</span>
+          <span style="font-size:11px;color:var(--text-soft);">seri</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);padding:6px 14px;border-radius:20px;border:1px solid var(--border);">
+          <span style="font-size:16px;">🎖️</span>
+          <span style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);">${badgeCount}</span>
+          <span style="font-size:11px;color:var(--text-soft);">rozet</span>
+        </div>
+      </div>
+
+      <div style="background:var(--surface2);border-radius:16px;padding:16px;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;">
+          ${getLeagueSvg(league.name, 24)}
+          <span style="font-size:15px;font-weight:700;color:var(--text);">${league.name}</span>
+          <span style="font-size:13px;color:var(--text-muted);">· ${s.elo} ELO</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:#22c55e;">${s.wins||0}</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">GALİBİYET</div></div>
+          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:#ef4444;">${s.losses||0}</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">MAĞLUBİYET</div></div>
+          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);">${wr}%</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">KAZANMA</div></div>
+        </div>
       </div>
     </div>`;
 }
