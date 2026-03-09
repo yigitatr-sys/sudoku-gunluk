@@ -4781,13 +4781,14 @@ async function startMatchmaking() {
     const puzzle = generateSudokuPuzzle(givens);
     
     console.log("4. Sudoku üretildi, veritabanına yeni oda açılıyor...");
-    const { data, error } = await sb.from('duels').insert({ 
-      code, 
-      puzzle: puzzle.puzzle, 
-      solution: puzzle.solution, 
-      player1_id: currentUser.id, 
-      status: 'waiting' 
-    }).select().single();
+    const { data, error } = await sb.from('duels').insert({
+  code,
+  puzzle: Array.from(puzzle.puzzle),
+  solution: Array.from(puzzle.solution),
+  player1_id: currentUser.id,
+  status: 'waiting',
+}).select();
+console.log("INSERT sonucu:", { data, error });
     
     if (error) { 
       showToast('❌ Oda kurulamadı: ' + error.message); 
