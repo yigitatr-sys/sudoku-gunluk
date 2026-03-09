@@ -2335,6 +2335,29 @@ let G = {
   extraHintUsed: false,
 };
 
+let duelState = {
+  duelId: null,
+  code: null,
+  opponentId: null,
+  opponentName: null,
+  myProgress: 0,
+  opponentProgress: 0,
+  timerSec: 0,
+  timerInterval: null,
+  realtimeChannel: null,
+  puzzle: null,
+  solution: null,
+  userGrid: Array(81).fill(0),
+  given: Array(81).fill(false),
+  errors: 0,
+  maxErrors: 3,
+  selectedCell: -1,
+  completed: false,
+  myElo: 0,
+  wins: 0,
+  losses: 0,
+};
+
 
 // ═══════════════════════════════════════════════
 //  BADGE SYSTEM
@@ -4394,29 +4417,6 @@ function getLeagueProgress(elo) {
 // ═══════════════════════════════════════════════
 //  DÜELLO EKRANI
 // ═══════════════════════════════════════════════
-
-let duelState = {
-  duelId: null,
-  code: null,
-  opponentId: null,
-  opponentName: null,
-  myProgress: 0,
-  opponentProgress: 0,
-  timerSec: 0,
-  timerInterval: null,
-  realtimeChannel: null,
-  puzzle: null,
-  solution: null,
-  userGrid: Array(81).fill(0),
-  given: Array(81).fill(false),
-  errors: 0,
-  maxErrors: 3,
-  selectedCell: -1,
-  completed: false,
-  myElo: 0,
-  wins: 0,
-  losses: 0,
-};
 
 function openDuelLeaderboard() {
   const screen = document.getElementById('duelLeaderboardScreen');
