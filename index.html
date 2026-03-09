@@ -4675,6 +4675,7 @@ async function createDuel() {
       player1_id: currentUser.id,
       status: 'waiting',
     }).select().single();
+    console.log("INSERT sonucu:", { data, error });
 
     if (error) { 
       showToast('❌ Veritabanı Hatası: ' + error.message); 
