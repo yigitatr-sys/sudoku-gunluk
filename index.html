@@ -4674,7 +4674,7 @@ async function createDuel() {
       solution: puzzle.solution,
       player1_id: currentUser.id,
       status: 'waiting',
-    }).select().single();
+    }).select();
     console.log("INSERT sonucu:", { data, error });
 
     if (error) { 
