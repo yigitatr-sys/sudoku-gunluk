@@ -1574,7 +1574,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
       </div>
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">6. İletişim</div>
-        <div style="font-size:13px;color:var(--text-soft);line-height:1.7;">Gizlilik politikasıyla ilgili sorularınız için: <span style="color:var(--accent);font-weight:600;">destek@sudokugunluk.com</span></div>
+        <div style="font-size:13px;color:var(--text-soft);line-height:1.7;">Gizlilik politikasıyla ilgili sorularınız için: <span style="color:var(--accent);font-weight:600;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4420213730212f043731202b2f3123312a28312f6a272b29">[email&#160;protected]</a></span></div>
       </div>
     </div>
     <button class="primary-btn" onclick="hideModal('privacyModal')">Anladım</button>
@@ -1703,7 +1703,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════════
 //  SUPABASE BAĞLANTISI
@@ -4322,7 +4321,7 @@ initSupabase();
 //  LİG SİSTEMİ
 // ═══════════════════════════════════════════════
 
-const LEAGUE_STYLES = {
+var LEAGUE_STYLES = {
   'Bronz':    { bg: 'linear-gradient(135deg,#3d1f0a,#6b3a1f)', border: '#cd7f32', glow: 'rgba(205,127,50,0.4)' },
   'Gümüş':   { bg: 'linear-gradient(135deg,#1a1e24,#2e3440)', border: '#9ba5b0', glow: 'rgba(155,165,176,0.4)' },
   'Altın':    { bg: 'linear-gradient(135deg,#2a1f00,#4a3800)', border: '#fbbf24', glow: 'rgba(251,191,36,0.4)' },
@@ -4351,7 +4350,7 @@ function getLeagueSvg(leagueName, size=40) {
   return svg.replace('viewBox', 'width="' + size + '" height="' + size + '" viewBox');
 }
 
-const LEAGUES = [
+var LEAGUES = [
   { name:'Bronz 1',    min:0,    max:99,   color:'#cd7f32' },
   { name:'Bronz 2',    min:100,  max:199,  color:'#cd7f32' },
   { name:'Bronz 3',    min:200,  max:299,  color:'#cd7f32' },
@@ -4395,7 +4394,7 @@ function getLeagueProgress(elo) {
 //  DÜELLO EKRANI
 // ═══════════════════════════════════════════════
 
-let duelState = {
+var duelState = {
   duelId: null,
   code: null,
   opponentId: null,
@@ -4956,16 +4955,4 @@ function closeDuelResult() {
 
 function cancelDuel() {
   if (duelState.duelId) sb.from('duels').delete().eq('id', duelState.duelId);
-  if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
-  hideModal('duelWaitModal');
-  duelState.duelId = null;
-}
-
-function copyDuelCode() {
-  navigator.clipboard?.writeText(duelState.code).then(() => showToast('✅ Kod kopyalandı!'));
-}
-
-</script>
-
-</body>
-</html>
+  if (duelState.realtimeChannel) sb.removeChannel(duelSt
