@@ -4638,6 +4638,21 @@ function getDuelGivens(elo) {
   return 20;                 // Şampiyon+ → Efsane
 }
 
+function generateSudokuPuzzle(givens) {
+  let mode = 'medium';
+  if (givens >= 50) mode = 'beginner';
+  else if (givens >= 42) mode = 'easy';
+  else if (givens >= 34) mode = 'medium';
+  else if (givens >= 28) mode = 'hard';
+  else if (givens >= 24) mode = 'expert';
+  else if (givens >= 22) mode = 'master';
+  else if (givens >= 20) mode = 'grandmaster';
+  else mode = 'legend';
+
+  const seed = Math.random() * 1e9 | 0;
+  return generatePuzzle(mode, seed);
+}
+
 async function createDuel() {
   if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
   const code = generateDuelCode();
