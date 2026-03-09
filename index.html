@@ -4628,14 +4628,13 @@ function generateDuelCode() {
 }
 
 function getDuelGivens(elo) {
-  // Elo'ya göre bulmaca zorluğu
-  if (elo < 300)  return 50; // Bronz    → Başlangıç
-  if (elo < 750)  return 42; // Gümüş    → Kolay
-  if (elo < 1350) return 34; // Altın    → Orta
-  if (elo < 2100) return 28; // Elmas    → Zor
-  if (elo < 3000) return 24; // Usta     → Uzman
-  if (elo < 4200) return 22; // Üstat    → Üstat
-  return 20;                 // Şampiyon+ → Efsane
+  if (elo < 300) return 50;
+  if (elo < 750) return 42;
+  if (elo < 1350) return 34;
+  if (elo < 2100) return 28;
+  if (elo < 3000) return 24;
+  if (elo < 4200) return 22;
+  return 20;
 }
 
 function generateSudokuPuzzle(givens) {
@@ -4657,13 +4656,14 @@ async function createDuel() {
   try {
     if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
     
-    // İşlem başlamadan önce ekrana bilgi ver
     showToast('⏳ Oda oluşturuluyor, lütfen bekle...');
     await new Promise(resolve => setTimeout(resolve, 50)); 
 
+    console.log("1. Sudoku üretiliyor...");
     const code = generateDuelCode();
     const givens = getDuelGivens(duelState.myElo);
     const puzzle = generateSudokuPuzzle(givens);
+    console.log("2. Sudoku üretildi, veritabanına kaydediliyor...");
 
     const { data, error } = await sb.from('duels').insert({
       code,
@@ -4679,6 +4679,7 @@ async function createDuel() {
       return; 
     }
 
+    console.log("3. Veritabanı kaydı başarılı!");
     duelState.duelId = data.id;
     duelState.code = code;
     duelState.puzzle = data.puzzle;
@@ -4692,29 +4693,32 @@ async function createDuel() {
     listenForDuelStart(data.id);
   } catch (err) {
     showToast('❌ Beklenmeyen Hata: ' + err.message);
-    console.error(err);
+    console.error("Create Duel Hatası:", err);
   }
 }
 
 async function joinDuelByCode() {
-  const code = document.getElementById('duelCodeInput').value.trim().toUpperCase();
-  if (code.length !== 6) { showToast('6 haneli kod gir!'); return; }
-  const { data, error } = await sb.from('duels').select('*').eq('code', code).eq('status', 'waiting').single();
-  if (error || !data) { showToast('❌ Geçersiz kod veya oda dolu!'); return; }
-  if (data.player1_id === currentUser.id) { showToast('Kendi odana katamazsın!'); return; }
+  try {
+    const code = document.getElementById('duelCodeInput').value.trim().toUpperCase();
+    if (code.length !== 6) { showToast('6 haneli kod gir!'); return; }
+    const { data, error } = await sb.from('duels').select('*').eq('code', code).eq('status', 'waiting').single();
+    if (error || !data) { showToast('❌ Geçersiz kod veya oda dolu!'); return; }
+    if (data.player1_id === currentUser.id) { showToast('Kendi odana katamazsın!'); return; }
 
-  // player2 olarak güncelle
-  await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', data.id);
-  duelState.duelId = data.id;
-  duelState.puzzle = data.puzzle;
-  duelState.solution = data.solution;
-  duelState.opponentId = data.player1_id;
+    await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', data.id);
+    duelState.duelId = data.id;
+    duelState.puzzle = data.puzzle;
+    duelState.solution = data.solution;
+    duelState.opponentId = data.player1_id;
 
-  // Rakip adını çek
-  const { data: p } = await sb.from('profiles').select('username').eq('id', data.player1_id).single();
-  duelState.opponentName = p?.username || 'Rakip';
+    const { data: p } = await sb.from('profiles').select('username').eq('id', data.player1_id).single();
+    duelState.opponentName = p?.username || 'Rakip';
 
-  startDuelGame();
+    startDuelGame();
+  } catch (err) {
+    showToast('❌ Katılma Hatası: ' + err.message);
+    console.error(err);
+  }
 }
 
 let matchmakingInterval = null;
@@ -4743,9 +4747,11 @@ async function startMatchmaking() {
       document.getElementById('matchmakingAnim').textContent = anims[ai++ % anims.length];
     }, 600);
 
+    console.log("1. Bekleyen oda aranıyor...");
     const { data: existing, error: fetchErr } = await sb.from('duels').select('*').eq('status', 'waiting').neq('player1_id', currentUser.id).limit(1).maybeSingle();
     
     if (existing) {
+      console.log("2. Oda bulundu, katılınıyor...");
       const { error: updateErr } = await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', existing.id);
       if (updateErr) { showToast('❌ Odaya katılamadın: ' + updateErr.message); cancelMatchmaking(); return; }
 
@@ -4763,12 +4769,14 @@ async function startMatchmaking() {
       return;
     }
 
+    console.log("3. Bekleyen oda yok, yeni sudoku üretiliyor...");
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const code = generateDuelCode();
     const givens = getDuelGivens(duelState.myElo);
     const puzzle = generateSudokuPuzzle(givens);
     
+    console.log("4. Sudoku üretildi, veritabanına yeni oda açılıyor...");
     const { data, error } = await sb.from('duels').insert({ 
       code, 
       puzzle: puzzle.puzzle, 
@@ -4779,10 +4787,12 @@ async function startMatchmaking() {
     
     if (error) { 
       showToast('❌ Oda kurulamadı: ' + error.message); 
+      console.error('Supabase insert error:', error);
       cancelMatchmaking(); 
       return; 
     }
 
+    console.log("5. Oda başarıyla kuruldu, rakip bekleniyor...");
     duelState.duelId = data.id; 
     duelState.code = code; 
     duelState.puzzle = data.puzzle; 
@@ -4798,7 +4808,7 @@ async function startMatchmaking() {
     listenForDuelStart(data.id);
   } catch (err) {
     showToast('❌ Eşleştirme Hatası: ' + err.message);
-    console.error(err);
+    console.error("Matchmaking Hatası:", err);
     cancelMatchmaking();
   }
 }
