@@ -4664,6 +4664,8 @@ async function createDuel() {
     const givens = getDuelGivens(duelState.myElo);
     const puzzle = generateSudokuPuzzle(givens);
     console.log("2. Sudoku üretildi, veritabanına kaydediliyor...");
+    console.log("Puzzle boyutu:", JSON.stringify(puzzle.puzzle).length, "byte");
+    console.log("Puzzle örnek:", puzzle.puzzle.slice(0,5));
 
     const { data, error } = await sb.from('duels').insert({
       code,
