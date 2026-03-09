@@ -4765,7 +4765,8 @@ async function startMatchmaking() {
     console.log("1. Bekleyen oda aranıyor...");
     const session = await sb.auth.getSession();
 const token = session.data.session.access_token;
-const fetchRes = await fetch(SUPABASE_URL + '/rest/v1/duels?status=eq.waiting&player1_id=neq.' + currentUser.id + '&limit=1', {
+const fiveMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+const fetchRes = await fetch(SUPABASE_URL + '/rest/v1/duels?status=eq.waiting&player1_id=neq.' + currentUser.id + '&created_at=gte.' + fiveMinAgo + '&limit=1', {
   headers: {
     'apikey': SUPABASE_KEY,
     'Authorization': 'Bearer ' + token
@@ -4862,18 +4863,27 @@ console.log("INSERT sonucu:", { data, error, status: res.status });
 }
 
 function listenForDuelStart(duelId) {
-  if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
-  duelState.realtimeChannel = sb.channel('duel:' + duelId)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'duels', filter: 'id=eq.' + duelId }, async (payload) => {
-      if (payload.new.status === 'active' && payload.new.player2_id) {
-        // Rakip geldi!
-        duelState.opponentId = payload.new.player2_id;
-        const { data: p } = await sb.from('profiles').select('username').eq('id', payload.new.player2_id).single();
-        duelState.opponentName = p?.username || 'Rakip';
-        hideModal('duelWaitModal');
+  if (duelState.pollInterval) clearInterval(duelState.pollInterval);
+  duelState.pollInterval = setInterval(async () => {
+    try {
+      const session = await sb.auth.getSession();
+      const token = session.data.session.access_token;
+      const res = await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + duelId + '&select=*', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      const duel = data[0];
+      if (duel && duel.status === 'active') {
+        clearInterval(duelState.pollInterval);
+        duelState.duelId = duel.id;
+        duelState.puzzle = duel.puzzle;
+        duelState.solution = duel.solution;
+        duelState.opponentId = duel.player2_id;
+        closeModal('duelWaitModal');
         startDuelGame();
       }
-    }).subscribe();
+    } catch(e) { console.error('Poll hatası:', e); }
+  }, 2000);
 }
 
 function startDuelGame() {
