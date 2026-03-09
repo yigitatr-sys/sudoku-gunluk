@@ -4695,17 +4695,17 @@ console.log("INSERT sonucu:", { data, error, status: res.status });
     }
 
     console.log("3. Veritabanı kaydı başarılı!");
-    duelState.duelId = data.id;
+    duelState.duelId = data[0].id;
     duelState.code = code;
-    duelState.puzzle = data.puzzle;
-    duelState.solution = data.solution;
+    duelState.puzzle = data[0].puzzle;
+    duelState.solution = data[0].solution;
 
     document.getElementById('duelWaitCode').textContent = code;
     document.getElementById('duelWaitTitle').textContent = 'Rakip Bekleniyor';
     document.getElementById('duelWaitMsg').textContent = 'Bu kodu arkadaşına gönder';
     showModal('duelWaitModal');
 
-    listenForDuelStart(data.id);
+    listenForDuelStart(data[0].id);
   } catch (err) {
     showToast('❌ Beklenmeyen Hata: ' + err.message);
     console.error("Create Duel Hatası:", err);
