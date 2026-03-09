@@ -4248,26 +4248,28 @@ function updateProfilePanel() {
   if (streakEl) streakEl.textContent = appState.streak || 0;
   const regBtn = document.getElementById('profileRegisterBtn');
   if (regBtn) regBtn.style.display = appState.supabaseId ? 'none' : 'block';
-  // Lig rozeti
-  const lgBadge = document.getElementById('profileLeagueBadge');
-  if (lgBadge && appState.supabaseId) {
-    lgBadge.style.display = 'block';
-    const elo = duelState.myElo || 0;
-    const league = getLeague(elo);
-    const leagueBase = league.name.split(' ')[0];
-    const style = LEAGUE_STYLES[leagueBase] || LEAGUE_STYLES['Bronz'];
-    const inner = document.getElementById('profileLeagueBadgeInner');
-    if (inner) {
-      inner.innerHTML = getLeagueSvg(league.name, 16) + ' <span>' + league.name.toUpperCase() + '</span>';
-      inner.style.background = style.bg;
-      inner.style.border = '1px solid ' + style.border;
-      inner.style.display = 'inline-flex';
-      inner.style.alignItems = 'center';
-      inner.style.gap = '4px';
+  // Lig rozeti — try/catch ile güvenli
+  try {
+    const lgBadge = document.getElementById('profileLeagueBadge');
+    if (lgBadge && appState.supabaseId && typeof getLeague === 'function') {
+      lgBadge.style.display = 'block';
+      const elo = (typeof duelState !== 'undefined' ? duelState.myElo : 0) || 0;
+      const league = getLeague(elo);
+      const leagueBase = league.name.split(' ')[0];
+      const style = (LEAGUE_STYLES || {})[leagueBase] || { bg:'', border:'' };
+      const inner = document.getElementById('profileLeagueBadgeInner');
+      if (inner) {
+        inner.innerHTML = (typeof getLeagueSvg === 'function' ? getLeagueSvg(league.name, 16) : '') + ' <span>' + league.name.toUpperCase() + '</span>';
+        inner.style.background = style.bg;
+        inner.style.border = '1px solid ' + style.border;
+        inner.style.display = 'inline-flex';
+        inner.style.alignItems = 'center';
+        inner.style.gap = '4px';
+      }
+    } else if (document.getElementById('profileLeagueBadge')) {
+      document.getElementById('profileLeagueBadge').style.display = 'none';
     }
-  } else if (lgBadge) {
-    lgBadge.style.display = 'none';
-  }
+  } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════
