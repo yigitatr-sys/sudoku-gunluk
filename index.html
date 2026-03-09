@@ -4654,31 +4654,46 @@ function generateSudokuPuzzle(givens) {
 }
 
 async function createDuel() {
-  if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
-  const code = generateDuelCode();
-  const givens = getDuelGivens(duelState.myElo);
-  const puzzle = generateSudokuPuzzle(givens);
-  const { data, error } = await sb.from('duels').insert({
-    code,
-    puzzle: puzzle.puzzle,
-    solution: puzzle.solution,
-    player1_id: currentUser.id,
-    status: 'waiting',
-  }).select().single();
-  if (error) { showToast('❌ Oda oluşturulamadı'); console.error(error); return; }
-  duelState.duelId = data.id;
-  duelState.code = code;
-  duelState.puzzle = data.puzzle;
-  duelState.solution = data.solution;
+  try {
+    if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
+    
+    // İşlem başlamadan önce ekrana bilgi ver
+    showToast('⏳ Oda oluşturuluyor, lütfen bekle...');
+    await new Promise(resolve => setTimeout(resolve, 50)); 
 
-  // Bekleme modalını göster
-  document.getElementById('duelWaitCode').textContent = code;
-  document.getElementById('duelWaitTitle').textContent = 'Rakip Bekleniyor';
-  document.getElementById('duelWaitMsg').textContent = 'Bu kodu arkadaşına gönder';
-  showModal('duelWaitModal');
+    const code = generateDuelCode();
+    const givens = getDuelGivens(duelState.myElo);
+    const puzzle = generateSudokuPuzzle(givens);
 
-  // Realtime: rakip gelince başlat
-  listenForDuelStart(data.id);
+    const { data, error } = await sb.from('duels').insert({
+      code,
+      puzzle: puzzle.puzzle,
+      solution: puzzle.solution,
+      player1_id: currentUser.id,
+      status: 'waiting',
+    }).select().single();
+
+    if (error) { 
+      showToast('❌ Veritabanı Hatası: ' + error.message); 
+      console.error('Supabase error:', error); 
+      return; 
+    }
+
+    duelState.duelId = data.id;
+    duelState.code = code;
+    duelState.puzzle = data.puzzle;
+    duelState.solution = data.solution;
+
+    document.getElementById('duelWaitCode').textContent = code;
+    document.getElementById('duelWaitTitle').textContent = 'Rakip Bekleniyor';
+    document.getElementById('duelWaitMsg').textContent = 'Bu kodu arkadaşına gönder';
+    showModal('duelWaitModal');
+
+    listenForDuelStart(data.id);
+  } catch (err) {
+    showToast('❌ Beklenmeyen Hata: ' + err.message);
+    console.error(err);
+  }
 }
 
 async function joinDuelByCode() {
@@ -4714,50 +4729,78 @@ function cancelMatchmaking() {
 }
 
 async function startMatchmaking() {
-  if (!currentUser) return;
-  const btn = document.getElementById('matchmakeBtn');
-  btn.style.display = 'none';
-  document.getElementById('matchmakingStatus').style.display = 'block';
-  // Arama animasyonu
-  const anims = ['⚔️','🔍','⏳','🎯'];
-  let ai = 0;
-  if (matchmakingInterval) clearInterval(matchmakingInterval);
-  matchmakingInterval = setInterval(() => {
-    document.getElementById('matchmakingAnim').textContent = anims[ai++ % anims.length];
-  }, 600);
+  try {
+    if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
+    
+    const btn = document.getElementById('matchmakeBtn');
+    btn.style.display = 'none';
+    document.getElementById('matchmakingStatus').style.display = 'block';
+    
+    const anims = ['⚔️','🔍','⏳','🎯'];
+    let ai = 0;
+    if (matchmakingInterval) clearInterval(matchmakingInterval);
+    matchmakingInterval = setInterval(() => {
+      document.getElementById('matchmakingAnim').textContent = anims[ai++ % anims.length];
+    }, 600);
 
-  // Bekleyen oda var mı?
-  const { data: existing } = await sb.from('duels').select('*').eq('status', 'waiting').neq('player1_id', currentUser.id).limit(1).single();
-  if (existing) {
-    // Var olan odaya katıl
-    await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', existing.id);
-    duelState.duelId = existing.id;
-    duelState.puzzle = existing.puzzle;
-    duelState.solution = existing.solution;
-    duelState.opponentId = existing.player1_id;
-    const { data: p } = await sb.from('profiles').select('username').eq('id', existing.player1_id).single();
-    duelState.opponentName = p?.username || 'Rakip';
-    clearInterval(matchmakingInterval);
-    document.getElementById('matchmakingStatus').style.display = 'none';
-    document.getElementById('matchmakeBtn').style.display = 'flex';
-    startDuelGame();
-    return;
+    const { data: existing, error: fetchErr } = await sb.from('duels').select('*').eq('status', 'waiting').neq('player1_id', currentUser.id).limit(1).maybeSingle();
+    
+    if (existing) {
+      const { error: updateErr } = await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', existing.id);
+      if (updateErr) { showToast('❌ Odaya katılamadın: ' + updateErr.message); cancelMatchmaking(); return; }
+
+      duelState.duelId = existing.id;
+      duelState.puzzle = existing.puzzle;
+      duelState.solution = existing.solution;
+      duelState.opponentId = existing.player1_id;
+      const { data: p } = await sb.from('profiles').select('username').eq('id', existing.player1_id).single();
+      duelState.opponentName = p?.username || 'Rakip';
+      
+      clearInterval(matchmakingInterval);
+      document.getElementById('matchmakingStatus').style.display = 'none';
+      document.getElementById('matchmakeBtn').style.display = 'flex';
+      startDuelGame();
+      return;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const code = generateDuelCode();
+    const givens = getDuelGivens(duelState.myElo);
+    const puzzle = generateSudokuPuzzle(givens);
+    
+    const { data, error } = await sb.from('duels').insert({ 
+      code, 
+      puzzle: puzzle.puzzle, 
+      solution: puzzle.solution, 
+      player1_id: currentUser.id, 
+      status: 'waiting' 
+    }).select().single();
+    
+    if (error) { 
+      showToast('❌ Oda kurulamadı: ' + error.message); 
+      cancelMatchmaking(); 
+      return; 
+    }
+
+    duelState.duelId = data.id; 
+    duelState.code = code; 
+    duelState.puzzle = data.puzzle; 
+    duelState.solution = data.solution;
+
+    document.getElementById('duelWaitCode').textContent = '🎲 Rakip Aranıyor...';
+    document.getElementById('duelWaitTitle').textContent = 'Eşleştirme';
+    document.getElementById('duelWaitMsg').textContent = 'Uygun rakip bulunuyor...';
+    showModal('duelWaitModal');
+    
+    btn.textContent = '🔍 Rakip Ara'; 
+    btn.disabled = false;
+    listenForDuelStart(data.id);
+  } catch (err) {
+    showToast('❌ Eşleştirme Hatası: ' + err.message);
+    console.error(err);
+    cancelMatchmaking();
   }
-
-  // Yok — oda oluştur ve bekle
-  const code = generateDuelCode();
-  const givens = getDuelGivens(duelState.myElo);
-  const puzzle = generateSudokuPuzzle(givens);
-  const { data } = await sb.from('duels').insert({ code, puzzle: puzzle.puzzle, solution: puzzle.solution, player1_id: currentUser.id, status: 'waiting' }).select().single();
-  if (!data) { clearInterval(matchmakingInterval); document.getElementById('matchmakingStatus').style.display = 'none'; document.getElementById('matchmakeBtn').style.display = 'flex'; return; }
-  duelState.duelId = data.id; duelState.code = code; duelState.puzzle = data.puzzle; duelState.solution = data.solution;
-
-  document.getElementById('duelWaitCode').textContent = '🎲 Rakip Aranıyor...';
-  document.getElementById('duelWaitTitle').textContent = 'Eşleştirme';
-  document.getElementById('duelWaitMsg').textContent = 'Uygun rakip bulunuyor...';
-  showModal('duelWaitModal');
-  btn.textContent = '🔍 Rakip Ara'; btn.disabled = false;
-  listenForDuelStart(data.id);
 }
 
 function listenForDuelStart(duelId) {
