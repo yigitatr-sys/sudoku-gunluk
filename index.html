@@ -1714,14 +1714,9 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function getToken() {
   try {
-    const keys = Object.keys(localStorage);
-    for (const key of keys) {
-      if (key.includes('supabase')) {
-        const val = JSON.parse(localStorage.getItem(key));
-        if (val?.access_token) return val.access_token;
-        if (val?.session?.access_token) return val.session.access_token;
-      }
-    }
+    const val = JSON.parse(localStorage.getItem('sb-ywcreaairumuxkydbxnt-auth-token'));
+    if (val?.access_token) return val.access_token;
+    if (val?.session?.access_token) return val.session.access_token;
     const { data } = await sb.auth.getSession();
     return data?.session?.access_token || null;
   } catch(e) { return null; }
