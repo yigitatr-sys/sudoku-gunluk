@@ -4716,11 +4716,20 @@ async function joinDuelByCode() {
   try {
     const code = document.getElementById('duelCodeInput').value.trim().toUpperCase();
     if (code.length !== 6) { showToast('6 haneli kod gir!'); return; }
-    const { data, error } = await sb.from('duels').select('*').eq('code', code).eq('status', 'waiting').single();
-    if (error || !data) { showToast('❌ Geçersiz kod veya oda dolu!'); return; }
-    if (data.player1_id === currentUser.id) { showToast('Kendi odana katamazsın!'); return; }
-
-    await sb.from('duels').update({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() }).eq('id', data.id);
+    const session = await sb.auth.getSession();
+const token = session.data.session.access_token;
+const joinRes = await fetch(SUPABASE_URL + '/rest/v1/duels?code=eq.' + code + '&status=eq.waiting&limit=1', {
+  headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
+});
+const joinData = await joinRes.json();
+const data = joinData[0] || null;
+if (!data) { showToast('❌ Geçersiz kod veya oda dolu!'); return; }
+if (data.player1_id === currentUser.id) { showToast('Kendi odana katamazsın!'); return; }
+await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + data.id, {
+  method: 'PATCH',
+  headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ player2_id: currentUser.id, status: 'active', started_at: new Date().toISOString() })
+});
     duelState.duelId = data.id;
     duelState.puzzle = data.puzzle;
     duelState.solution = data.solution;
@@ -4842,10 +4851,10 @@ console.log("INSERT sonucu:", { data, error, status: res.status });
     }
 
     console.log("5. Oda başarıyla kuruldu, rakip bekleniyor...");
-    duelState.duelId = data.id; 
+    duelState.duelId = data[0].id; 
     duelState.code = code; 
-    duelState.puzzle = data.puzzle; 
-    duelState.solution = data.solution;
+    duelState.puzzle = data[0].puzzle; 
+    duelState.solution = data[0].solution;
 
     document.getElementById('duelWaitCode').textContent = '🎲 Rakip Aranıyor...';
     document.getElementById('duelWaitTitle').textContent = 'Eşleştirme';
