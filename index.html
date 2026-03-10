@@ -1751,7 +1751,11 @@ async function initSupabase() {
     }
   });
 
-  const { data: { session } } = await sb.auth.getSession();
+  let { data: { session } } = await sb.auth.getSession();
+if (session) {
+  const { data: refreshed } = await sb.auth.refreshSession();
+  if (refreshed?.session) session = refreshed.session;
+}
   if (session) {
     _authHandled = true;
     currentUser = session.user;
