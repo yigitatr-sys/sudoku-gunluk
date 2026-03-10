@@ -5032,6 +5032,7 @@ async function pushDuelProgress() {
     user_id: currentUser.id,
     progress: duelState.myProgress,
     completed: duelState.completed,
+won: duelState.won || false,
     finish_time: duelState.completed ? duelState.timerSec : null,
     errors: duelState.errors,
   }, { onConflict: 'duel_id,user_id' });
@@ -5044,7 +5045,8 @@ function listenDuelProgress() {
       if (payload.new.user_id !== currentUser.id) {
         duelState.opponentProgress = payload.new.progress || 0;
         updateDuelBars();
-        if (payload.new.completed) finishDuel(false, 'opponent_won');
+        if (payload.new.completed && payload.new.won) finishDuel(false, 'opponent_won');
+if (payload.new.completed && !payload.new.won) finishDuel(true, 'opponent_lost');
       }
     }).subscribe();
   duelState.realtimeChannel = ch;
@@ -5079,6 +5081,7 @@ function startDuelTimer() {
 async function finishDuel(won, reason) {
   if (duelState.completed) return;
   duelState.completed = true;
+  duelState.won = won;
   clearInterval(duelState.timerInterval);
   if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
 
