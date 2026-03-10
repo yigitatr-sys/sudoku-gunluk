@@ -4888,7 +4888,7 @@ function listenForDuelStart(duelId) {
         duelState.puzzle = duel.puzzle;
         duelState.solution = duel.solution;
         duelState.opponentId = duel.player2_id;
-        closeModal('duelWaitModal');
+        hideModal('duelWaitModal');
         startDuelGame();
       }
     } catch(e) { console.error('Poll hatası:', e); }
