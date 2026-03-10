@@ -1712,6 +1712,21 @@ const SUPABASE_URL  = 'https://ywcreaairumuxkydbxnt.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3Y3JlYWFpcnVtdXhreWRieG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMDc2MTAsImV4cCI6MjA4ODU4MzYxMH0.UqTjURHwDH8RC_lsudEp7yIwWPJZUhs0_sFXAgkBNlc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+async function getToken() {
+  try {
+    const keys = Object.keys(localStorage);
+    for (const key of keys) {
+      if (key.includes('supabase')) {
+        const val = JSON.parse(localStorage.getItem(key));
+        if (val?.access_token) return val.access_token;
+        if (val?.session?.access_token) return val.session.access_token;
+      }
+    }
+    const { data } = await sb.auth.getSession();
+    return data?.session?.access_token || null;
+  } catch(e) { return null; }
+}
+
 // Oturum açık mı?
 let currentUser = null;
 
@@ -4676,7 +4691,7 @@ async function createDuel() {
   method: 'POST',
   headers: {
     'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+    'Authorization': 'Bearer ' + (await getToken()),
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
   },
@@ -4720,8 +4735,7 @@ async function joinDuelByCode() {
   try {
     const code = document.getElementById('duelCodeInput').value.trim().toUpperCase();
     if (code.length !== 6) { showToast('6 haneli kod gir!'); return; }
-    const session = await sb.auth.getSession();
-const token = session.data.session.access_token;
+    const token = await getToken();
 const joinRes = await fetch(SUPABASE_URL + '/rest/v1/duels?code=eq.' + code + '&status=eq.waiting&limit=1', {
   headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
 });
@@ -4776,8 +4790,7 @@ async function startMatchmaking() {
     }, 600);
 
     console.log("1. Bekleyen oda aranıyor...");
-    const session = await sb.auth.getSession();
-const token = session.data.session.access_token;
+    const token = await getToken();
 const fiveMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
 const fetchRes = await fetch(SUPABASE_URL + '/rest/v1/duels?status=eq.waiting&player1_id=neq.' + currentUser.id + '&created_at=gte.' + fiveMinAgo + '&limit=1', {
   headers: {
@@ -4791,8 +4804,7 @@ const fetchErr = null;
     
     if (existing) {
       console.log("2. Oda bulundu, katılınıyor...");
-      const session2 = await sb.auth.getSession();
-const token2 = session2.data.session.access_token;
+      const token2 = await getToken();
 const updateRes = await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + existing.id, {
   method: 'PATCH',
   headers: {
@@ -4835,7 +4847,7 @@ const p = pData[0] || null;
   method: 'POST',
   headers: {
     'apikey': SUPABASE_KEY,
-    'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+    'Authorization': 'Bearer ' + (await getToken()),
     'Content-Type': 'application/json',
     'Prefer': 'return=representation'
   },
@@ -4883,8 +4895,7 @@ function listenForDuelStart(duelId) {
   if (duelState.pollInterval) clearInterval(duelState.pollInterval);
   duelState.pollInterval = setInterval(async () => {
     try {
-      const session = await sb.auth.getSession();
-      const token = session.data.session.access_token;
+      const token = await getToken();
       const res = await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + duelId + '&select=*', {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
       });
