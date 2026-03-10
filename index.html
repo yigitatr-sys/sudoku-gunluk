@@ -534,6 +534,29 @@ body.dark .cell.same-num { background:#3a2e1a; }
 .badge-row-desc { font-size:12px; color:var(--text-soft); margin-top:2px; }
 .badge-row.locked .badge-row-desc { color:var(--text-muted); }
 .badge-row-check { font-size:18px; }
+/* ── YENİ LİG ROZET SİSTEMİ ── */
+.league-badge {
+  display: flex; justify-content: center; align-items: center;
+  color: white; position: relative;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  flex-shrink: 0; box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.bronz { background: linear-gradient(135deg, #c08b5c, #7a4f2b); border-radius: 50%; border: 2px solid #dfa777; box-shadow: 0 4px 10px rgba(122, 79, 43, 0.2); }
+.gumus { background: linear-gradient(135deg, #e0e3eb, #8b93a5); border-radius: 20%; border: 2px solid #ffffff; box-shadow: 0 6px 12px rgba(139, 147, 165, 0.3); color: #333; text-shadow: none; }
+.altin { background: linear-gradient(135deg, #ffe066, #d4af37); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); filter: drop-shadow(0px 3px 6px rgba(212, 175, 55, 0.5)); }
+.elmas { background: linear-gradient(135deg, #00f2fe, #4facfe); transform: rotate(45deg); border-radius: 15%; box-shadow: 0 0 10px rgba(0, 242, 254, 0.5); border: 1.5px solid #e0ffff; }
+.elmas .badge-icon { transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; }
+.usta { background: linear-gradient(135deg, #8e2de2, #4a00e0); clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%); filter: drop-shadow(0px 4px 8px rgba(74, 0, 224, 0.5)); }
+.ustat { background: linear-gradient(135deg, #ff416c, #ff4b2b); border-radius: 35% 10% 35% 10%; box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4), inset 0 0 8px rgba(255,255,255,0.2); border: 2px solid #ffcfd2; }
+.sampiyon { background: #1a1a2e; border-radius: 50%; z-index: 1; }
+.sampiyon::before { content: ''; position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px; background: linear-gradient(45deg, #ffd700, #ff00cc, #00ffff, #ffd700); background-size: 200%; border-radius: 50%; z-index: -1; animation: spinBorder 3s linear infinite; }
+.efsane { background: linear-gradient(270deg, #ff007f, #7928ca, #00d2ff); background-size: 400% 400%; border-radius: 20%; animation: gradientShift 4s ease infinite, floatBadge 3s ease-in-out infinite; clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%); filter: drop-shadow(0px 5px 10px rgba(121, 40, 202, 0.6)); }
+
+@keyframes spinBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes floatBadge { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
 </style>
 </head>
 <body>
@@ -4377,21 +4400,37 @@ const LEAGUE_STYLES = {
 };
 
 // SVG lig rozetleri
-const LEAGUE_SVGS = {
-  'Bronz': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="22" fill="#6b3a1f" stroke="#cd7f32" stroke-width="2.5"/><line x1="14" y1="34" x2="34" y2="14" stroke="#cd7f32" stroke-width="3" stroke-linecap="round"/><line x1="34" y1="34" x2="14" y2="14" stroke="#cd7f32" stroke-width="3" stroke-linecap="round"/><circle cx="14" cy="14" r="3" fill="#e8a040"/><circle cx="34" cy="14" r="3" fill="#e8a040"/><circle cx="14" cy="34" r="3" fill="#e8a040"/><circle cx="34" cy="34" r="3" fill="#e8a040"/><circle cx="24" cy="24" r="4" fill="#f0b060"/></svg>`,
-  'Gümüş': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#2e3440" stroke="#9ba5b0" stroke-width="2"/><line x1="18" y1="32" x2="30" y2="16" stroke="#c8d0d8" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="32" x2="18" y2="16" stroke="#c8d0d8" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="24" r="3.5" fill="#e0e8f0"/></svg>`,
-  'Altın': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#3a2e00" stroke="#fbbf24" stroke-width="2"/><polygon points="24,10 26.5,18 35,18 28.5,23 31,31 24,26 17,31 19.5,23 13,18 21.5,18" fill="#fbbf24"/></svg>`,
-  'Elmas': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#001a2e" stroke="#67e8f9" stroke-width="2"/><polygon points="24,12 34,22 24,38 14,22" fill="none" stroke="#67e8f9" stroke-width="1.5"/><polygon points="24,12 34,22 24,22" fill="#a0f0ff" opacity="0.6"/><polygon points="24,12 14,22 24,22" fill="#67e8f9" opacity="0.4"/></svg>`,
-  'Usta':  `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#1a0a2e" stroke="#a78bfa" stroke-width="2"/><line x1="24" y1="10" x2="24" y2="34" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/><line x1="16" y1="20" x2="32" y2="20" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/><polygon points="24,10 27,16 24,14 21,16" fill="#c4b5fd"/><circle cx="24" cy="34" r="3" fill="#7c3aed"/></svg>`,
-  'Üstat': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#2a1000" stroke="#fb923c" stroke-width="2"/><line x1="24" y1="8" x2="24" y2="32" stroke="#fb923c" stroke-width="3" stroke-linecap="round"/><line x1="15" y1="18" x2="33" y2="18" stroke="#fb923c" stroke-width="2.5" stroke-linecap="round"/><polygon points="24,8 27.5,15 24,12 20.5,15" fill="#fdba74"/><circle cx="24" cy="33" r="4" fill="#c2410c" stroke="#fb923c" stroke-width="1.5"/><circle cx="24" cy="33" r="2" fill="#fed7aa"/></svg>`,
-  'Şampiyon': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L38 12 L38 28 Q38 38 24 44 Q10 38 10 28 L10 12 Z" fill="#1a0028" stroke="#e879f9" stroke-width="2"/><path d="M17 14 L17 24 Q17 32 24 34 Q31 32 31 24 L31 14 Z" fill="none" stroke="#e879f9" stroke-width="1.5"/><line x1="14" y1="17" x2="17" y2="17" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/><line x1="31" y1="17" x2="34" y2="17" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="17" x2="14" y2="22" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/><line x1="34" y1="17" x2="34" y2="22" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="34" x2="29" y2="34" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="36" x2="27" y2="36" stroke="#e879f9" stroke-width="2" stroke-linecap="round"/></svg>`,
-  'Efsane': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="22" fill="#000d1a" stroke="#00eaff" stroke-width="2"/><polygon points="24,6 27,18 38,18 29,26 32,38 24,30 16,38 19,26 10,18 21,18" fill="#00eaff" opacity="0.9"/><polygon points="24,10 26,18 33,18 27,23 29,31 24,27 19,31 21,23 15,18 22,18" fill="#001428"/></svg>`,
-};
-
+// ═══════════════════════════════════════════════
+//  YENİ CSS LİG ROZETLERİ SİSTEMİ
+// ═══════════════════════════════════════════════
 function getLeagueSvg(leagueName, size=40) {
   const base = leagueName.split(' ')[0];
-  const svg = LEAGUE_SVGS[base] || LEAGUE_SVGS['Bronz'];
-  return svg.replace('viewBox', 'width="' + size + '" height="' + size + '" viewBox');
+  
+  // Senin tasarımlarının kod haritası
+  const map = {
+    'Bronz':    { cls: 'bronz',    icon: '⚒' },
+    'Gümüş':    { cls: 'gumus',    icon: '⚔' },
+    'Altın':    { cls: 'altin',    icon: '★' },
+    'Elmas':    { cls: 'elmas',    icon: '<div class="badge-icon">◈</div>' },
+    'Usta':     { cls: 'usta',     icon: '🛡' },
+    'Üstat':    { cls: 'ustat',    icon: '⚜' },
+    'Şampiyon': { cls: 'sampiyon', icon: '🏆' },
+    'Efsane':   { cls: 'efsane',   icon: '👑' }
+  };
+  
+  const data = map[base] || map['Bronz'];
+  const fontSize = Math.max(12, size * 0.45); // Logoya göre iç ikonu otomatik boyutlandırır
+  
+  // Elmas'ın (45 derece dönmesinden dolayı) yanındaki yazıları ittirmemesi için özel güvenli kutu
+  if (base === 'Elmas') {
+    const innerSize = size * 0.75;
+    return `<div style="width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <div class="league-badge elmas" style="width:${innerSize}px; height:${innerSize}px; font-size:${fontSize}px;">${data.icon}</div>
+            </div>`;
+  }
+  
+  // Diğer tüm rütbeler için yerleşim
+  return `<div class="league-badge ${data.cls}" style="width:${size}px; height:${size}px; font-size:${fontSize}px;">${data.icon}</div>`;
 }
 
 const LEAGUES = [
