@@ -639,6 +639,26 @@ body.dark .cell.same-num { background:#3a2e1a; }
     color: var(--text) !important;
     transition: background-color 0.2s ease-in-out;
 }
+
+/* ── PREMIUM EKRAN GEÇİŞ ANİMASYONU ── */
+@keyframes slideInUp {
+    0% { 
+        transform: translateY(40px); 
+        opacity: 0; 
+    }
+    100% { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+/* Oyun ekranı ve diğer paneller açıldığında animasyonu tetikle */
+.panel.active, 
+#gameScreen.active,
+#duelGameScreen.active {
+    animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 </style>
 </head>
 <body>
@@ -757,14 +777,28 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
       <!-- Logo satırı -->
       <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:14px;">
-        <div style="font-size:12px;color:var(--text-muted);" id="dailyDate"></div>
-        <div class="home-logo" style="font-size:28px;letter-spacing:-0.5px;">Su<span>doku</span></div>
-        <div style="display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;box-shadow:var(--shadow);">
-          <span style="font-size:15px;">🔥</span>
-          <span style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--accent);" id="homeStreak">0</span>
-          <span style="font-size:11px;color:var(--text-muted);">seri</span>
-        </div>
-      </div>
+  
+  <div onclick="showScreen('statsScreen')" style="display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; padding:4px 12px 4px 4px; cursor:pointer; box-shadow:var(--shadow); transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+    <div id="homeMiniAvatar" style="width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold;">
+      👤
+    </div>
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+      <span style="font-size:10px; font-weight:700; color:var(--text); line-height:1; letter-spacing: 0.5px; text-transform: uppercase;">Profil</span>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div class="home-logo" style="font-size:28px; letter-spacing:-0.5px; line-height:1;">Su<span>doku</span></div>
+    <div style="font-size:10px; color:var(--text-muted); margin-top:4px; font-weight:500; letter-spacing:0.3px;" id="dailyDate"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 12px;box-shadow:var(--shadow);">
+    <span style="font-size:15px;">🔥</span>
+    <span style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--accent);" id="homeStreak">0</span>
+    <span style="font-size:11px;color:var(--text-muted);">seri</span>
+  </div>
+
+</div>
 
       <!-- Günün Bulmacası -->
       <div class="daily-card" onclick="startGame('daily')">
@@ -996,7 +1030,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-tab active" id="navHome"     onclick="switchTab('homePanel',this)"    ><span class="nav-tab-icon">🏠</span><span class="nav-tab-label">Ana</span></button>
     <button class="nav-tab"        id="navLb"       onclick="switchTab('lbPanel',this)"      ><span class="nav-tab-icon">🏆</span><span class="nav-tab-label">Sıralama</span></button>
-    <button class="nav-tab"        id="navProfile"  onclick="switchTab('profilePanel',this)" ><span class="nav-tab-icon">👤</span><span class="nav-tab-label">Profil</span></button>
     <button class="nav-tab"        id="navSettings" onclick="switchTab('settingsPanel',this)"><span class="nav-tab-icon">⚙️</span><span class="nav-tab-label">Ayarlar</span></button>
   </nav>
 
