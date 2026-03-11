@@ -81,7 +81,7 @@ body {
 @keyframes slideOutRight { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(100%)} }
 
 /* Oyun ekranı ayrı, nav'ı gizler */
-#gameScreen { display:none; position:absolute; inset:0; flex-direction:column; background:var(--bg); z-index:50; }
+#gameScreen { display:none; position:absolute; inset:0; flex-direction:column; background:var(--bg); z-index:50; justify-content: space-evenly; }
 #gameScreen.active { display:flex; }
 
 /* ── BOTTOM NAV ── */
@@ -188,7 +188,7 @@ body {
 /* ── GAME SCREEN ── */
 #gameScreen { flex-direction:column; }
 
-.game-header { display:grid; grid-template-columns:40px 1fr auto; align-items:center; padding:8px 14px 7px; background:var(--surface); border-bottom:1px solid var(--border); gap:8px; }
+.game-header { display:grid; grid-template-columns:40px 1fr auto; align-items:center; padding:4px 14px 4px; background:var(--surface); border-bottom:1px solid var(--border); gap:8px; }
 .back-btn { background:none; border:none; font-size:20px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:var(--text); transition:background 0.15s; touch-action:manipulation; }
 .back-btn:hover { background:var(--surface2); }
 .game-title-area { text-align:center; }
@@ -207,18 +207,18 @@ body {
 .diff-badge.legend       { background:linear-gradient(135deg,#1a1035,#2d1b69); color:#c4aaff; }
 .diff-badge.tanri        { background:linear-gradient(135deg,#0a0a0a,#1a0a2e); color:#00eaff; }
 
-.stats-bar { display:flex; justify-content:space-around; padding:8px 18px; background:var(--surface); border-bottom:1px solid var(--border); }
+.stats-bar { display:flex; justify-content:center; gap:24px; padding:4px 18px; background:transparent; border-bottom:none; }
 .stat-item { text-align:center; }
-.stat-value { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); line-height:1; }
-.stat-label { font-size:9px; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:1px; }
+.stat-value { font-family:'DM Serif Display',serif; font-size:14px; color:var(--text); line-height:1; }
+.stat-label { font-size:8px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; margin-top:1px; }
 .stat-item.errors .stat-value { color:var(--danger); }
 .stat-item.hints .stat-value { color:var(--accent); }
 .timer-hidden #timerDisplay { color:transparent; letter-spacing:-2px; user-select:none; }
 .timer-hidden #timerDisplay::after { content:'••:••'; color:var(--text-muted); position:absolute; left:50%; transform:translateX(-50%); letter-spacing:normal; }
 
-.grid-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:4px 12px; background:var(--bg); overflow:hidden; }
+.grid-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:4px 12px; background:var(--bg); overflow:hidden; max-height:fit-content; }
 
-.sudoku-grid { display:grid; grid-template-columns:repeat(9,1fr); border:2.5px solid var(--text); border-radius:4px; overflow:hidden; width:min(calc(100vw - 24px), calc(100vh - 280px), 340px); height:auto; aspect-ratio:1; box-shadow:var(--shadow-lg); }
+.sudoku-grid { display:grid; grid-template-columns:repeat(9,1fr); border:2.5px solid var(--text); border-radius:4px; overflow:hidden; width:min(calc(100vw - 24px), calc(100vh - 260px), 260px); height:auto; aspect-ratio:1; box-shadow:var(--shadow-lg); }
 
 .cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; background:var(--surface); border-right:1px solid var(--border); border-bottom:1px solid var(--border); cursor:pointer; position:relative; transition:background 0.1s; user-select:none; touch-action:manipulation; -webkit-tap-highlight-color:rgba(0,0,0,0.1); }
 .cell:nth-child(3n) { border-right:2px solid var(--border-strong); }
@@ -261,8 +261,8 @@ body {
 /* ── KÜÇÜK EKRAN (iPhone SE vb.) ── */
 @media (max-height: 700px) {
   .game-header { padding:5px 14px 4px; }
-  .stats-bar { padding:5px 18px; }
-  .stat-value { font-size:16px; }
+  .stats-bar { padding:3px 18px; }
+  .stat-value { font-size:13px; }
   .grid-wrap { padding:2px 12px; }
   .sudoku-grid { max-height:min(calc(100vw - 24px), calc(100vh - 290px)) !important; }
   .controls { padding:2px 14px calc(6px + env(safe-area-inset-bottom)); }
@@ -902,17 +902,8 @@ body.dark .cell.same-num { background:#3a2e1a; }
       <div class="stat-item" style="position:relative;"><div class="stat-value" id="timerDisplay">00:00</div><div class="stat-label">Süre</div></div>
       <div class="stat-item errors"><div class="stat-value" id="errorsDisplay">0</div><div class="stat-label">Hata</div></div>
       <div class="stat-item hints"><div class="stat-value" id="hintsDisplay">3</div><div class="stat-label">İpucu</div></div>
-      <div class="stat-item"><div class="stat-value" id="streakDisplay">0🔥</div><div class="stat-label">Seri</div></div>
-    </div>
-    <div class="controls">
-      <div class="control-row">
-        <button class="ctrl-btn" onclick="undoMove()"><span class="ctrl-icon">↩️</span><span class="ctrl-label">Geri Al</span></button>
-        <button class="ctrl-btn" onclick="eraseCell()"><span class="ctrl-icon">🗑️</span><span class="ctrl-label">Sil</span></button>
-        <button class="ctrl-btn" id="pencilBtn" onclick="togglePencil()"><span class="ctrl-icon">✏️</span><span class="ctrl-label">Kalem</span></button>
-        <button class="ctrl-btn" onclick="useHint()"><span class="ctrl-icon">💡</span><span class="ctrl-label">İpucu</span></button>
-      </div>
-      <div class="numpad" id="numpad"></div>
-      <div class="numpad-row2" id="numpad2"></div>
+      <div class="stat-item" style="display:none;"><div class="stat-value" id="streakDisplay">0🔥</div><div class="stat-label">Seri</div></div>
+      <div class="stat-item" style="display:none;"></div>
     </div>
     <div class="grid-wrap" style="position:relative;">
       <div class="sudoku-grid" id="sudokuGrid"></div>
@@ -936,7 +927,17 @@ body.dark .cell.same-num { background:#3a2e1a; }
         <div style="font-size:13px;color:#b0a89e;letter-spacing:1px;">Devam etmek için dokun</div>
       </div>
     </div>
-    
+    <div class="controls">
+      <div class="control-row">
+        <button class="ctrl-btn" onclick="undoMove()"><span class="ctrl-icon">↩️</span><span class="ctrl-label">Geri Al</span></button>
+        <button class="ctrl-btn" onclick="eraseCell()"><span class="ctrl-icon">🗑️</span><span class="ctrl-label">Sil</span></button>
+        <button class="ctrl-btn" id="pencilBtn" onclick="togglePencil()"><span class="ctrl-icon">✏️</span><span class="ctrl-label">Kalem</span></button>
+        <button class="ctrl-btn" onclick="useHint()"><span class="ctrl-icon">💡</span><span class="ctrl-label">İpucu</span></button>
+      </div>
+      <div class="numpad" id="numpad"></div>
+      <div class="numpad-row2" id="numpad2"></div>
+      <div class="controls" style="padding-top:0; margin-bottom:36px;"></div>
+    </div>
   </div>
 
   <!-- ══════════════════ BOTTOM NAV ══════════════════ -->
