@@ -207,9 +207,9 @@ body {
 .diff-badge.legend       { background:linear-gradient(135deg,#1a1035,#2d1b69); color:#c4aaff; }
 .diff-badge.tanri        { background:linear-gradient(135deg,#0a0a0a,#1a0a2e); color:#00eaff; }
 
-.stats-bar { display:flex; justify-content:center; gap:24px; padding:4px 18px; background:transparent; border-bottom:none; }
+.stats-bar { display:grid; grid-template-columns:1fr 1fr 1fr; padding:4px 12px; background:transparent; border-bottom:none; }
 .stat-item { text-align:center; }
-.stat-value { font-family:'DM Serif Display',serif; font-size:14px; color:var(--text); line-height:1; }
+.stat-value { font-family:'DM Serif Display',serif; font-size:17px; color:var(--text); line-height:1; }
 .stat-label { font-size:8px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; margin-top:1px; }
 .stat-item.errors .stat-value { color:var(--danger); }
 .stat-item.hints .stat-value { color:var(--accent); }
@@ -218,7 +218,7 @@ body {
 
 .grid-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:4px 12px; background:var(--bg); overflow:hidden; max-height:fit-content; }
 
-.sudoku-grid { display:grid; grid-template-columns:repeat(9,1fr); border:2.5px solid var(--text); border-radius:4px; overflow:hidden; width:min(calc(100vw - 24px), calc(100vh - 260px), 260px); height:auto; aspect-ratio:1; box-shadow:var(--shadow-lg); }
+.sudoku-grid { display:grid; grid-template-columns:repeat(9,1fr); border:2.5px solid var(--text); border-radius:4px; overflow:hidden; width:min(calc(100vw - 24px), calc(100vh - 280px), 260px); height:auto; aspect-ratio:1; box-shadow:var(--shadow-lg); }
 
 .cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; background:var(--surface); border-right:1px solid var(--border); border-bottom:1px solid var(--border); cursor:pointer; position:relative; transition:background 0.1s; user-select:none; touch-action:manipulation; -webkit-tap-highlight-color:rgba(0,0,0,0.1); }
 .cell:nth-child(3n) { border-right:2px solid var(--border-strong); }
@@ -241,14 +241,14 @@ body {
 .pencil-grid { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); width:100%; height:100%; position:absolute; inset:0; padding:1px; pointer-events:none; }
 .pencil-num { font-size:clamp(5px,1.7vw,8px); color:#9b8ea0; display:flex; align-items:center; justify-content:center; line-height:1; font-weight:500; }
 
-.controls { padding:4px 14px calc(10px + env(safe-area-inset-bottom)); background:var(--surface); border-top:1px solid var(--border); flex-shrink:0; }
+.controls { padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:var(--surface); border-top:none; border-radius:20px 20px 0 0; flex-shrink:0; box-shadow:0 -4px 20px rgba(0,0,0,0.08); }
 .control-row { display:flex; justify-content:space-around; margin-bottom:4px; }
-.ctrl-btn { display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; cursor:pointer; padding:5px 12px; border-radius:10px; transition:background 0.15s; color:var(--text); touch-action:manipulation; min-height:40px; justify-content:center; }
+.ctrl-btn { display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; cursor:pointer; padding:3px 10px; border-radius:10px; transition:background 0.15s; color:var(--text); touch-action:manipulation; min-height:32px; justify-content:center; }
 .ctrl-btn:hover { background:var(--surface2); }
 .ctrl-btn:active { transform:scale(0.93); background:var(--surface2); }
 .ctrl-btn.active { background:var(--accent-light); color:var(--accent); }
-.ctrl-icon { font-size:20px; line-height:1; }
-.ctrl-label { font-size:9px; font-weight:600; color:var(--text-muted); letter-spacing:0.5px; }
+.ctrl-icon { font-size:11px; line-height:1; }
+.ctrl-label { font-size:11px; font-weight:600; color:var(--text-muted); letter-spacing:0.5px; }
 .ctrl-btn.active .ctrl-label { color:var(--accent); }
 
 .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:2px 0; }
@@ -264,7 +264,7 @@ body {
   .stats-bar { padding:3px 18px; }
   .stat-value { font-size:13px; }
   .grid-wrap { padding:2px 12px; }
-  .sudoku-grid { max-height:min(calc(100vw - 24px), calc(100vh - 290px)) !important; }
+  .sudoku-grid { max-height:min(calc(100vw - 48px), calc(100vh - 20px)) !important; }
   .controls { padding:2px 14px calc(6px + env(safe-area-inset-bottom)); }
   .control-row { margin-bottom:2px; }
   .ctrl-btn { padding:3px 12px; min-height:34px; }
@@ -575,7 +575,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
 /* 2. Sudoku tahtasını her telefona sığacak şekilde ortalar */
 #board, .board, #sudoku-board, .sudoku-grid {
     width: 100% !important;
-    max-width: 360px !important; /* Çok büyümesini ve taşmasını engeller */
+    max-width: 300px !important; /* Çok büyümesini ve taşmasını engeller */
     margin: 10px auto 30px auto !important; /* Tam ortaya hizalar, alttan boşluk bırakır */
     aspect-ratio: 1 / 1 !important; /* Kusursuz kare kalmasını sağlar */
 }
