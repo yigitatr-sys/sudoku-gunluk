@@ -874,6 +874,16 @@ body.dark .cell.same-num { background:#3a2e1a; }
       <div class="stat-item hints"><div class="stat-value" id="hintsDisplay">3</div><div class="stat-label">İpucu</div></div>
       <div class="stat-item"><div class="stat-value" id="streakDisplay">0🔥</div><div class="stat-label">Seri</div></div>
     </div>
+    <div class="controls">
+      <div class="control-row">
+        <button class="ctrl-btn" onclick="undoMove()"><span class="ctrl-icon">↩️</span><span class="ctrl-label">Geri Al</span></button>
+        <button class="ctrl-btn" onclick="eraseCell()"><span class="ctrl-icon">🗑️</span><span class="ctrl-label">Sil</span></button>
+        <button class="ctrl-btn" id="pencilBtn" onclick="togglePencil()"><span class="ctrl-icon">✏️</span><span class="ctrl-label">Kalem</span></button>
+        <button class="ctrl-btn" onclick="useHint()"><span class="ctrl-icon">💡</span><span class="ctrl-label">İpucu</span></button>
+      </div>
+      <div class="numpad" id="numpad"></div>
+      <div class="numpad-row2" id="numpad2"></div>
+    </div>
     <div class="grid-wrap" style="position:relative;">
       <div class="sudoku-grid" id="sudokuGrid"></div>
       <div id="floatingNumpad" style="display:none;position:absolute;inset:0;background:rgba(245,242,238,0.97);backdrop-filter:blur(4px);border-radius:4px;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px;z-index:10;">
@@ -896,16 +906,7 @@ body.dark .cell.same-num { background:#3a2e1a; }
         <div style="font-size:13px;color:#b0a89e;letter-spacing:1px;">Devam etmek için dokun</div>
       </div>
     </div>
-    <div class="controls">
-      <div class="control-row">
-        <button class="ctrl-btn" onclick="undoMove()"><span class="ctrl-icon">↩️</span><span class="ctrl-label">Geri Al</span></button>
-        <button class="ctrl-btn" onclick="eraseCell()"><span class="ctrl-icon">🗑️</span><span class="ctrl-label">Sil</span></button>
-        <button class="ctrl-btn" id="pencilBtn" onclick="togglePencil()"><span class="ctrl-icon">✏️</span><span class="ctrl-label">Kalem</span></button>
-        <button class="ctrl-btn" onclick="useHint()"><span class="ctrl-icon">💡</span><span class="ctrl-label">İpucu</span></button>
-      </div>
-      <div class="numpad" id="numpad"></div>
-      <div class="numpad-row2" id="numpad2"></div>
-    </div>
+    
   </div>
 
   <!-- ══════════════════ BOTTOM NAV ══════════════════ -->
@@ -3112,7 +3113,7 @@ function selectCell(idx) {
   G.selectedCell = idx;
   applyHighlights();
   // Verilen hücre değilse floating numpad aç
-  if (!G.given[idx]) openNumpad();
+  // floating numpad kaldırıldı
 }
 
 function openNumpad() {
