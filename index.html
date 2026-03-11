@@ -640,23 +640,35 @@ body.dark .cell.same-num { background:#3a2e1a; }
     transition: background-color 0.2s ease-in-out;
 }
 
-/* ── PREMIUM EKRAN GEÇİŞ ANİMASYONU ── */
+/* --- PREMIUM YATAY VE DİKEY GEÇİŞ SİSTEMİ --- */
+
+/* 1. Oyun Ekranları (Hala aşağıdan gelmeli) */
 @keyframes slideInUp {
-    0% { 
-        transform: translateY(40px); 
-        opacity: 0; 
-    }
-    100% { 
-        transform: translateY(0); 
-        opacity: 1; 
-    }
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+#gameScreen.active, #duelGameScreen.active {
+    animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Oyun ekranı ve diğer paneller açıldığında animasyonu tetikle */
-.panel.active, 
-#gameScreen.active,
-#duelGameScreen.active {
-    animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* 2. Menüler Arası Yatay Kayma (Sayfa çevirme hissi) */
+@keyframes slideInRight {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInLeft {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Sıralama Ekranı sağdan kayarak gelsin */
+#lbPanel.active {
+    animation: slideInRight 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Ana Ekran soldan kayarak gelsin */
+#homePanel.active {
+    animation: slideInLeft 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 </style>
@@ -1025,13 +1037,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
       <div class="controls" style="padding-top:0; margin-bottom:36px;"></div>
     </div>
   </div>
-
-  <!-- ══════════════════ BOTTOM NAV ══════════════════ -->
-  <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-tab active" id="navHome"     onclick="switchTab('homePanel',this)"    ><span class="nav-tab-icon">🏠</span><span class="nav-tab-label">Ana</span></button>
-    <button class="nav-tab"        id="navLb"       onclick="switchTab('lbPanel',this)"      ><span class="nav-tab-icon">🏆</span><span class="nav-tab-label">Sıralama</span></button>
-    <button class="nav-tab"        id="navSettings" onclick="switchTab('settingsPanel',this)"><span class="nav-tab-icon">⚙️</span><span class="nav-tab-label">Ayarlar</span></button>
-  </nav>
 
   <!-- ══════════════════ AYARLAR TAB ══════════════════ -->
   <div class="tab-panel" id="settingsPanel" style="overflow-y:auto;">
@@ -2765,19 +2770,34 @@ function switchTab(panelId, btn) {
 }
 
 function showScreen(id) {
+  // 1. ADIM: Ekranda ne var ne yoksa hepsini kesin olarak gizle (active sınıfını sil)
+  const allPanels = ['homePanel', 'lbPanel', 'profilePanel', 'settingsPanel', 'gameScreen'];
+  
+  allPanels.forEach(panelId => {
+    const el = document.getElementById(panelId);
+    if (el) {
+      el.classList.remove('active');
+    }
+  });
+
+  // 2. ADIM: Sadece parmağımızla kaydırdığımız (veya tıkladığımız) ekranı aç
   const map = {
-    'homeScreen':   ['homePanel',    'navHome'],
-    'lbScreen':     ['lbPanel',      'navLb'],
-    'statsScreen':  ['profilePanel', 'navProfile'],
+    'homeScreen': 'homePanel',
+    'lbScreen': 'lbPanel',
+    'statsScreen': 'profilePanel',
+    'settingsScreen': 'settingsPanel',
+    'gameScreen': 'gameScreen'
   };
+
   if (map[id]) {
-    const [panel, nav] = map[id];
-    switchTab(panel, document.getElementById(nav));
-  } else if (id === 'gameScreen') {
-    document.getElementById('gameScreen').classList.add('active');
-    // Oyun ekranında menüyü gizleyen senin orijinal kodun:
-    document.getElementById('bottomNav').style.display = 'none'; 
+    document.getElementById(map[id]).classList.add('active');
   }
+}
+
+// Switch Tab fonksiyonunu da güncelle (buton aramasın)
+function switchTab(panelId, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
 }
 
 function exitGame() {
@@ -5330,6 +5350,46 @@ function highlightSameNumbers() {
         }
     });
 }
+
+// ── EKRAN KAYDIRMA (SWIPE) İLE GEÇİŞ SİSTEMİ ──
+let touchstartX = 0;
+let touchendX = 0;
+
+// Ekrana dokunulan ilk noktayı al
+document.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+});
+
+// Parmak ekrandan kalktığında son noktayı al ve hesapla
+document.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    // Parmağın en az 60 piksel kaymış olması lazım (yanlışlıkla dokunmaları önlemek için)
+    const threshold = 60; 
+    const isSwipeLeft = (touchstartX - touchendX) > threshold;
+    const isSwipeRight = (touchendX - touchstartX) > threshold;
+
+    // Hangi ekranda olduğumuzu bulalım
+    const isHomeActive = document.getElementById('homePanel').classList.contains('active');
+    const isLbActive = document.getElementById('lbPanel').classList.contains('active');
+    const isGameActive = document.getElementById('gameScreen').classList.contains('active');
+
+    // Eğer oyun oynuyorsak kaydırmayı iptal et (Sudoku çözerken ekran değişmesin)
+    if (isGameActive) return;
+
+    if (isSwipeLeft && isHomeActive) {
+        // Ana menüdeyiz, parmak sola kaydı -> Sıralamayı (Liderlik Tablosunu) aç
+        showScreen('lbScreen');
+    } 
+    else if (isSwipeRight && isLbActive) {
+        // Sıralamadayız, parmak sağa kaydı -> Ana menüye dön
+        showScreen('homeScreen');
+    }
+}
+
 </script>
 
 </body>
