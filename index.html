@@ -2939,6 +2939,7 @@ function updateHomeScreen() {
 let generatingGame = false;
 
 function startGame(mode) {
+closeLevelsSheet();
   if (generatingGame) return;
   if (DIFFICULTIES[mode] && !isUnlocked(mode)) {
     const prog = unlockProgress(mode);
