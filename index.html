@@ -557,6 +557,36 @@ body.dark .cell.same-num { background:#3a2e1a; }
 @keyframes spinBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes floatBadge { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+/* --- MOBİL EKRAN İÇİN NUMPAD KÜÇÜLTME VE TAHTA ORTALAMA --- */
+
+/* 1. Üstteki tuş takımını ve butonları yarı yarıya küçültür */
+.game-controls, #numpad, .static-numpad {
+    gap: 5px !important;
+    margin-bottom: 10px !important;
+    padding: 0 5px !important;
+}
+.game-controls button, #numpad button, .static-numpad button, .action-btn {
+    padding: 8px 4px !important;
+    font-size: 15px !important;
+    min-height: 35px !important;
+    border-radius: 8px !important;
+}
+
+/* 2. Sudoku tahtasını her telefona sığacak şekilde ortalar */
+#board, .board, #sudoku-board, .sudoku-grid {
+    width: 100% !important;
+    max-width: 360px !important; /* Çok büyümesini ve taşmasını engeller */
+    margin: 10px auto 30px auto !important; /* Tam ortaya hizalar, alttan boşluk bırakır */
+    aspect-ratio: 1 / 1 !important; /* Kusursuz kare kalmasını sağlar */
+}
+
+/* TIKLANAN RAKAMIN DİĞER EŞLERİNİ PARLATMA EFEKTİ */
+.cell.highlight-same {
+    background-color: rgba(142, 45, 226, 0.25) !important; /* Temana uygun şeffaf tatlı bir mor */
+    font-weight: 900 !important; /* Rakam biraz daha kalınlaşıp belirginleşir */
+    color: var(--text) !important;
+    transition: background-color 0.2s ease-in-out;
+}
 </style>
 </head>
 <body>
@@ -3114,6 +3144,7 @@ function selectCell(idx) {
   applyHighlights();
   // Verilen hücre değilse floating numpad aç
   // floating numpad kaldırıldı
+  highlightSameNumbers();
 }
 
 function openNumpad() {
@@ -3258,6 +3289,7 @@ function eraseCell() {
   G.pencilGrid[idx] = new Array(9).fill(false);
   renderGrid();
   updateStats();
+  highlightSameNumbers();
 }
 
 function undoMove() {
@@ -5190,7 +5222,26 @@ function cancelDuel() {
 function copyDuelCode() {
   navigator.clipboard?.writeText(duelState.code).then(() => showToast('✅ Kod kopyalandı!'));
 }
+// --- AYNI RAKAMLARI PARLATMA SİSTEMİ ---
+function highlightSameNumbers() {
+    // 1. Önce tahtadaki eski parlamaları temizle
+    document.querySelectorAll('.cell.highlight-same').forEach(c => c.classList.remove('highlight-same'));
 
+    // 2. Senin oyununda "seçili" olan hücreyi bul (Oyunun buna 'selected' class'ı verdiğini varsayıyoruz)
+    const selectedCell = document.querySelector('.cell.selected') || document.querySelector('.cell.active');
+    if (!selectedCell) return;
+
+    // 3. İçindeki rakamı al (Kutu boşsa hiçbir şey yapma)
+    const val = selectedCell.innerText.trim();
+    if (val === '' || val === '0') return;
+
+    // 4. Tahtadaki tüm kutuları gez, aynı rakamı taşıyanları parlat!
+    document.querySelectorAll('.cell').forEach(cell => {
+        if (cell.innerText.trim() === val) {
+            cell.classList.add('highlight-same');
+        }
+    });
+}
 </script>
 
 </body>
