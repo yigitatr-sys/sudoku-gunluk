@@ -71,11 +71,11 @@ body {
 [style*="overflow-y:auto"], [style*="overflow-y: auto"] { -webkit-overflow-scrolling:touch; }
 
 /* ── APP SHELL ── */
-#appShell { width:100%; max-width:480px; height:100vh; display:flex; flex-direction:column; position:relative; overflow:hidden; }
+#appShell { width:100%; max-width:480px; height:100vh; position:relative; overflow:hidden; display:flex; flex-direction:column; }
 
 /* Tab panels — hepsi aynı alanda, sadece aktif görünür */
-.tab-panel { display:none; flex:1; flex-direction:column; overflow:hidden; }
-.tab-panel.active { display:flex; animation:fadeIn 0.2s ease; }
+.tab-panel { position:absolute; top:0; left:0; right:0; bottom:0; background:var(--bg); display:none; flex-direction:column; overflow:hidden; }
+.tab-panel.active { display:flex; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
 @keyframes slideInRight  { from{opacity:0;transform:translateX(100%)} to{opacity:1;transform:translateX(0)} }
 @keyframes slideOutRight { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(100%)} }
@@ -659,6 +659,9 @@ body.dark .cell.same-num { background:#3a2e1a; }
     animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.swipe-dot { width:6px; height:6px; border-radius:50%; background:var(--border-strong); transition:all 0.3s ease; }
+.swipe-dot.active { width:20px; border-radius:4px; background:var(--accent); }
+
 </style>
 </head>
 <body>
@@ -771,6 +774,12 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
 <div id="appShell">
 
+<div id="swipeDots" style="position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:69;pointer-events:none;">
+  <div class="swipe-dot" id="dot0"></div>
+  <div class="swipe-dot active" id="dot1"></div>
+  <div class="swipe-dot" id="dot2"></div>
+</div>
+
   <!-- ══════════════════ HOME TAB ══════════════════ -->
   <div class="tab-panel active" id="homePanel">
     <div style="overflow-y:auto;flex:1;padding:16px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:0;">
@@ -854,23 +863,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
         </button>
       </div>
 
-      <!-- Turnuva Butonu -->
-      <div style="width:100%;margin-top:10px;">
-        <button onclick="openTournamentScreen()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1a1035,#2d1b5e);border:1.5px solid #6c3fc5;border-radius:16px;padding:15px 18px;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 20px rgba(108,63,197,0.25);-webkit-tap-highlight-color:transparent;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:22px;filter:drop-shadow(0 0 6px #a78bfa);">👑</span>
-            <div style="text-align:left;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div style="font-size:14px;font-weight:700;color:#e2d9ff;">Turnuvalar</div>
-                <span style="font-size:9px;font-weight:700;background:#6c3fc5;color:#fff;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;">YAKINDA</span>
-              </div>
-              <div style="font-size:11px;color:#a78bfa;margin-top:2px;">Günlük ve haftalık şampiyonalar</div>
-            </div>
-          </div>
-          <span style="font-size:20px;color:#a78bfa;">›</span>
-        </button>
-      </div>
-
     </div><!-- /scroll area -->
   </div><!-- /homePanel -->
 
@@ -905,141 +897,72 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
   <!-- ══════════════════ ROZETLER TAB ══════════════════ -->
   <!-- ══════════════════ PROFİL TAB ══════════════════ -->
-  <style>
-  .swipeable-showcase::-webkit-scrollbar { display: none; }
-  .swipeable-showcase { -ms-overflow-style: none; scrollbar-width: none; }
-
-  #badgeSummaryRecent {
-    display: flex; gap: 10px; flex-wrap: wrap; padding: 12px;
-    background: inset 0 2px 10px rgba(0,0,0,0.02);
-    border-radius: 12px; border: 1px dashed var(--border-strong);
-    min-height: 60px; align-items: center; justify-content: center;
-  }
-  
-  /* Yeni Düello Geçmişi Stilleri */
-  .duel-history-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; background: var(--surface2); border-radius: 12px;
-      margin-bottom: 8px; font-size: 13px; font-weight: 500;
-  }
-</style>
-
-<div class="tab-panel" id="profilePanel">
-    
-    <div class="panel-header" style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:var(--surface); border-bottom:1px solid var(--border); z-index:10;">
-      <div class="panel-header-title" style="font-family:'DM Serif Display', serif; font-size:22px; color:var(--text); margin:0;">Profilim</div>
-      <button onclick="switchTab('settingsPanel',document.getElementById('navSettings'))" style="background:none; border:none; font-size:20px; cursor:pointer; padding:4px; touch-action:manipulation;" title="Ayarlar">⚙️</button>
-    </div>
-
-    <div style="overflow-y:auto; flex:1; padding:16px 20px; display:flex; flex-direction:column; gap:16px; -webkit-overflow-scrolling:touch; background:var(--bg); height:100%;">
-
-      <div class="stats-card" style="background:var(--surface); border-radius:20px; padding:24px 16px 20px; text-align:center; border:1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.03); position:relative;">
-        <div id="profileAvatarDisplay" style="width:68px; height:68px; border-radius:50%; margin:0 auto 12px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:32px; border:2px solid var(--accent);"></div>
-        
-        <div id="statsUsername" style="font-family:'DM Serif Display', serif; font-size:24px; color:var(--text); line-height:1.2; margin-bottom:4px;">Misafir</div>
-        <div id="statsUserSub" style="font-size:12px; color:var(--text-muted); font-weight:500; margin-bottom:12px;">Sıralamaya katıl → kullanıcı adı seç</div>
-        
-        <div id="profileLeagueBadge" style="display:none; margin-bottom:12px;">
-            <span id="profileLeagueBadgeInner" style="font-size:11px; font-weight:700; background:linear-gradient(135deg, #3d1f0a, #6b3a1f); color:#fbbf24; padding:4px 12px; border-radius:30px; border:1px solid rgba(205, 127, 50, 0.5);">🟫 BRONZ 1</span>
-        </div>
-        
-        <div style="display:inline-flex; align-items:center; gap:6px; background:var(--accent-light); border:1px solid rgba(193, 127, 62, 0.2); border-radius:30px; padding:6px 16px; margin-bottom:20px;">
-          <span style="font-size:14px;">🔥</span>
-          <span id="statsStreak" style="font-family:'DM Serif Display', serif; font-size:18px; color:var(--accent-dark); line-height:1;">0</span>
-          <span style="font-size:11px; font-weight:600; color:var(--accent-dark); text-transform:uppercase;">Günlük Seri</span>
-        </div>
-        
-        <div style="display:flex; gap:10px;">
-          <button onclick="showEditProfileModal()" style="flex:1; padding:10px; background:var(--surface2); border:1px solid var(--border-strong); border-radius:12px; font-size:13px; font-weight:600; color:var(--text); cursor:pointer;">Düzenle</button>
-          <button class="primary-btn" id="profileRegisterBtn" onclick="showRegisterModal()" style="flex:1; margin:0; padding:10px; border-radius:12px; font-size:13px; font-weight:600; display:none;">🏆 Katıl</button>
-        </div>
-      </div>
-
-      <div>
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:12px;">
-          <h3 class="stats-section-title" style="margin:0; font-family:'DM Serif Display', serif; font-size:18px; color:var(--text);">Genel Bakış</h3>
-        </div>
-        
-        <div class="swipeable-showcase stats-quad" style="display:flex; gap:12px; overflow-x:auto; scroll-snap-type: x mandatory; padding-bottom:8px; scroll-behavior:smooth;">
-          
-          <div class="stats-quad-item" style="flex: 0 0 60%; scroll-snap-align: start; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 16px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;">
-            <div class="stats-quad-label" style="font-size:11px; font-weight:600; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; position:relative; z-index:2;">Toplam Çözüm</div>
-            <div class="stats-quad-val" id="stTotalSolves" style="font-family:'DM Serif Display', serif; font-size:28px; color:var(--text); line-height:1; position:relative; z-index:2;">0</div>
-          </div>
-          
-          <div class="stats-quad-item" style="flex: 0 0 60%; scroll-snap-align: start; background:var(--accent); border:none; border-radius:16px; padding:20px 16px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;">
-            <div class="stats-quad-label" style="font-size:11px; font-weight:600; color:var(--accent-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; position:relative; z-index:2;">En İyi Süre</div>
-            <div class="stats-quad-val" id="stBestTime" style="font-family:'DM Serif Display', serif; font-size:28px; color:#ffffff; line-height:1; position:relative; z-index:2;">—</div>
-          </div>
-          
-          <div class="stats-quad-item" style="flex: 0 0 60%; scroll-snap-align: start; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 16px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;">
-            <div class="stats-quad-label" style="font-size:11px; font-weight:600; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; position:relative; z-index:2;">Ortalama Süre</div>
-            <div class="stats-quad-val" id="stAvgTime" style="font-family:'DM Serif Display', serif; font-size:28px; color:var(--text); line-height:1; position:relative; z-index:2;">—</div>
-          </div>
-          
-          <div class="stats-quad-item" style="flex: 0 0 60%; scroll-snap-align: start; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px 16px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;">
-            <div class="stats-quad-label" style="font-size:11px; font-weight:600; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; position:relative; z-index:2;">Hatasız</div>
-            <div class="stats-quad-val" id="stPerfect" style="font-family:'DM Serif Display', serif; font-size:28px; color:var(--success); line-height:1; position:relative; z-index:2;">0</div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="stats-card" style="background:var(--surface); border-radius:20px; padding:20px 16px; border:1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <h3 style="margin:0; font-family:'DM Serif Display', serif; font-size:18px; color:var(--text);">Koleksiyon</h3>
-          <button onclick="openBadgesScreen()" style="background:var(--surface2); border:none; border-radius:10px; font-size:11px; padding:6px 12px; color:var(--text); font-weight:600; cursor:pointer;">Tümünü Gör</button>
-        </div>
-        
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border);">
-          <div>
-            <span id="badgeSummaryCount" style="font-family:'DM Serif Display', serif; font-size:28px; color:var(--accent); line-height:1;">0</span>
-            <span id="badgeSummaryTotal" style="font-size:12px; font-weight:500; color:var(--text-muted);">/ 0 kazanıldı</span>
-          </div>
-          <div style="width: 45%; height:6px; background:var(--surface2); border-radius:10px; overflow:hidden;">
-            <div id="badgeSummaryBar" style="height:100%; background:var(--accent); border-radius:10px; transition:width 1s; width:0%;"></div>
-          </div>
-        </div>
-        
-        <div style="font-size:11px; font-weight:600; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">Son Kazanılanlar</div>
-        <div id="badgeSummaryRecent"></div>
-      </div>
-
-      <div class="stats-card" style="background:var(--surface); border-radius:20px; padding:20px 16px; border:1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.02); margin-bottom:12px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-          <h3 style="margin:0; font-family:'DM Serif Display', serif; font-size:18px; color:var(--text);">Son Düellolar</h3>
-          <span style="font-size:16px; opacity:0.8;">⚔️</span>
-        </div>
-        
-        <div id="recentDuelsContainer">
-            <div class="duel-history-item">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="color:var(--success); font-size:16px;">🟢</span>
-                    <span style="color:var(--text);">Ahmet_99</span>
-                </div>
-                <div style="color:var(--success); font-weight:700;">+12 Puan</div>
-            </div>
-            
-            <div class="duel-history-item">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="color:var(--danger); font-size:16px;">🔴</span>
-                    <span style="color:var(--text);">ProSudoku</span>
-                </div>
-                <div style="color:var(--danger); font-weight:700;">-8 Puan</div>
-            </div>
-
-            <div class="duel-history-item">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="color:var(--text-muted); font-size:16px;">⚪</span>
-                    <span style="color:var(--text);">Misafir_41</span>
-                </div>
-                <div style="color:var(--text-soft); font-weight:700;">Berabere</div>
-            </div>
-        </div>
-        </div>
-
-    </div>
+  <div class="tab-panel" id="profilePanel">
+    <div class="panel-header" style="display:flex; align-items:center; gap:12px; padding:12px 20px; background:var(--surface); border-bottom:1px solid var(--border); z-index:10;">
+  <button onclick="switchTab('homePanel',document.getElementById('navHome'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
+  <div class="panel-header-title" style="flex:1; font-family:'DM Serif Display',serif; font-size:22px; color:var(--text); margin:0;">Profilim</div>
+  <button onclick="switchTab('settingsPanel',document.getElementById('navSettings'))" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
 </div>
+    <div style="overflow-y:auto;flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch;">
+
+      <!-- PROFİL KARTI -->
+      <div class="stats-card" style="text-align:center;padding:24px 20px 20px;">
+        <div id="profileAvatarDisplay" style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid var(--accent);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 12px;"></div>
+        <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-bottom:4px;" id="statsUsername">Misafir</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;" id="statsUserSub">Sıralamaya katıl → kullanıcı adı seç</div>
+        <div id="profileLeagueBadge" style="display:none;margin-bottom:12px;"><span id="profileLeagueBadgeInner" style="font-size:11px;font-weight:700;background:linear-gradient(135deg,#3d1f0a,#6b3a1f);color:#fbbf24;padding:4px 12px;border-radius:20px;border:1px solid #cd7f32;">🟫 BRONZ 1</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent-light);border-radius:20px;padding:8px 20px;display:inline-flex;margin-bottom:16px;">
+          <span style="font-size:16px;">🔥</span>
+          <span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);" id="statsStreak">0</span>
+          <span style="font-size:12px;color:var(--text-soft);">günlük seri</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="showEditProfileModal()" style="flex:1;padding:11px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;touch-action:manipulation;">✏️ Düzenle</button>
+          <button class="primary-btn" id="profileRegisterBtn" onclick="showRegisterModal()" style="flex:1;margin:0;display:none;">🏆 Katıl</button>
+        </div>
+      </div>
+
+      <!-- ROZET ÖZET KARTI -->
+      <div class="stats-card" style="padding-bottom:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="stats-section-title" style="margin:0;">🎖️ Rozetler</div>
+          <button onclick="openBadgesScreen()" style="background:none;border:none;font-size:12px;color:var(--accent);font-weight:700;cursor:pointer;touch-action:manipulation;">Tümünü Gör →</button>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px;">
+          <span style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);" id="badgeSummaryCount">0</span>
+          <span style="font-size:12px;color:var(--text-muted);" id="badgeSummaryTotal">/ 0 rozet</span>
+        </div>
+        <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:14px;">
+          <div id="badgeSummaryBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s ease;width:0%;"></div>
+        </div>
+        <div id="badgeSummaryRecent" style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:10px;"></div>
+      </div>
+
+      <!-- GENEL BAKIŞ -->
+      <div class="stats-card">
+        <div class="stats-section-title">Genel Bakış</div>
+        <div class="stats-quad">
+          <div class="stats-quad-item"><div class="stats-quad-val" id="stTotalSolves">0</div><div class="stats-quad-label">Toplam Çözüm</div></div>
+          <div class="stats-quad-item"><div class="stats-quad-val" id="stBestTime">—</div><div class="stats-quad-label">En İyi Süre</div></div>
+          <div class="stats-quad-item"><div class="stats-quad-val" id="stAvgTime">—</div><div class="stats-quad-label">Ortalama Süre</div></div>
+          <div class="stats-quad-item"><div class="stats-quad-val" id="stPerfect">0</div><div class="stats-quad-label">Hatasız</div></div>
+        </div>
+      </div>
+
+      <!-- SEVİYE EN İYİ SÜRE -->
+      <div class="stats-card">
+        <div class="stats-section-title">Seviye Başına En İyi Süre</div>
+        <div id="bestPerDiff"></div>
+      </div>
+
+      <!-- ZORLUK DAĞILIMI -->
+      <div class="stats-card">
+        <div class="stats-section-title">Zorluk Dağılımı</div>
+        <div id="diffChart" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;"></div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ══════════════════ OYUN (fullscreen overlay) ══════════════════ -->
   <div id="gameScreen">
@@ -1096,16 +1019,12 @@ body.dark .cell.same-num { background:#3a2e1a; }
     </div>
   </div>
 
-  <!-- ══════════════════ BOTTOM NAV ══════════════════ -->
-  <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-tab active" id="navHome"     onclick="switchTab('homePanel',this)"    ><span class="nav-tab-icon">🏠</span><span class="nav-tab-label">Ana</span></button>
-    <button class="nav-tab"        id="navLb"       onclick="switchTab('lbPanel',this)"      ><span class="nav-tab-icon">🏆</span><span class="nav-tab-label">Sıralama</span></button>
-    <button class="nav-tab"        id="navSettings" onclick="switchTab('settingsPanel',this)"><span class="nav-tab-icon">⚙️</span><span class="nav-tab-label">Ayarlar</span></button>
-  </nav>
-
   <!-- ══════════════════ AYARLAR TAB ══════════════════ -->
   <div class="tab-panel" id="settingsPanel" style="overflow-y:auto;">
-    <div class="panel-header"><div class="panel-header-title">⚙️ Ayarlar</div></div>
+    <div class="panel-header" style="display:flex;align-items:center;gap:12px;">
+  <button onclick="switchTab('profilePanel',document.getElementById('navProfile'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
+  <div class="panel-header-title" style="flex:1;">⚙️ Ayarlar</div>
+</div>
     <div style="padding:12px 16px 40px;display:flex;flex-direction:column;gap:8px;">
 
       <!-- GÖRÜNÜM -->
@@ -1213,6 +1132,136 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
     </div>
   </div>
+
+<div id="tournamentScreen" class="tab-panel">
+  <div class="panel-header">
+  <div class="panel-header-title">⚔️ Turnuvalar</div>
+</div>
+  <div style="overflow-y:auto;flex:1;padding:16px;">
+
+    <!-- Yakında banner -->
+    <div style="background:linear-gradient(135deg,#1a1035,#2d1b5e);border-radius:20px;padding:24px 20px;margin-bottom:20px;text-align:center;border:1px solid #6c3fc5;box-shadow:0 8px 32px rgba(108,63,197,0.3);">
+      <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 12px #a78bfa);">⚔️</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#e2d9ff;margin-bottom:8px;">Turnuvalar Geliyor!</div>
+      <div style="font-size:13px;color:#a78bfa;line-height:1.6;">Diğer oyuncularla gerçek zamanlı yarış.<br>Kazan, sıralamada yüksel, özel rozetler kazan.</div>
+    </div>
+
+    <!-- Günlük Turnuva kartı -->
+    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);">
+      <div style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);padding:16px 18px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:20px;">🌅</div>
+          <span style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;padding:3px 9px;border-radius:20px;letter-spacing:1px;">YAKINDA</span>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:2px;">Günlük Turnuva</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);">Her gün saat 20:00'de başlar · 1 saat</div>
+      </div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">👥</div>
+            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">⏱️</div>
+            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">60 dk</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">🎯</div>
+            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Orta</div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">🥇</span>
+              <span style="font-size:12px;color:var(--text);">Günün Şampiyonu</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">🔥</span>
+              <span style="font-size:12px;color:var(--text);">Seri Savaşçısı</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">⚡</span>
+              <span style="font-size:12px;color:var(--text);">Hız Ustası</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Haftalık Şampiyona kartı -->
+    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);">
+      <div style="background:linear-gradient(135deg,#1a1612,#3d2b00,#5a3e00);padding:16px 18px 14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:20px;">👑</div>
+          <span style="font-size:10px;font-weight:700;background:rgba(255,215,0,0.2);color:#ffd700;padding:3px 9px;border-radius:20px;letter-spacing:1px;border:1px solid rgba(255,215,0,0.3);">YAKINDA</span>
+        </div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#ffd700;margin-bottom:2px;">Haftalık Şampiyona</div>
+        <div style="font-size:12px;color:rgba(255,215,0,0.6);">Her Cumartesi 18:00 · Hafta boyunca</div>
+      </div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">👥</div>
+            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">📅</div>
+            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">7 gün</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:18px;margin-bottom:3px;">💀</div>
+            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">Zor</div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">👑</span>
+              <span style="font-size:12px;color:var(--text);">Haftalık Efsane</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">💎</span>
+              <span style="font-size:12px;color:var(--text);">İlk 10</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:20px;">🌟</span>
+              <span style="font-size:12px;color:var(--text);">Hafta Savaşçısı</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Haberdar Et butonu -->
+    <button onclick="tournamentNotify()" id="tournamentNotifyBtn" style="width:100%;padding:15px;background:linear-gradient(135deg,#6c3fc5,#4a2880);border:none;border-radius:16px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 16px rgba(108,63,197,0.4);">🔔 Turnuva Başlayınca Bildir</button>
+
+    <!-- Turnuva Şampiyonları -->
+    <div style="margin-top:24px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">⚔️ Turnuva Şampiyonları</div>
+
+      <!-- Sekme -->
+      <div style="display:flex;background:var(--surface);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px;border:1px solid var(--border);">
+        <button onclick="switchTrnTab('daily')" id="trnTabDaily" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#6c3fc5,#4a2880);color:#fff;touch-action:manipulation;">Günlük</button>
+        <button onclick="switchTrnTab('weekly')" id="trnTabWeekly" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Haftalık</button>
+        <button onclick="switchTrnTab('alltime')" id="trnTabAlltime" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Tüm Zamanlar</button>
+      </div>
+
+      <!-- Liste -->
+      <div id="trnLeaderboard" style="background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);"></div>
+    </div>
+
+  </div>
+</div>
 
 </div><!-- /appShell -->
 
@@ -1557,137 +1606,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
       </div>
     </div>
     <button onclick="closeDuelResult()" style="width:100%;background:var(--accent);border:none;border-radius:12px;padding:13px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Tamam</button>
-  </div>
-</div>
-
-<div id="tournamentScreen" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column;max-width:480px;margin:0 auto;">
-  <div class="panel-header" style="display:flex;align-items:center;gap:12px;">
-    <button onclick="closeTournamentScreen()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
-    <div class="panel-header-title">⚔️ Turnuvalar</div>
-  </div>
-  <div style="overflow-y:auto;flex:1;padding:16px;">
-
-    <!-- Yakında banner -->
-    <div style="background:linear-gradient(135deg,#1a1035,#2d1b5e);border-radius:20px;padding:24px 20px;margin-bottom:20px;text-align:center;border:1px solid #6c3fc5;box-shadow:0 8px 32px rgba(108,63,197,0.3);">
-      <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 12px #a78bfa);">⚔️</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#e2d9ff;margin-bottom:8px;">Turnuvalar Geliyor!</div>
-      <div style="font-size:13px;color:#a78bfa;line-height:1.6;">Diğer oyuncularla gerçek zamanlı yarış.<br>Kazan, sıralamada yüksel, özel rozetler kazan.</div>
-    </div>
-
-    <!-- Günlük Turnuva kartı -->
-    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);">
-      <div style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);padding:16px 18px 14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="font-size:20px;">🌅</div>
-          <span style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;padding:3px 9px;border-radius:20px;letter-spacing:1px;">YAKINDA</span>
-        </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:2px;">Günlük Turnuva</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.65);">Her gün saat 20:00'de başlar · 1 saat</div>
-      </div>
-      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;">
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">👥</div>
-            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">⏱️</div>
-            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">60 dk</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">🎯</div>
-            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Orta</div>
-          </div>
-        </div>
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🥇</span>
-              <span style="font-size:12px;color:var(--text);">Günün Şampiyonu</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🔥</span>
-              <span style="font-size:12px;color:var(--text);">Seri Savaşçısı</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">⚡</span>
-              <span style="font-size:12px;color:var(--text);">Hız Ustası</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Haftalık Şampiyona kartı -->
-    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);">
-      <div style="background:linear-gradient(135deg,#1a1612,#3d2b00,#5a3e00);padding:16px 18px 14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="font-size:20px;">👑</div>
-          <span style="font-size:10px;font-weight:700;background:rgba(255,215,0,0.2);color:#ffd700;padding:3px 9px;border-radius:20px;letter-spacing:1px;border:1px solid rgba(255,215,0,0.3);">YAKINDA</span>
-        </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#ffd700;margin-bottom:2px;">Haftalık Şampiyona</div>
-        <div style="font-size:12px;color:rgba(255,215,0,0.6);">Her Cumartesi 18:00 · Hafta boyunca</div>
-      </div>
-      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;">
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">👥</div>
-            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">📅</div>
-            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">7 gün</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">💀</div>
-            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Zor</div>
-          </div>
-        </div>
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">👑</span>
-              <span style="font-size:12px;color:var(--text);">Haftalık Efsane</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">💎</span>
-              <span style="font-size:12px;color:var(--text);">İlk 10</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🌟</span>
-              <span style="font-size:12px;color:var(--text);">Hafta Savaşçısı</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Haberdar Et butonu -->
-    <button onclick="tournamentNotify()" id="tournamentNotifyBtn" style="width:100%;padding:15px;background:linear-gradient(135deg,#6c3fc5,#4a2880);border:none;border-radius:16px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 16px rgba(108,63,197,0.4);">🔔 Turnuva Başlayınca Bildir</button>
-
-    <!-- Turnuva Şampiyonları -->
-    <div style="margin-top:24px;">
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">⚔️ Turnuva Şampiyonları</div>
-
-      <!-- Sekme -->
-      <div style="display:flex;background:var(--surface);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px;border:1px solid var(--border);">
-        <button onclick="switchTrnTab('daily')" id="trnTabDaily" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#6c3fc5,#4a2880);color:#fff;touch-action:manipulation;">Günlük</button>
-        <button onclick="switchTrnTab('weekly')" id="trnTabWeekly" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Haftalık</button>
-        <button onclick="switchTrnTab('alltime')" id="trnTabAlltime" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Tüm Zamanlar</button>
-      </div>
-
-      <!-- Liste -->
-      <div id="trnLeaderboard" style="background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);"></div>
-    </div>
-
   </div>
 </div>
 
@@ -2107,6 +2025,11 @@ async function fetchDailyLeaderboard(date) {
   if (error) { console.error(error); return []; }
   return data;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderLeaderboard();
+});
+
 </script>
 
 <script>
@@ -2824,15 +2747,132 @@ function loadState() {
 //  NAVİGASYON
 // ═══════════════════════════════════════════════
 
+const TAB_ORDER = ['lbPanel', 'homePanel', 'tournamentScreen'];
+let currentTabIndex = 1;
+
+// EKRAN KAYDIRMA SİSTEMİ //
+
 function switchTab(panelId, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(panelId).classList.add('active');
+  const newIndex = TAB_ORDER.indexOf(panelId);
+  const dir = newIndex >= currentTabIndex ? 1 : -1;
+  const current = document.querySelector('.tab-panel.active');
+  const next = document.getElementById(panelId);
+  if (!next || current === next) return;
+
+  // Önce active ekle (display:flex olsun), sonra transform uygula
+  next.classList.add('active');
+  next.style.transition = 'none';
+  next.style.transform = `translateX(${dir * 100}%)`;
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      next.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
+      current.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
+      next.style.transform = 'translateX(0)';
+      current.style.transform = `translateX(${-dir * 100}%)`;
+      setTimeout(() => {
+        current.classList.remove('active');
+        current.style.transform = '';
+        current.style.transition = '';
+        next.style.transition = '';
+      }, 320);
+    });
+  });
+
+  currentTabIndex = newIndex >= 0 ? newIndex : currentTabIndex;
+  [0,1,2].forEach(i => { const d = document.getElementById('dot'+i); if(d) d.classList.toggle('active', i === currentTabIndex); });
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  if (panelId === 'homePanel')    { stopTimer(); updateHomeScreen(); }
-  if (panelId === 'lbPanel')      renderLeaderboard();
-  if (panelId === 'profilePanel') { renderStats(); updateBadgeSummary(); }
+  if (panelId === 'homePanel')       { updateHomeScreen(); }
+  if (panelId === 'lbPanel')         renderLeaderboard();
+  if (panelId === 'profilePanel')    { renderStats(); updateBadgeSummary(); }
 }
+
+// Swipe
+(function() {
+  let sx = 0, sy = 0;
+  let dragging = false, lockedDir = 0;
+  let nextPanel = null, curPanel = null, w = 0, nextIndex = -1;
+
+  function isGameActive() {
+    return document.getElementById('gameScreen').classList.contains('active') ||
+           document.getElementById('duelGameScreen').style.display === 'flex';
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (isGameActive()) return;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    dragging = false; lockedDir = 0;
+    nextPanel = null; curPanel = null; nextIndex = -1;
+  }, {passive:true});
+
+  document.addEventListener('touchmove', e => {
+    if (isGameActive()) return;
+    const dx = e.touches[0].clientX - sx;
+    const dy = e.touches[0].clientY - sy;
+
+    if (!dragging) {
+      if (Math.abs(dx) < 10) return;
+      if (Math.abs(dy) > Math.abs(dx)) return;
+      lockedDir = dx < 0 ? 1 : -1;
+      nextIndex = currentTabIndex + lockedDir;
+      if (nextIndex < 0 || nextIndex >= TAB_ORDER.length) return;
+      dragging = true;
+      w = window.innerWidth;
+      curPanel = document.querySelector('.tab-panel.active');
+      nextPanel = document.getElementById(TAB_ORDER[nextIndex]);
+      nextPanel.classList.add('active');
+      nextPanel.style.transition = 'none';
+      curPanel.style.transition = 'none';
+      nextPanel.style.transform = `translateX(${lockedDir * w}px)`;
+    }
+
+    if (!dragging || !nextPanel || !curPanel) return;
+    const dx2 = e.touches[0].clientX - sx;
+    curPanel.style.transform = `translateX(${dx2}px)`;
+    nextPanel.style.transform = `translateX(${lockedDir * w + dx2}px)`;
+  }, {passive:true});
+
+  document.addEventListener('touchend', e => {
+    if (!dragging || !nextPanel || !curPanel) return;
+    dragging = false;
+    const dx = e.changedTouches[0].clientX - sx;
+    const commit = Math.abs(dx) > w * 0.3;
+
+    if (commit && nextIndex >= 0 && nextIndex < TAB_ORDER.length) {
+      const easing = 'transform 0.26s cubic-bezier(0.4,0,0.2,1)';
+      curPanel.style.transition = easing;
+      nextPanel.style.transition = easing;
+      curPanel.style.transform = `translateX(${-lockedDir * w}px)`;
+      nextPanel.style.transform = 'translateX(0)';
+      setTimeout(() => {
+        curPanel.classList.remove('active');
+        curPanel.style.transform = ''; curPanel.style.transition = '';
+        nextPanel.style.transition = '';
+        currentTabIndex = nextIndex;
+        [0,1,2].forEach(i => { const d = document.getElementById('dot'+i); if(d) d.classList.toggle('active', i === currentTabIndex); });
+        const pid = TAB_ORDER[currentTabIndex];
+        if (pid === 'homePanel') updateHomeScreen();
+        if (pid === 'lbPanel') renderLeaderboard();
+        if (pid === 'profilePanel') { renderStats(); updateBadgeSummary(); }
+        nextPanel = null; curPanel = null;
+      }, 260);
+    } else {
+      const easing = 'transform 0.2s cubic-bezier(0.4,0,0.2,1)';
+      curPanel.style.transition = easing;
+      nextPanel.style.transition = easing;
+      curPanel.style.transform = 'translateX(0)';
+      nextPanel.style.transform = `translateX(${lockedDir * w}px)`;
+      setTimeout(() => {
+        nextPanel.classList.remove('active');
+        nextPanel.style.transform = ''; nextPanel.style.transition = '';
+        curPanel.style.transition = '';
+        nextPanel = null; curPanel = null;
+      }, 200);
+    }
+  }, {passive:true});
+})();
 
 function showScreen(id) {
   const map = {
@@ -2846,7 +2886,6 @@ function showScreen(id) {
   } else if (id === 'gameScreen') {
     document.getElementById('gameScreen').classList.add('active');
     // Oyun ekranında menüyü gizleyen senin orijinal kodun:
-    document.getElementById('bottomNav').style.display = 'none'; 
   }
 }
 
@@ -2871,7 +2910,6 @@ function exitGame() {
     saveState();
   }
   document.getElementById('gameScreen').classList.remove('active');
-  document.getElementById('bottomNav').style.display = '';
   stopTimer();
   updateHomeScreen();
 }
@@ -2911,16 +2949,12 @@ function showUnlockCelebration(diff) {
 // ═══════════════════════════════════════════════
 
 function openTournamentScreen() {
-  const screen = document.getElementById('tournamentScreen');
-  screen.style.display = 'flex';
-  screen.style.animation = 'slideInRight 0.28s cubic-bezier(0.4,0,0.2,1)';
+  switchTab('tournamentScreen', null);
   renderTrnLeaderboard('daily');
 }
 
 function closeTournamentScreen() {
-  const screen = document.getElementById('tournamentScreen');
-  screen.style.animation = 'slideOutRight 0.24s cubic-bezier(0.4,0,0.2,1)';
-  setTimeout(() => { screen.style.display = 'none'; }, 220);
+  switchTab('homePanel', null);
 }
 
 function showLbInfo() {
@@ -3205,7 +3239,6 @@ async function _doStartGame(mode) {
   updateStats();
   // Oyun ekranını overlay olarak aç, nav gizle
   document.getElementById('gameScreen').classList.add('active');
-  document.getElementById('bottomNav').style.display = 'none';
   startTimer();
 }
 
@@ -3554,7 +3587,6 @@ function _resumeGame(saved) {
   renderGrid();
   updateStats();
   document.getElementById('gameScreen').classList.add('active');
-  document.getElementById('bottomNav').style.display = 'none';
   startTimer();
   showToast('▶️ Kaldığın yerden devam ediyorsun!');
 }
@@ -3596,7 +3628,6 @@ function resumeGame() {
   renderGrid();
   updateStats();
   document.getElementById('gameScreen').classList.add('active');
-  document.getElementById('bottomNav').style.display = 'none';
   startTimer();
   showToast('▶️ Kaldığın yerden devam ediyorsun!');
 }
