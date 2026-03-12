@@ -446,15 +446,6 @@ body.dark .cell.same-num { background:#3a2e1a; }
 /* ── STATS SCREEN ── */
 .stats-card { background:var(--surface); border-radius:18px; padding:18px; border:1px solid var(--border); box-shadow:var(--shadow); }
 .stats-section-title { font-size:11px; font-weight:700; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; }
-.stats-profile-row { display:flex; align-items:center; gap:14px; }
-.stats-avatar { width:52px; height:52px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; flex-shrink:0; }
-.stats-username { font-family:'DM Serif Display',serif; font-size:20px; color:var(--text); }
-.stats-usersub { font-size:11px; color:var(--text-muted); margin-top:2px; }
-
-.stats-quad { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.stats-quad-item { background:var(--surface2); border-radius:12px; padding:14px 12px; text-align:center; }
-.stats-quad-val { font-family:'DM Serif Display',serif; font-size:26px; color:var(--text); line-height:1; }
-.stats-quad-label { font-size:10px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
 
 /* Activity grid */
 .activity-grid { display:grid; grid-template-rows:repeat(7,1fr); grid-auto-flow:column; gap:3px; overflow-x:auto; padding-bottom:6px; }
@@ -661,6 +652,52 @@ body.dark .cell.same-num { background:#3a2e1a; }
 
 .swipe-dot { width:6px; height:6px; border-radius:50%; background:var(--border-strong); transition:all 0.3s ease; }
 .swipe-dot.active { width:20px; border-radius:4px; background:var(--accent); }
+
+/* Profil Tasarımı */
+
+.profile-hero{position:relative;background:linear-gradient(145deg,#5c2d0a 0%,#8a5520 45%,#c17f3e 100%);padding:32px 20px 24px;text-align:center;overflow:visible;}
+body.dark .profile-hero{background:linear-gradient(145deg,#2a1206 0%,#4a2810 45%,#8a5520 100%);}
+.profile-hero-deco{position:absolute;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;}
+.profile-avatar-ring{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b,#d97706);padding:3px;margin:0 auto 14px;position:relative;z-index:1;}
+.profile-avatar-ring-inner{width:100%;height:100%;border-radius:50%;background:#3d1f0a;border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:50px;overflow:hidden;}
+body.dark .profile-avatar-ring-inner{background:#1a0d03;}
+.profile-hero-name{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:3px;position:relative;z-index:1;}
+.profile-hero-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:14px;letter-spacing:0.4px;position:relative;z-index:1;}
+.profile-hero-badges{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;position:relative;z-index:1;}
+.hero-league-pill{font-size:11px;font-weight:700;background:linear-gradient(135deg,#92400e,#b45309);color:#fbbf24;padding:5px 14px;border-radius:20px;border:1px solid rgba(251,191,36,0.4);}
+.hero-streak-pill{font-size:11px;font-weight:700;background:rgba(255,255,255,0.13);color:#fff;padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);}
+.profile-xp-wrap{background:rgba(0,0,0,0.22);border-radius:14px;padding:12px 16px;margin-bottom:18px;position:relative;z-index:1;}
+.profile-xp-labels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:8px;font-weight:600;letter-spacing:0.5px;}
+.profile-xp-bar-bg{height:8px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;}
+.profile-xp-bar{height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:4px;transition:width 1s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
+.profile-hero-btns{display:flex;gap:8px;position:relative;z-index:1;}
+.profile-btn-edit{flex:1;padding:11px;background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.28);border-radius:12px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation;}
+.profile-btn-join{flex:1;padding:11px;background:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;color:#8a5520;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation;}
+.profile-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.profile-stat-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:16px 14px;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+.profile-stat-stripe{position:absolute;top:0;left:0;right:0;height:3px;}
+.profile-stat-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;}
+.profile-stat-val{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);line-height:1;}
+.profile-stat-label{font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;font-weight:600;}
+.profile-badge-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.profile-card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0;}
+.profile-card-title{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
+.profile-card-link{font-size:12px;font-weight:700;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;touch-action:manipulation;}
+.profile-badge-big-count{font-family:'DM Serif Display',serif;font-size:32px;color:var(--accent);padding:8px 16px 0;}
+.profile-badge-big-sub{font-size:12px;color:var(--text-muted);padding:2px 16px 10px;}
+.profile-badge-prog-bg{height:5px;background:var(--surface2);margin:0 16px;border-radius:3px;}
+.profile-badge-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),#e8a85e);border-radius:3px;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
+.profile-badge-icons-wrap{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;}
+.profile-badge-icon-box{width:46px;height:46px;border-radius:12px;background:var(--accent-light);border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:24px;}
+.profile-badge-icon-box.locked{background:var(--surface2);border-color:var(--border);filter:grayscale(1);opacity:0.45;}
+.profile-diff-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.profile-diff-list{padding:12px 16px;display:flex;flex-direction:column;gap:11px;}
+.profile-diff-row{display:flex;align-items:center;gap:10px;}
+.profile-diff-name{font-size:12px;font-weight:700;color:var(--text-soft);width:68px;flex-shrink:0;}
+.profile-diff-bar-bg{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.profile-diff-bar-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);width:0%;}
+.profile-diff-count{font-size:12px;font-weight:700;color:var(--text);width:28px;text-align:right;flex-shrink:0;}
+.profile-best-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;padding-bottom:4px;}
 
 </style>
 </head>
@@ -898,69 +935,85 @@ body.dark .cell.same-num { background:#3a2e1a; }
   <!-- ══════════════════ ROZETLER TAB ══════════════════ -->
   <!-- ══════════════════ PROFİL TAB ══════════════════ -->
   <div class="tab-panel" id="profilePanel">
-    <div class="panel-header" style="display:flex; align-items:center; gap:12px; padding:12px 20px; background:var(--surface); border-bottom:1px solid var(--border); z-index:10;">
-  <button onclick="switchTab('homePanel',document.getElementById('navHome'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
-  <div class="panel-header-title" style="flex:1; font-family:'DM Serif Display',serif; font-size:22px; color:var(--text); margin:0;">Profilim</div>
-  <button onclick="switchTab('settingsPanel',document.getElementById('navSettings'))" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
-</div>
-    <div style="overflow-y:auto;flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;-webkit-overflow-scrolling:touch;">
-
-      <!-- PROFİL KARTI -->
-      <div class="stats-card" style="text-align:center;padding:24px 20px 20px;">
-        <div id="profileAvatarDisplay" style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid var(--accent);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 12px;"></div>
-        <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);margin-bottom:4px;" id="statsUsername">Misafir</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;" id="statsUserSub">Sıralamaya katıl → kullanıcı adı seç</div>
-        <div id="profileLeagueBadge" style="display:none;margin-bottom:12px;"><span id="profileLeagueBadgeInner" style="font-size:11px;font-weight:700;background:linear-gradient(135deg,#3d1f0a,#6b3a1f);color:#fbbf24;padding:4px 12px;border-radius:20px;border:1px solid #cd7f32;">🟫 BRONZ 1</span></div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--accent-light);border-radius:20px;padding:8px 20px;display:inline-flex;margin-bottom:16px;">
-          <span style="font-size:16px;">🔥</span>
-          <span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);" id="statsStreak">0</span>
-          <span style="font-size:12px;color:var(--text-soft);">günlük seri</span>
+    <div class="panel-header" style="display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(255,255,255,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:10;">
+      <button onclick="switchTab('homePanel',document.getElementById('navHome'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
+      <div class="panel-header-title" style="flex:1;font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin:0;">Profilim</div>
+      <button onclick="switchTab('settingsPanel',document.getElementById('navSettings'))" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;padding-bottom:120px;-webkit-overflow-scrolling:touch;">
+      <div class="profile-hero">
+        <div class="profile-hero-deco" style="width:130px;height:130px;top:-35px;right:-35px;"></div>
+        <div class="profile-hero-deco" style="width:100px;height:100px;bottom:-40px;left:-20px;"></div>
+        <div class="profile-hero-deco" style="width:55px;height:55px;top:24px;left:36px;"></div>
+        <div class="profile-avatar-ring">
+          <div class="profile-avatar-ring-inner" id="profileAvatarDisplay"></div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="showEditProfileModal()" style="flex:1;padding:11px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;touch-action:manipulation;">✏️ Düzenle</button>
-          <button class="primary-btn" id="profileRegisterBtn" onclick="showRegisterModal()" style="flex:1;margin:0;display:none;">🏆 Katıl</button>
+        <div class="profile-hero-name" id="statsUsername">Misafir</div>
+        <div class="profile-hero-sub" id="statsUserSub">Sıralamaya katıl → kullanıcı adı seç</div>
+        <div class="profile-hero-badges">
+          <div id="profileLeagueBadge" style="display:none;"><span id="profileLeagueBadgeInner" class="hero-league-pill">🥇 ALTIN 2</span></div>
+          <span class="hero-streak-pill">🔥 <span id="statsStreak">0</span> günlük seri</span>
         </div>
-      </div>
-
-      <!-- ROZET ÖZET KARTI -->
-      <div class="stats-card" style="padding-bottom:4px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="stats-section-title" style="margin:0;">🎖️ Rozetler</div>
-          <button onclick="openBadgesScreen()" style="background:none;border:none;font-size:12px;color:var(--accent);font-weight:700;cursor:pointer;touch-action:manipulation;">Tümünü Gör →</button>
+        <div class="profile-xp-wrap">
+          <div class="profile-xp-labels">
+            <span id="profileLevelLabel">SEVİYE 1</span>
+            <span id="profileXpLabel">0 / 100 XP</span>
+          </div>
+          <div class="profile-xp-bar-bg"><div class="profile-xp-bar" id="profileXpBar"></div></div>
         </div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px;">
-          <span style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);" id="badgeSummaryCount">0</span>
-          <span style="font-size:12px;color:var(--text-muted);" id="badgeSummaryTotal">/ 0 rozet</span>
-        </div>
-        <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:14px;">
-          <div id="badgeSummaryBar" style="height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s ease;width:0%;"></div>
-        </div>
-        <div id="badgeSummaryRecent" style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:10px;"></div>
-      </div>
-
-      <!-- GENEL BAKIŞ -->
-      <div class="stats-card">
-        <div class="stats-section-title">Genel Bakış</div>
-        <div class="stats-quad">
-          <div class="stats-quad-item"><div class="stats-quad-val" id="stTotalSolves">0</div><div class="stats-quad-label">Toplam Çözüm</div></div>
-          <div class="stats-quad-item"><div class="stats-quad-val" id="stBestTime">—</div><div class="stats-quad-label">En İyi Süre</div></div>
-          <div class="stats-quad-item"><div class="stats-quad-val" id="stAvgTime">—</div><div class="stats-quad-label">Ortalama Süre</div></div>
-          <div class="stats-quad-item"><div class="stats-quad-val" id="stPerfect">0</div><div class="stats-quad-label">Hatasız</div></div>
+        <div class="profile-hero-btns">
+          <button class="profile-btn-edit" onclick="showEditProfileModal()">✏️ Düzenle</button>
+          <button class="profile-btn-join" id="profileRegisterBtn" onclick="showRegisterModal()" style="display:none;">🏆 Sıralamaya Katıl</button>
         </div>
       </div>
-
-      <!-- SEVİYE EN İYİ SÜRE -->
-      <div class="stats-card">
-        <div class="stats-section-title">Seviye Başına En İyi Süre</div>
+      <div class="profile-stats-grid" style="padding:0 16px;">
+        <div class="profile-stat-card">
+          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#c17f3e,#e8a85e);"></div>
+          <div class="profile-stat-icon-wrap" style="background:#f5e6d0;">🎯</div>
+          <div class="profile-stat-val" id="stTotalSolves">0</div>
+          <div class="profile-stat-label">Toplam Çözüm</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#3b82f6,#60a5fa);"></div>
+          <div class="profile-stat-icon-wrap" style="background:#eff6ff;">⚡</div>
+          <div class="profile-stat-val" id="stBestTime">—</div>
+          <div class="profile-stat-label">En İyi Süre</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
+          <div class="profile-stat-icon-wrap" style="background:#f0fdf4;">⏱️</div>
+          <div class="profile-stat-val" id="stAvgTime">—</div>
+          <div class="profile-stat-label">Ortalama Süre</div>
+        </div>
+        <div class="profile-stat-card">
+          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
+          <div class="profile-stat-icon-wrap" style="background:#faf5ff;">✨</div>
+          <div class="profile-stat-val" id="stPerfect">0</div>
+          <div class="profile-stat-label">Hatasız</div>
+        </div>
+      </div>
+      <div class="profile-badge-card" style="margin:0 16px;">
+        <div class="profile-card-header">
+          <span class="profile-card-title">🎖️ Rozetler</span>
+          <button class="profile-card-link" onclick="openBadgesScreen()">Tümünü Gör →</button>
+        </div>
+        <div class="profile-badge-big-count" id="badgeSummaryCount">0</div>
+        <div class="profile-badge-big-sub" id="badgeSummaryTotal">/ 0 rozet kazanıldı</div>
+        <div class="profile-badge-prog-bg"><div class="profile-badge-prog-fill" id="badgeSummaryBar"></div></div>
+        <div id="badgeSummaryRecent"></div>
+      </div>
+      <div class="profile-best-card" style="margin:0 16px;">
+        <div class="profile-card-header" style="padding-bottom:4px;">
+          <span class="profile-card-title">⏱️ Seviye Başına En İyi Süre</span>
+        </div>
         <div id="bestPerDiff"></div>
       </div>
-
-      <!-- ZORLUK DAĞILIMI -->
-      <div class="stats-card">
-        <div class="stats-section-title">Zorluk Dağılımı</div>
-        <div id="diffChart" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;"></div>
+      <div class="profile-diff-card" style="margin:0 16px;">
+        <div class="profile-card-header" style="padding-bottom:4px;">
+          <span class="profile-card-title">📊 Zorluk Dağılımı</span>
+        </div>
+        <div id="diffChart"></div>
       </div>
-
     </div>
   </div>
 
@@ -2656,7 +2709,7 @@ function renderStats() {
   if (avatarEl) avatarEl.textContent = ini;
   document.getElementById('statsUsername').textContent = s.username || 'Misafir';
   document.getElementById('statsUserSub').textContent = s.username
-    ? `${scores.length} bulmaca çözüldü · ${s.streak} günlük seri`
+    ? getMemberSince()
     : 'Sıralamaya katıl → kullanıcı adı seç';
   document.getElementById('statsStreak').textContent = s.streak || 0;
 
@@ -4522,7 +4575,7 @@ function updateProfilePanel() {
     }
   }
   if (usernameEl) usernameEl.textContent = appState.username || 'Misafir';
-  if (subEl) subEl.textContent = appState.username ? `@${appState.username}` : 'Sıralamaya katıl → kullanıcı adı seç';
+  if (subEl) subEl.textContent = appState.username ? getMemberSince() : 'Sıralamaya katıl → kullanıcı adı seç';
   if (streakEl) streakEl.textContent = appState.streak || 0;
   const regBtn = document.getElementById('profileRegisterBtn');
   if (regBtn) regBtn.style.display = appState.supabaseId ? 'none' : 'block';
@@ -4548,7 +4601,13 @@ function updateProfilePanel() {
       document.getElementById('profileLeagueBadge').style.display = 'none';
     }
   } catch(e) {}
+  updateProfileXP();
 }
+function calcLevel(s,streak,p){const xp=(s*10)+(streak*5)+(p*20);const t=[0,100,250,500,900,1400,2100,3000,4200,5800,7800,10200,13200,17000,22000,28000,36000];let l=1;for(let i=1;i<t.length;i++){if(xp>=t[i])l=i+1;else break;}const cur=t[Math.min(l-1,t.length-1)],nxt=t[Math.min(l,t.length-1)];const prog=nxt===cur?100:Math.round(((xp-cur)/(nxt-cur))*100);return{level:l,xp,nextThresh:nxt,progress:prog};}
+
+function getMemberSince(){if(typeof currentUser!=='undefined'&&currentUser&&currentUser.created_at){const d=new Date(currentUser.created_at),days=Math.floor((Date.now()-d.getTime())/86400000);if(days===0)return'bugün katıldı';if(days===1)return'1 gün önce katıldı';if(days<30)return days+' gün önce katıldı';return Math.floor(days/30)+' ay önce katıldı';}if(!localStorage.getItem('firstVisit'))localStorage.setItem('firstVisit',Date.now().toString());const first=parseInt(localStorage.getItem('firstVisit')),days=Math.floor((Date.now()-first)/86400000);if(days===0)return'bugün katıldı';if(days===1)return'1 gün önce katıldı';return days+' gün önce katıldı';}
+
+function updateProfileXP(){const s=parseInt(document.getElementById('stTotalSolves')?.textContent)||0;const streak=parseInt(document.getElementById('statsStreak')?.textContent)||0;const p=parseInt(document.getElementById('stPerfect')?.textContent)||0;const{level,xp,nextThresh,progress}=calcLevel(s,streak,p);const ll=document.getElementById('profileLevelLabel');const xl=document.getElementById('profileXpLabel');const xb=document.getElementById('profileXpBar');if(ll)ll.textContent='SEVİYE '+level;if(xl)xl.textContent=xp+' / '+nextThresh+' XP';if(xb)setTimeout(()=>{xb.style.width=progress+'%';},300);const sub=document.getElementById('statsUserSub');if(sub&&typeof currentUser!=='undefined'&&currentUser)sub.textContent=getMemberSince();}
 
 // ═══════════════════════════════════════════════
 //  KONFETİ
