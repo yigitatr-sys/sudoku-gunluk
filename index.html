@@ -246,8 +246,9 @@ body {
 /* ── GAME SCREEN ── */
 #gameScreen { flex-direction:column; }
 
-.game-header { display:grid; grid-template-columns:40px 1fr auto; align-items:center; padding:4px 14px 2px; background:var(--surface); border-bottom:1px solid var(--border); gap:8px; }
-.back-btn { background:none; border:none; font-size:20px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; color:var(--text); transition:background 0.15s; touch-action:manipulation; }
+.game-header { display:grid; grid-template-columns:40px 1fr auto; align-items:center; padding:6px 14px 4px; background:linear-gradient(145deg,#fff8f0,#fdf3e7); border-bottom:1.5px solid #f0ddc4; gap:8px; }
+.back-btn { background:linear-gradient(145deg,#fff8f0,#fdf0e0); border:1.5px solid #f0ddc4; font-size:18px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; color:var(--text); transition:background 0.15s; touch-action:manipulation; box-shadow:0 2px 6px rgba(193,127,62,0.1); }
+.back-btn:hover { background:var(--accent-light); }
 .back-btn:hover { background:var(--surface2); }
 .game-title-area { text-align:center; }
 .game-title { font-family:'DM Serif Display',serif; font-size:17px; color:var(--text); }
@@ -1092,7 +1093,7 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
     <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;padding:16px 0 120px;-webkit-overflow-scrolling:touch;background:var(--bg);">
 
       <!-- Hero -->
-      <div style="padding:20px 18px 18px;background:linear-gradient(145deg,#fff8f0,#fdf3e7);border-bottom:1.5px solid #f0ddc4;position:relative;overflow:hidden;">
+      <div style="padding:20px 18px 18px;background:linear-gradient(145deg,#fff8f0,#fdf3e7);border-bottom:1.5px solid #f0ddc4;position:relative;">
         <div style="position:absolute;right:-20px;top:-20px;font-size:100px;opacity:0.06;pointer-events:none;user-select:none;line-height:1;">🧩</div>
         <div style="display:flex;align-items:center;gap:14px;">
           <div style="position:relative;flex-shrink:0;">
@@ -1249,16 +1250,16 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
  </div> 
 
   <!-- ══════════════════ AYARLAR TAB ══════════════════ -->
-  <div class="tab-panel" id="settingsPanel" style="overflow-y:auto;">
-    <div class="panel-header" style="display:flex;align-items:center;gap:12px;">
-  <button onclick="switchTab('profilePanel',document.getElementById('navProfile'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
-  <div class="panel-header-title" style="flex:1;">⚙️ Ayarlar</div>
-</div>
-    <div style="padding:12px 16px 40px;display:flex;flex-direction:column;gap:8px;">
+  <div class="tab-panel" id="settingsPanel" style="overflow-y:auto;background:var(--bg);">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(145deg,#fff8f0,#fdf3e7);border-bottom:1.5px solid #f0ddc4;">
+      <button onclick="switchTab('profilePanel',document.getElementById('navProfile'))" style="background:linear-gradient(145deg,#fff8f0,#fdf0e0);border:1.5px solid #f0ddc4;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:0 2px 8px rgba(193,127,62,0.1);">←</button>
+      <div style="flex:1;font-family:'DM Serif Display',serif;font-size:22px;color:#1a1612;">⚙️ Ayarlar</div>
+    </div>
+    <div style="padding:16px 16px 60px;display:flex;flex-direction:column;gap:6px;">
 
       <!-- GÖRÜNÜM -->
-      <div class="settings-section-title">Görünüm</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Görünüm</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row">
           <div class="settings-icon-wrap" style="background:#2c2c2e;">🌙</div>
           <div style="flex:1;min-width:0;">
@@ -1279,8 +1280,8 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
 
       <!-- SES & TİTREŞİM -->
-      <div class="settings-section-title" style="margin-top:8px;">Ses & Titreşim</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Ses & Titreşim</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row">
           <div class="settings-icon-wrap" style="background:#ff9500;">🔊</div>
           <div style="flex:1;min-width:0;">
@@ -1301,8 +1302,8 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
 
       <!-- BİLDİRİMLER -->
-      <div class="settings-section-title" style="margin-top:8px;">Bildirimler</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Bildirimler</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row">
           <div class="settings-icon-wrap" style="background:#ff3b30;">🔔</div>
           <div style="flex:1;min-width:0;">
@@ -1314,8 +1315,8 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
 
       <!-- DİL -->
-      <div class="settings-section-title" style="margin-top:8px;">Dil</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Dil</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row">
           <div class="settings-icon-wrap" style="background:#007aff;">🌍</div>
           <div style="flex:1;min-width:0;">
@@ -1327,8 +1328,8 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
 
       <!-- HESAP -->
-      <div class="settings-section-title" style="margin-top:8px;">Hesap</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Hesap</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row" onclick="showResetConfirm()" style="cursor:pointer;">
           <div class="settings-icon-wrap" style="background:#ff3b30;">🗑️</div>
           <div style="flex:1;min-width:0;">
@@ -1340,8 +1341,8 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
 
       <!-- HAKKINDA -->
-      <div class="settings-section-title" style="margin-top:8px;">Hakkında</div>
-      <div class="settings-card">
+      <div style="font-size:10px;font-weight:700;color:#a08060;letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;">Hakkında</div>
+      <div style="background:linear-gradient(145deg,#fff8f0,#fdf3e7);border:1.5px solid #f0ddc4;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(193,127,62,0.08);">
         <div class="settings-row" onclick="showModal('privacyModal')" style="cursor:pointer;">
           <div class="settings-icon-wrap" style="background:#5856d6;">📋</div>
           <div style="flex:1;min-width:0;">
@@ -1903,13 +1904,13 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
 
 <!-- Levels Bottom Sheet -->
 <div id="levelsSheet" onclick="closeLevelsSheet(event)" style="display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,0.45);align-items:flex-end;max-width:480px;margin:0 auto;">
-  <div id="levelsSheetInner" style="background:var(--bg);border-radius:24px 24px 0 0;padding:0 0 calc(24px + env(safe-area-inset-bottom));width:100%;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);">
+  <div id="levelsSheetInner" style="background:linear-gradient(170deg,#fff8f0,#fdf3e7);border-radius:24px 24px 0 0;padding:0 0 calc(24px + env(safe-area-inset-bottom));width:100%;max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);">
     <div style="display:flex;justify-content:center;padding:12px 0 4px;">
-      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;"></div>
+      <div style="width:40px;height:4px;background:#f0ddc4;border-radius:2px;"></div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;">
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);">Seviyeler</div>
-      <button onclick="closeLevelsSheet()" style="background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:var(--text-muted);touch-action:manipulation;">✕</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 20px 16px;border-bottom:1.5px solid #f0ddc4;">
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#1a1612;">🧩 Seviyeler</div>
+      <button onclick="closeLevelsSheet()" style="background:linear-gradient(145deg,#fff8f0,#fdf0e0);border:1.5px solid #f0ddc4;border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;color:#a08060;touch-action:manipulation;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(193,127,62,0.1);">✕</button>
     </div>
 
     <div style="padding:0 16px 16px;">
@@ -3713,7 +3714,13 @@ function updateHomeScreen() {
       }
       const req = DIFFICULTIES[diff].unlockRequires;
       const prevLabel = DIFFICULTIES[req.diff].label;
-      progEl.innerHTML = `<div class="diff-progress-bar"><div class="diff-progress-fill" style="width:${prog.pct}%"></div></div><span>${prog.done}/${prog.needed} ${prevLabel}</span>`;
+      progEl.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+          <div style="flex:1;background:rgba(193,127,62,0.15);border-radius:99px;height:4px;overflow:hidden;">
+            <div style="height:100%;border-radius:99px;background:var(--accent);width:${prog.pct}%;transition:width 0.4s;"></div>
+          </div>
+          <span style="font-size:10px;font-weight:700;color:#a08060;white-space:nowrap;flex-shrink:0;">${prog.done}/${prog.needed} ${prevLabel}</span>
+        </div>`;
     } else if (progEl) {
       progEl.remove();
     }
