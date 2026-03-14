@@ -1867,24 +1867,51 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
 
     <div style="padding:0 16px 16px;">
 
-      <div onclick="startGame('beginner')"  data-diff="beginner"  class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Başlangıç</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('easy')"      data-diff="easy"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Kolay</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('medium')"    data-diff="medium"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Orta</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('hard')"      data-diff="hard"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Zor</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('expert')"    data-diff="expert"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Uzman</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('master')"    data-diff="master"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Usta</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div style="padding:12px 16px 24px;display:flex;flex-direction:column;gap:10px;">
 
-      <div style="display:flex;align-items:center;gap:10px;margin:12px 4px 4px;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:10px;color:var(--text-muted);letter-spacing:1.5px;font-weight:600;">İLERİ SEVİYE</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-      </div>
+  <div onclick="startGame('beginner')" data-diff="beginner" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Başlangıç</span>
+  </div>
 
-      <div onclick="startGame('grandmaster')" data-diff="grandmaster" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Üstat</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('legend')"      data-diff="legend"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Şampiyon</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
-      <div onclick="startGame('tanri')"       data-diff="tanri"       class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Efsane</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+  <div onclick="startGame('easy')" data-diff="easy" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Kolay</span>
+  </div>
 
-    </div>
+  <div onclick="startGame('medium')" data-diff="medium" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Orta</span>
+  </div>
+
+  <div onclick="startGame('hard')" data-diff="hard" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Zor</span>
+  </div>
+
+  <div onclick="startGame('expert')" data-diff="expert" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Uzman</span>
+  </div>
+
+  <div onclick="startGame('master')" data-diff="master" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Usta</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+    <span style="font-size:10px;color:var(--text-muted);letter-spacing:1.5px;font-weight:600;">İLERİ SEVİYE</span>
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+  </div>
+
+  <div onclick="startGame('grandmaster')" data-diff="grandmaster" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Üstat</span>
+  </div>
+
+  <div onclick="startGame('legend')" data-diff="legend" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Şampiyon</span>
+  </div>
+
+  <div onclick="startGame('tanri')" data-diff="tanri" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;cursor:pointer;width:100%;box-sizing:border-box;box-shadow:var(--shadow);">
+    <span style="font-size:15px;font-weight:600;color:var(--text);">Efsane</span>
+  </div>
+
+</div>
   </div>
 </div>
 
