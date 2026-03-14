@@ -340,6 +340,7 @@ body {
 
 .controls {
   padding: 0 16px 0 16px;
+  padding-bottom: env(safe-area-inset-bottom);
   background: transparent;
   border-top: none;
   border-radius: 0;
@@ -1245,7 +1246,7 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
         <button class="ctrl-btn" onclick="useHint()"><span class="ctrl-icon">💡</span><span class="ctrl-label">İpucu</span></button>
       </div>
       <div class="numpad" id="numpad"></div>
-      <div class="controls" style="padding-top:0; margin-bottom:124px;"></div>
+      <div style="height:env(safe-area-inset-bottom);flex-shrink:0; margin-bottom:108px"></div>
   </div>
  </div> 
 
@@ -3494,6 +3495,8 @@ function showScreen(id) {
 
 function exitGame() {
   document.getElementById('swipeDots').style.display = 'flex';
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) nav.style.display = 'flex';
   // Tamamlanmamış oyunu kaydet
   if (!G.completed && !G.gameLost && G.solution.length > 0) {
     appState.savedGames = appState.savedGames || {};
@@ -3740,6 +3743,8 @@ let generatingGame = false;
 
 function startGame(mode) {
   document.getElementById('swipeDots').style.display = 'none';
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) nav.style.display = 'none';
 closeLevelsSheet();
   if (generatingGame) return;
   if (DIFFICULTIES[mode] && !isUnlocked(mode)) {
