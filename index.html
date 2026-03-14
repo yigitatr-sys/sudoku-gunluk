@@ -1051,89 +1051,82 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
     </div>
   </div>
 
-  <!-- ══════════════════ ROZETLER TAB ══════════════════ -->
   <!-- ══════════════════ PROFİL TAB ══════════════════ -->
   <div class="tab-panel" id="profilePanel">
     <div class="panel-header" style="display:flex;align-items:center;gap:12px;padding:12px 20px;background:rgba(255,255,255,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:10;">
       <button onclick="switchTab('homePanel',document.getElementById('navHome'))" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:4px;touch-action:manipulation;">←</button>
       <div class="panel-header-title" style="flex:1;font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin:0;">Profilim</div>
-      <button onclick="switchTab('settingsPanel',document.getElementById('navSettings'))" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
+      <button onclick="switchTab('settingsPanel',null)" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;touch-action:manipulation;">⚙️</button>
     </div>
-    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;padding-bottom:120px;-webkit-overflow-scrolling:touch;">
-      <div class="profile-hero">
-        <div class="profile-hero-deco" style="width:130px;height:130px;top:-35px;right:-35px;"></div>
-        <div class="profile-hero-deco" style="width:100px;height:100px;bottom:-40px;left:-20px;"></div>
-        <div class="profile-hero-deco" style="width:55px;height:55px;top:24px;left:36px;"></div>
-        <div class="profile-avatar-ring">
-          <div class="profile-avatar-ring-inner" id="profileAvatarDisplay"></div>
-        </div>
-        <div class="profile-hero-name" id="statsUsername">Misafir</div>
-        <div class="profile-hero-sub" id="statsUserSub">Sıralamaya katıl → kullanıcı adı seç</div>
-        <div class="profile-hero-badges">
-          <div id="profileLeagueBadge" style="display:none;"><span id="profileLeagueBadgeInner" class="hero-league-pill">🥇 ALTIN 2</span></div>
-          <span class="hero-streak-pill">🔥 <span id="statsStreak">0</span> günlük seri</span>
-        </div>
-        <div class="profile-xp-wrap">
-          <div class="profile-xp-labels">
-            <span id="profileLevelLabel">SEVİYE 1</span>
-            <span id="profileXpLabel">0 / 100 XP</span>
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:0;padding-bottom:120px;-webkit-overflow-scrolling:touch;">
+
+      <!-- Mini Hero -->
+      <div style="padding:20px 20px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--accent-light);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;" id="profileAvatarDisplay"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);font-weight:700;" id="statsUsername">Misafir</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+            <span style="font-size:11px;color:var(--text-muted);" id="statsUserSub">Sıralamaya katıl</span>
+            <span style="font-size:11px;color:var(--accent);">🔥 <span id="statsStreak">0</span> seri</span>
           </div>
-          <div class="profile-xp-bar-bg"><div class="profile-xp-bar" id="profileXpBar"></div></div>
+          <div style="margin-top:6px;background:var(--border);border-radius:99px;height:3px;width:100%;overflow:hidden;">
+            <div id="profileXpBar" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 0.4s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;">
+            <span style="font-size:9px;color:var(--text-muted);letter-spacing:1px;" id="profileLevelLabel">SEVİYE 1</span>
+            <span style="font-size:9px;color:var(--text-muted);" id="profileXpLabel">0 / 100 XP</span>
+          </div>
         </div>
-        <div class="profile-hero-btns">
-          <button class="profile-btn-edit" onclick="showEditProfileModal()">✏️ Düzenle</button>
-          <button class="profile-btn-join" id="profileRegisterBtn" onclick="showRegisterModal()" style="display:none;">🏆 Sıralamaya Katıl</button>
+        <button onclick="showEditProfileModal()" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--text-muted);cursor:pointer;flex-shrink:0;touch-action:manipulation;">✏️</button>
+      </div>
+
+      <!-- İstatistikler -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);">
+        <div style="padding:16px;border-right:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:4px;">Toplam Çözüm</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);" id="stTotalSolves">0</div>
+        </div>
+        <div style="padding:16px;">
+          <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:4px;">En İyi Süre</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);" id="stBestTime">—</div>
+        </div>
+        <div style="padding:16px;border-right:1px solid var(--border);border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:4px;">Ortalama Süre</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);" id="stAvgTime">—</div>
+        </div>
+        <div style="padding:16px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.5px;margin-bottom:4px;">Hatasız</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);" id="stPerfect">0</div>
         </div>
       </div>
-      <div class="profile-stats-grid" style="padding:0 16px;">
-        <div class="profile-stat-card">
-          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#c17f3e,#e8a85e);"></div>
-          <div class="profile-stat-icon-wrap" style="background:#f5e6d0;">🎯</div>
-          <div class="profile-stat-val" id="stTotalSolves">0</div>
-          <div class="profile-stat-label">Toplam Çözüm</div>
+
+      <!-- Rozetler -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">🎖️ Rozetler</span>
+          <button onclick="openBadgesScreen()" style="background:none;border:none;font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;touch-action:manipulation;">Tümünü Gör →</button>
         </div>
-        <div class="profile-stat-card">
-          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#3b82f6,#60a5fa);"></div>
-          <div class="profile-stat-icon-wrap" style="background:#eff6ff;">⚡</div>
-          <div class="profile-stat-val" id="stBestTime">—</div>
-          <div class="profile-stat-label">En İyi Süre</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <div style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);" id="badgeSummaryCount">0</div>
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);" id="badgeSummaryTotal">/ 0 rozet kazanıldı</div>
+            <div style="margin-top:4px;background:var(--border);border-radius:99px;height:3px;width:120px;overflow:hidden;">
+              <div id="badgeSummaryBar" style="height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 0.4s;"></div>
+            </div>
+          </div>
         </div>
-        <div class="profile-stat-card">
-          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
-          <div class="profile-stat-icon-wrap" style="background:#f0fdf4;">⏱️</div>
-          <div class="profile-stat-val" id="stAvgTime">—</div>
-          <div class="profile-stat-label">Ortalama Süre</div>
-        </div>
-        <div class="profile-stat-card">
-          <div class="profile-stat-stripe" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
-          <div class="profile-stat-icon-wrap" style="background:#faf5ff;">✨</div>
-          <div class="profile-stat-val" id="stPerfect">0</div>
-          <div class="profile-stat-label">Hatasız</div>
-        </div>
+        <div id="badgeSummaryRecent" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       </div>
-      <div class="profile-badge-card" style="margin:0 16px;">
-        <div class="profile-card-header">
-          <span class="profile-card-title">🎖️ Rozetler</span>
-          <button class="profile-card-link" onclick="openBadgesScreen()">Tümünü Gör →</button>
-        </div>
-        <div class="profile-badge-big-count" id="badgeSummaryCount">0</div>
-        <div class="profile-badge-big-sub" id="badgeSummaryTotal">/ 0 rozet kazanıldı</div>
-        <div class="profile-badge-prog-bg"><div class="profile-badge-prog-fill" id="badgeSummaryBar"></div></div>
-        <div id="badgeSummaryRecent"></div>
+
+      <!-- Gizli — JS için gerekli id'ler -->
+      <div style="display:none;">
+        <span id="profileLeagueBadge"></span>
+        <span id="profileLeagueBadgeInner"></span>
+        <button id="profileRegisterBtn" onclick="showRegisterModal()"></button>
       </div>
-      <div class="profile-best-card" style="margin:0 16px;">
-        <div class="profile-card-header" style="padding-bottom:4px;">
-          <span class="profile-card-title">⏱️ Seviye Başına En İyi Süre</span>
-        </div>
-        <div id="bestPerDiff"></div>
-      </div>
-      <div class="profile-diff-card" style="margin:0 16px;">
-        <div class="profile-card-header" style="padding-bottom:4px;">
-          <span class="profile-card-title">📊 Zorluk Dağılımı</span>
-        </div>
-        <div id="diffChart"></div>
-      </div>
+
     </div>
+  </div>
   </div>
 
   <!-- ══════════════════ OYUN (fullscreen overlay) ══════════════════ -->
@@ -1872,20 +1865,24 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       <button onclick="closeLevelsSheet()" style="background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;color:var(--text-muted);touch-action:manipulation;">✕</button>
     </div>
 
-    <div style="padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+    <div style="padding:0 16px 16px;">
 
-      <div class="diff-btn" data-diff="beginner"   onclick="startGame('beginner')"  ><div class="diff-name">Başlangıç</div></div>
-      <div class="diff-btn" data-diff="easy"        onclick="startGame('easy')"      ><div class="diff-name">Kolay</div></div>
-      <div class="diff-btn" data-diff="medium"      onclick="startGame('medium')"    ><div class="diff-name">Orta</div></div>
-      <div class="diff-btn" data-diff="hard"        onclick="startGame('hard')"      ><div class="diff-name">Zor</div></div>
-      <div class="diff-btn" data-diff="expert"      onclick="startGame('expert')"    ><div class="diff-name">Uzman</div></div>
-      <div class="diff-btn" data-diff="master"      onclick="startGame('master')"    ><div class="diff-name">Usta</div></div>
+      <div onclick="startGame('beginner')"  data-diff="beginner"  class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Başlangıç</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('easy')"      data-diff="easy"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Kolay</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('medium')"    data-diff="medium"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Orta</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('hard')"      data-diff="hard"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Zor</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('expert')"    data-diff="expert"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Uzman</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('master')"    data-diff="master"    class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Usta</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
 
-      <div class="diff-section-title legend-title" style="grid-column:1/-1;margin:4px 0 2px;">✦ Efsaneler Yolu ✦</div>
+      <div style="display:flex;align-items:center;gap:10px;margin:12px 4px 4px;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:10px;color:var(--text-muted);letter-spacing:1.5px;font-weight:600;">İLERİ SEVİYE</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
 
-      <div class="diff-btn" data-diff="grandmaster" onclick="startGame('grandmaster')"><div class="diff-name">Üstat</div></div>
-      <div class="diff-btn" data-diff="legend"      onclick="startGame('legend')"     ><div class="diff-name">Şampiyon</div></div>
-      <div class="diff-btn" data-diff="tanri"       onclick="startGame('tanri')"      style="grid-column:1/-1;"><div class="diff-name">Efsane</div></div>
+      <div onclick="startGame('grandmaster')" data-diff="grandmaster" class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Üstat</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('legend')"      data-diff="legend"      class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;border-bottom:1px solid var(--border);cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Şampiyon</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
+      <div onclick="startGame('tanri')"       data-diff="tanri"       class="diff-btn" style="all:unset;display:flex;align-items:center;justify-content:space-between;padding:13px 4px;cursor:pointer;width:100%;box-sizing:border-box;"><span style="font-size:14px;color:var(--text);">Efsane</span><span style="color:var(--text-muted);font-size:16px;">›</span></div>
 
     </div>
   </div>
@@ -4282,7 +4279,8 @@ async function getRealLbEntries(d) {
       name: row.username || 'Anonim',
       ini: (row.username || 'AN').slice(0,2).toUpperCase(),
       time: row.time_seconds,
-      isMe: row.user_id === currentUser?.id
+      isMe: row.user_id === currentUser?.id,
+      userId: row.user_id
     }));
   } catch(e) {
     console.error('getRealLbEntries hatası:', e);
@@ -4387,7 +4385,7 @@ async function renderLbForDate(d) {
     const e = top3[oi]; if (!e) return '';
     return `<div class="podium-item ${classes[vi]}">
       <div class="podium-crown">${crowns[vi]}</div>
-      <div class="podium-avatar">${e.ini}</div>
+      <div class="podium-avatar" onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;">${e.ini}</div>
       <div class="podium-name">${e.name}</div>
       <div class="podium-time">${formatTime(e.time)}</div>
       <div class="podium-bar"></div>
@@ -4397,9 +4395,9 @@ async function renderLbForDate(d) {
   document.getElementById('lbList').innerHTML = rest.length === 0
     ? '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">Daha fazla oyuncu yok</div>'
     : rest.map((e, i) => `
-      <div class="lb-list-row${e.isMe ? ' me' : ''}">
+      <div class="lb-list-row${e.isMe ? ' me' : ''}" onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;">
         <span class="lb-list-rank">${i+4}</span>
-        <div class="lb-list-avatar">${e.ini}</div>
+        <div class="lb-list-avatar" style="${e.avatarUrl ? `background-image:url(${e.avatarUrl});background-size:cover;` : ''}">${e.avatarUrl ? '' : e.ini}</div>
         <div class="lb-list-name">${e.name}${e.isMe ? '<small>Sen</small>' : ''}</div>
         <div class="lb-list-time">${formatTime(e.time)}</div>
       </div>`).join('');
@@ -5271,36 +5269,57 @@ async function showDuelProfile(userId) {
     
   showModal('genericModal');
   document.getElementById('genericModalContent').innerHTML = `
-    <div style="text-align:center;padding:8px 0 4px;">
-      <div style="display:flex;justify-content:center;margin-bottom:12px;">${avatar}</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--text);">${p.username}</div>
-      
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:4px;background:var(--accent-light);padding:6px 14px;border-radius:20px;">
-          <span style="font-size:16px;">🔥</span>
-          <span style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--accent);">${streak}</span>
-          <span style="font-size:11px;color:var(--text-soft);">seri</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);padding:6px 14px;border-radius:20px;border:1px solid var(--border);">
-          <span style="font-size:16px;">🎖️</span>
-          <span style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);">${badgeCount}</span>
-          <span style="font-size:11px;color:var(--text-soft);">rozet</span>
-        </div>
-      </div>
 
-      <div style="background:var(--surface2);border-radius:16px;padding:16px;border:1px solid var(--border);">
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;">
-          ${getLeagueSvg(league.name, 24)}
-          <span style="font-size:15px;font-weight:700;color:var(--text);">${league.name}</span>
-          <span style="font-size:13px;color:var(--text-muted);">· ${s.elo} ELO</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:#22c55e;">${s.wins||0}</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">GALİBİYET</div></div>
-          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:#ef4444;">${s.losses||0}</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">MAĞLUBİYET</div></div>
-          <div style="text-align:center;"><div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);">${wr}%</div><div style="font-size:9px;font-weight:600;color:var(--text-muted);letter-spacing:0.5px;">KAZANMA</div></div>
+    <!-- Avatar + İsim -->
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+      <div style="width:56px;height:56px;border-radius:50%;border:2px solid var(--border);overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">
+        ${p.avatar && p.avatar.startsWith('http')
+          ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;">`
+          : (p.avatar || '🧩')}
+      </div>
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);">${p.username}</div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px;">
+          ${getLeagueSvg(league.name, 14)}
+          <span style="font-size:12px;color:var(--text-muted);">${league.name} · ${s.elo} ELO</span>
         </div>
       </div>
-    </div>`;
+    </div>
+
+    <!-- İstatistikler -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="text-align:center;padding:12px 0;background:var(--surface2);border-radius:12px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#22c55e;">${s.wins||0}</div>
+        <div style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;margin-top:2px;">GALİBİYET</div>
+      </div>
+      <div style="text-align:center;padding:12px 0;background:var(--surface2);border-radius:12px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#ef4444;">${s.losses||0}</div>
+        <div style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;margin-top:2px;">MAĞLUBİYET</div>
+      </div>
+      <div style="text-align:center;padding:12px 0;background:var(--surface2);border-radius:12px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);">${wr}%</div>
+        <div style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;margin-top:2px;">KAZANMA</div>
+      </div>
+    </div>
+
+    <!-- Seri + Rozet -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--surface2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;">🔥</span>
+        <div>
+          <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--accent);">${streak}</div>
+          <div style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;">GÜNLÜK SERİ</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:20px;">🎖️</span>
+        <div>
+          <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);">${badgeCount}</div>
+          <div style="font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;">ROZET</div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function showDuelIntro(force = false) {
