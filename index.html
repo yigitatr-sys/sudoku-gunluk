@@ -486,6 +486,20 @@ body {
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.18)} 100%{transform:scale(1)} }
+
+/* Satır/Sütun/Kutu tamamlanma parlaması */
+@keyframes flashComplete {
+  0%   { background: rgba(219, 234, 254, 0.4); }
+  20%  { background: rgba(59, 130, 246, 0.35); box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.4); }
+  55%  { background: rgba(147, 197, 253, 0.25); box-shadow: none; }
+  85%  { background: rgba(239, 246, 255, 0.15); }
+  100% { background: transparent; }
+}
+.cell.flash-complete {
+  animation: flashComplete 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  z-index: 2;
+}
+
 body.dark .sudoku-grid { border-color:var(--text-muted); }
 body.dark .cell { background:#2a2420; border-color:#3d342c; }
 body.dark .cell:nth-child(3n) { border-right-color:#5a4e44; }
@@ -1200,6 +1214,7 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       <div class="numpad" id="numpad"></div>
       <div class="controls" style="padding-top:0; margin-bottom:124px;"></div>
   </div>
+ </div> 
 
   <!-- ══════════════════ AYARLAR TAB ══════════════════ -->
   <div class="tab-panel" id="settingsPanel" style="overflow-y:auto;">
@@ -1756,7 +1771,7 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;">
         <div style="font-size:22px;flex-shrink:0;">📈</div>
-        <div><div style="font-size:13px;font-weight:700;color:var(--text);">ELO puanı kazan</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Kazanınca <span style="color:#22c55e;font-weight:700;">+25 ELO</span>, kaybedince <span style="color:#ef4444;font-weight:700;">-15 ELO</span>. Ligler arası yüksel!</div></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Hızlı bitirirsen <span style="color:#22c55e;font-weight:700;">+25</span>, yavaş kalırsan <span style="color:#22c55e;font-weight:700;">+18</span>. Kaybedersen <span style="color:#ef4444;font-weight:700;">-8</span> ila <span style="color:#ef4444;font-weight:700;">-15</span>. Süre ve hatalar puanı etkiler.</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;">
         <div style="font-size:22px;flex-shrink:0;">🏆</div>
@@ -4007,6 +4022,7 @@ function inputNumber(n) {
 
   renderGrid();
   updateStats();
+  checkLineCompletion(idx);
   checkWin();
 }
 
@@ -4027,6 +4043,51 @@ function removePencilNote(idx, n) {
       G.pencilGrid[i][n - 1] = false;
     }
   }
+}
+
+function checkLineCompletion(idx) {
+  const row = Math.floor(idx / 9);
+  const col = idx % 9;
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+
+  // Satır tamamlandı mı?
+  const rowComplete = Array.from({length: 9}, (_, c) => row * 9 + c)
+    .every(i => G.userGrid[i] !== 0 && G.userGrid[i] === G.solution[i]);
+
+  // Sütun tamamlandı mı?
+  const colComplete = Array.from({length: 9}, (_, r) => r * 9 + col)
+    .every(i => G.userGrid[i] !== 0 && G.userGrid[i] === G.solution[i]);
+
+  // 3×3 kutu tamamlandı mı?
+  const boxIndices = [];
+  for (let r = boxRow; r < boxRow + 3; r++)
+    for (let c = boxCol; c < boxCol + 3; c++)
+      boxIndices.push(r * 9 + c);
+  const boxComplete = boxIndices.every(i => G.userGrid[i] !== 0 && G.userGrid[i] === G.solution[i]);
+
+  const flashIndices = new Set();
+  if (rowComplete) Array.from({length: 9}, (_, c) => row * 9 + c).forEach(i => flashIndices.add(i));
+  if (colComplete) Array.from({length: 9}, (_, r) => r * 9 + col).forEach(i => flashIndices.add(i));
+  if (boxComplete) boxIndices.forEach(i => flashIndices.add(i));
+
+  if (flashIndices.size === 0) return;
+
+  // Kısa gecikmeyle parlat (renderGrid'den sonra)
+  setTimeout(() => {
+    const els = [];
+    flashIndices.forEach(i => {
+      const el = document.querySelector(`.cell[data-index="${i}"]`);
+      if (el) {
+        el.classList.remove('flash-complete');
+        els.push(el);
+      }
+    });
+    // Hepsini tek seferde reflow'dan geçir, sonra hepsine aynı anda class ekle
+    void document.getElementById('sudokuGrid').offsetWidth;
+    els.forEach(el => el.classList.add('flash-complete'));
+    setTimeout(() => els.forEach(el => el.classList.remove('flash-complete')), 1400);
+  }, 50);
 }
 
 function eraseCell() {
@@ -6019,8 +6080,27 @@ async function finishDuel(won, reason) {
 
   await pushDuelProgress();
 
-  // ELO güncelle
-  const eloChange = won ? 25 : -15;
+ // ELO güncelle — dinamik puan sistemi
+  let eloChange;
+  if (won) {
+    // Kazanma: süreye göre 18-25 arası
+    // 0-120sn → 25, 120-300sn → 25'ten 18'e iner, 300sn+ → 18
+    const t = duelState.timerSec || 0;
+    if (t <= 120) {
+      eloChange = 25;
+    } else if (t >= 300) {
+      eloChange = 18;
+    } else {
+      // 120-300 arası smooth düşüş
+      eloChange = Math.round(25 - ((t - 120) / 180) * 7);
+    }
+  } else {
+    // Kaybetme: hata sayısına göre 8-15 arası
+    // 0 hata → -8, 3 hata → -15
+    const maxErr = duelState.maxErrors || 3;
+    const errRatio = Math.min(duelState.errors / maxErr, 1);
+    eloChange = -Math.round(8 + errRatio * 7);
+  }
   const newElo = Math.max(0, duelState.myElo + eloChange);
 
   await sb.from('league_stats').upsert({
