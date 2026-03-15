@@ -53,6 +53,11 @@ body.dark {
 /* ── SPLASH SCREEN ── */
 #splashScreen { position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; transition:opacity 0.4s ease; }
 #splashScreen.fade-out { opacity:0; pointer-events:none; }
+.splash-stats { display:flex; justify-content:space-between; align-items:flex-end; position:absolute; bottom:28px; left:28px; right:28px; opacity:0; animation:splashFade 0.4s ease 0.6s forwards; }
+.splash-stat-item { display:flex; flex-direction:column; }
+.splash-stat-item:last-child { align-items:flex-end; }
+.splash-stat-num { font-family:'DM Serif Display',serif; font-size:22px; color:var(--accent); line-height:1; }
+.splash-stat-label { font-size:10px; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; }
 .splash-logo { font-family:'DM Serif Display',serif; font-size:48px; color:var(--text); animation:splashPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 .splash-logo span { color:var(--accent); }
 .splash-tagline { font-size:13px; color:var(--text-muted); letter-spacing:3px; text-transform:uppercase; opacity:0; animation:splashFade 0.4s ease 0.4s forwards; }
@@ -812,6 +817,16 @@ body.dark .profile-avatar-ring-inner{background:#1a0d03;}
   <div class="splash-logo">Su<span>doku</span></div>
   <div class="splash-tagline">Türkiye Günlük Yarışması</div>
   <div class="splash-dot"></div>
+  <div class="splash-stats">
+  <div class="splash-stat-item">
+    <span class="splash-stat-num" id="splashTodayGames">—</span>
+    <span class="splash-stat-label">Bugün oynandı</span>
+  </div>
+  <div class="splash-stat-item">
+    <span class="splash-stat-num" id="splashActiveNow">—</span>
+    <span class="splash-stat-label">Şu an oynuyor</span>
+  </div>
+</div>
 </div>
 
 <!-- ══════════════════ ONBOARDING ══════════════════ -->
@@ -5179,13 +5194,36 @@ function checkOnboarding() {
 //  SPLASH SCREEN
 // ═══════════════════════════════════════════════
 
-function showSplash() {
+async function showSplash() {
   const splash = document.getElementById('splashScreen');
   splash.classList.remove('fade-out');
+
+  // Splash'i her koşulda 1.8 saniye sonra kapat
   setTimeout(() => {
     splash.classList.add('fade-out');
     setTimeout(() => { splash.style.display = 'none'; }, 400);
-  }, 1400);
+  }, 1800);
+
+  // Veri çekmeyi ayrıca dene, kapanmayı engellemesin
+  try {
+    const today = todayStr();
+    const { count: todayCount } = await sb
+      .from('daily_scores')
+      .select('*', { count: 'exact', head: true })
+      .eq('date', today);
+    const todayEl = document.getElementById('splashTodayGames');
+    if (todayEl) todayEl.textContent = (todayCount ?? 0).toLocaleString('tr-TR');
+  } catch(e) {}
+
+  try {
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { count: activeCount } = await sb
+      .from('daily_scores')
+      .select('*', { count: 'exact', head: true })
+      .gte('updated_at', fiveMinAgo);
+    const activeEl = document.getElementById('splashActiveNow');
+    if (activeEl) activeEl.textContent = (activeCount ?? 0).toLocaleString('tr-TR');
+  } catch(e) {}
 }
 
 // ═══════════════════════════════════════════════
