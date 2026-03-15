@@ -6398,8 +6398,13 @@ function listenDuelProgress() {
       if (payload.new.user_id !== currentUser.id) {
         duelState.opponentProgress = payload.new.progress || 0;
         updateDuelBars();
-        if (payload.new.completed && payload.new.won) finishDuel(false, 'opponent_won');
-if (payload.new.completed && !payload.new.won) finishDuel(true, 'opponent_lost');
+        if (payload.new.completed) {
+  if (payload.new.won) {
+    if (!duelState.completed) finishDuel(false, 'opponent_won');
+  } else {
+    if (!duelState.completed) finishDuel(true, 'opponent_lost');
+  }
+}
       }
     }).subscribe();
   duelState.realtimeChannel = ch;
@@ -6436,9 +6441,10 @@ async function finishDuel(won, reason) {
   duelState.completed = true;
   duelState.won = won;
   clearInterval(duelState.timerInterval);
-  if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
 
-  await pushDuelProgress();
+await pushDuelProgress();
+
+if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
 
  // ELO güncelle — dinamik puan sistemi
   let eloChange;
