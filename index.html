@@ -5840,13 +5840,14 @@ function generateDuelCode() {
 }
 
 function getDuelGivens(elo) {
-  if (elo < 300) return 50;
-  if (elo < 750) return 42;
-  if (elo < 1350) return 34;
-  if (elo < 2100) return 28;
-  if (elo < 3000) return 24;
-  if (elo < 4200) return 22;
-  return 20;
+  if (elo < 300)  return 34; 
+  if (elo < 750)  return 28; 
+  if (elo < 1350) return 24; 
+  if (elo < 2100) return 22; 
+  if (elo < 3000) return 20; 
+  if (elo < 4200) return 18; 
+  if (elo < 5200) return 17; 
+  return 17;                 
 }
 
 function generateSudokuPuzzle(givens) {
