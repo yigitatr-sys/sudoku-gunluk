@@ -1554,135 +1554,73 @@ body.dark .btn-reject { border-color:var(--border-strong); }
 
 <div id="tournamentScreen" class="tab-panel">
   <div class="panel-header">
-  <div class="panel-header-title">⚔️ Turnuvalar</div>
-</div>
-  <div style="overflow-y:auto;flex:1;padding:16px;">
+    <div class="panel-header-title">⚔️ Turnuvalar</div>
+  </div>
+  <div style="overflow-y:auto;flex:1;padding:16px;padding-bottom:max(env(safe-area-inset-bottom),24px);">
 
-    <!-- Yakında banner -->
-    <div style="background:linear-gradient(135deg,#1a1035,#2d1b5e);border-radius:20px;padding:24px 20px;margin-bottom:20px;text-align:center;border:1px solid #6c3fc5;box-shadow:0 8px 32px rgba(108,63,197,0.3);">
-      <div style="font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 12px #a78bfa);">⚔️</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#e2d9ff;margin-bottom:8px;">Turnuvalar Geliyor!</div>
-      <div style="font-size:13px;color:#a78bfa;line-height:1.6;">Diğer oyuncularla gerçek zamanlı yarış.<br>Kazan, sıralamada yüksel, özel rozetler kazan.</div>
+    <!-- Aktif Turnuva Kartı -->
+    <div id="activeTournamentCard" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);border-radius:20px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">🌅</span>
+          <div>
+            <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;">Günlük Turnuva</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px;" id="trnDateLabel">Yükleniyor...</div>
+          </div>
+        </div>
+        <div id="trnStatusBadge" style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;padding:4px 10px;border-radius:20px;letter-spacing:1px;">...</div>
+      </div>
+
+      <!-- Geri sayım -->
+      <div id="trnCountdownWrap" style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px 16px;margin-bottom:14px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;" id="trnCountdownLabel">Başlamasına</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:32px;color:#fff;letter-spacing:2px;" id="trnCountdown">--:--:--</div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:3px;">Katılımcı</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;" id="trnParticipants">—</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:3px;">Senin Sıran</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;" id="trnMyRank">—</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:3px;">Zorluk</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;">Orta</div>
+        </div>
+      </div>
+
+      <!-- Katıl butonu -->
+      <button id="trnJoinBtn" onclick="joinTournament()" style="width:100%;padding:14px;background:linear-gradient(135deg,#6c3fc5,#4a2880);border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 16px rgba(108,63,197,0.4);">⚔️ Turnuvaya Katıl</button>
     </div>
 
-    <!-- Günlük Turnuva kartı -->
-    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);">
-      <div style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);padding:16px 18px 14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="font-size:20px;">🌅</div>
-          <span style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;padding:3px 9px;border-radius:20px;letter-spacing:1px;">YAKINDA</span>
-        </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:2px;">Günlük Turnuva</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.65);">Her gün saat 20:00'de başlar · 1 saat</div>
-      </div>
-      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;">
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">👥</div>
-            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">⏱️</div>
-            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">60 dk</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">🎯</div>
-            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Orta</div>
-          </div>
-        </div>
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🥇</span>
-              <span style="font-size:12px;color:var(--text);">Günün Şampiyonu</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🔥</span>
-              <span style="font-size:12px;color:var(--text);">Seri Savaşçısı</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">⚡</span>
-              <span style="font-size:12px;color:var(--text);">Hız Ustası</span>
-            </div>
-          </div>
-        </div>
+    <!-- Ödül Rozetleri -->
+    <div style="background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px;">🏅 ÖDÜL ROZETLERİ</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:20px;">🥇</span><span style="font-size:12px;color:var(--text);">Günün Şampiyonu</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:20px;">🔥</span><span style="font-size:12px;color:var(--text);">Seri Savaşçısı</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:20px;">⚡</span><span style="font-size:12px;color:var(--text);">Hız Ustası</span></div>
       </div>
     </div>
 
-    <!-- Haftalık Şampiyona kartı -->
-    <div style="background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);">
-      <div style="background:linear-gradient(135deg,#1a1612,#3d2b00,#5a3e00);padding:16px 18px 14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="font-size:20px;">👑</div>
-          <span style="font-size:10px;font-weight:700;background:rgba(255,215,0,0.2);color:#ffd700;padding:3px 9px;border-radius:20px;letter-spacing:1px;border:1px solid rgba(255,215,0,0.3);">YAKINDA</span>
-        </div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#ffd700;margin-bottom:2px;">Haftalık Şampiyona</div>
-        <div style="font-size:12px;color:rgba(255,215,0,0.6);">Her Cumartesi 18:00 · Hafta boyunca</div>
+    <!-- Canlı Sıralama -->
+    <div style="background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:700;color:var(--text);">Canlı Sıralama</div>
+        <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;" id="trnLiveDot"></div>
       </div>
-      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;gap:10px;">
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">👥</div>
-            <div style="font-size:11px;color:var(--text-muted);">Katılımcı</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Sınırsız</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">📅</div>
-            <div style="font-size:11px;color:var(--text-muted);">Süre</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">7 gün</div>
-          </div>
-          <div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;">
-            <div style="font-size:18px;margin-bottom:3px;">💀</div>
-            <div style="font-size:11px;color:var(--text-muted);">Zorluk</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text);">Zor</div>
-          </div>
-        </div>
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">🏅 ÖDÜL ROZETLERİ</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">👑</span>
-              <span style="font-size:12px;color:var(--text);">Haftalık Efsane</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">💎</span>
-              <span style="font-size:12px;color:var(--text);">İlk 10</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:20px;">🌟</span>
-              <span style="font-size:12px;color:var(--text);">Hafta Savaşçısı</span>
-            </div>
-          </div>
-        </div>
+      <div id="trnLiveLeaderboard" style="padding:8px 0;">
+        <div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted);">Turnuva başladığında sıralama burada görünür</div>
       </div>
-    </div>
-
-    <!-- Haberdar Et butonu -->
-    <button onclick="tournamentNotify()" id="tournamentNotifyBtn" style="width:100%;padding:15px;background:linear-gradient(135deg,#6c3fc5,#4a2880);border:none;border-radius:16px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 16px rgba(108,63,197,0.4);">🔔 Turnuva Başlayınca Bildir</button>
-
-    <!-- Turnuva Şampiyonları -->
-    <div style="margin-top:24px;">
-      <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">⚔️ Turnuva Şampiyonları</div>
-
-      <!-- Sekme -->
-      <div style="display:flex;background:var(--surface);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px;border:1px solid var(--border);">
-        <button onclick="switchTrnTab('daily')" id="trnTabDaily" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#6c3fc5,#4a2880);color:#fff;touch-action:manipulation;">Günlük</button>
-        <button onclick="switchTrnTab('weekly')" id="trnTabWeekly" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Haftalık</button>
-        <button onclick="switchTrnTab('alltime')" id="trnTabAlltime" style="flex:1;padding:8px 4px;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-muted);touch-action:manipulation;">Tüm Zamanlar</button>
-      </div>
-
-      <!-- Liste -->
-      <div id="trnLeaderboard" style="background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);"></div>
     </div>
 
   </div>
 </div>
-
-</div><!-- /appShell -->
+<!-- /appShell -->
 
 <!-- ══════════════════ JOURNEY EKRANI ══════════════════ -->
 <div id="journeyScreen" style="display:none;position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:200;flex-direction:column;overflow:hidden;background:#0a2010;">
@@ -1805,7 +1743,7 @@ body.dark .btn-reject { border-color:var(--border-strong); }
 
       <!-- Butonlar -->
       <button class="primary-btn" onclick="hideModal('winModal');exitGame();">Ana Menüye Dön</button>
-      <button onclick="hideModal('winModal');startGame(G.mode);" style="background: none; border: none; width: 100%; padding: 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px;">Yeni Bulmaca →</button>
+      <button onclick="G.mode === 'tournament' ? (hideModal('winModal')) : (hideModal('winModal'),startGame(G.mode));" style="background: none; border: none; width: 100%; padding: 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px;">Yeni Bulmaca →</button>
 
     </div>
   </div>
@@ -3567,6 +3505,7 @@ function hideFriendsScreen() {
   }, 280);
 }
 
+
 // ── ARKADAŞLAR EKRANI RENDER ──
 
 async function renderFriendsScreen() {
@@ -4651,10 +4590,316 @@ function showUnlockCelebration(diff) {
 //  HOME SCREEN
 // ═══════════════════════════════════════════════
 
-function openTournamentScreen() {
-  switchTab('tournamentScreen', null);
-  renderTrnLeaderboard('daily');
+// ── TURNUVA SİSTEMİ ──
+
+let trnState = {
+  tournament: null,
+  entry: null,
+  currentPuzzleIndex: 0,
+  timerInterval: null,
+  countdownInterval: null,
+  secondsLeft: 3600
 }
+
+async function openTournamentScreen() {
+  switchTab('tournamentScreen', null)
+  await loadTournament()
+}
+
+async function loadTournament() {
+  const today = new Date().toISOString().slice(0, 10)
+
+  const { data: trn } = await sb
+    .from('tournaments')
+    .select('id, date, starts_at, ends_at, status')
+    .eq('date', today)
+    .maybeSingle()
+
+  if (!trn) {
+    renderTournamentUpcoming()
+    return
+  }
+
+  trnState.tournament = trn
+
+  // Kullanıcının entry'si var mı
+  if (currentUser) {
+    const { data: entry } = await sb
+      .from('tournament_entries')
+      .select('*')
+      .eq('tournament_id', trn.id)
+      .eq('user_id', currentUser.id)
+      .maybeSingle()
+    trnState.entry = entry
+  }
+
+  // Katılımcı sayısı
+  const { count } = await sb
+    .from('tournament_entries')
+    .select('*', { count: 'exact', head: true })
+    .eq('tournament_id', trn.id)
+  document.getElementById('trnParticipants').textContent = count || 0
+
+  // Sıralama
+  if (trnState.entry) {
+    const { data: rank } = await sb
+      .from('tournament_entries')
+      .select('user_id')
+      .eq('tournament_id', trn.id)
+      .gt('total_score', trnState.entry.total_score)
+    document.getElementById('trnMyRank').textContent = '#' + ((rank?.length || 0) + 1)
+  }
+
+  const now = new Date()
+  const startsAt = new Date(trn.starts_at)
+  const endsAt = new Date(trn.ends_at)
+
+  if (trn.status === 'upcoming') {
+    renderTournamentUpcoming(startsAt)
+    startCountdown(startsAt)
+  } else if (trn.status === 'active') {
+    trnState.secondsLeft = Math.max(0, Math.floor((endsAt - now) / 1000))
+    console.log('secondsLeft:', trnState.secondsLeft)
+    renderTournamentActive()
+    startTournamentTimer()
+    loadTrnLeaderboard()
+  } else if (trn.status === 'finished') {
+    renderTournamentFinished()
+    loadTrnLeaderboard()
+  }
+}
+
+function renderTournamentUpcoming(startsAt) {
+  document.getElementById('trnStatusBadge').textContent = 'YAKINDA'
+  document.getElementById('trnStatusBadge').style.background = 'rgba(255,255,255,0.15)'
+  document.getElementById('trnDateLabel').textContent = 'Her gün 20:00 - 21:00'
+  document.getElementById('trnCountdownLabel').textContent = 'Başlamasına'
+  document.getElementById('trnJoinBtn').textContent = '🔔 Başlayınca Bildir'
+  document.getElementById('trnJoinBtn').style.background = 'linear-gradient(135deg,#6c3fc5,#4a2880)'
+  document.getElementById('trnJoinBtn').onclick = tournamentNotify
+}
+
+function renderTournamentActive() {
+  document.getElementById('trnStatusBadge').textContent = '🔴 CANLI'
+  document.getElementById('trnStatusBadge').style.background = 'rgba(239,68,68,0.3)'
+  document.getElementById('trnDateLabel').textContent = 'Turnuva devam ediyor!'
+  document.getElementById('trnCountdownLabel').textContent = 'Bitimine'
+
+  if (trnState.entry) {
+    document.getElementById('trnJoinBtn').textContent = '▶️ Devam Et — Bulmaca #' + (trnState.entry.puzzles_solved + 1)
+    document.getElementById('trnJoinBtn').style.background = 'linear-gradient(135deg,#16a34a,#15803d)'
+  } else {
+    document.getElementById('trnJoinBtn').textContent = '⚔️ Turnuvaya Katıl'
+    document.getElementById('trnJoinBtn').style.background = 'linear-gradient(135deg,#6c3fc5,#4a2880)'
+  }
+  document.getElementById('trnJoinBtn').onclick = joinTournament
+}
+
+function renderTournamentFinished() {
+  document.getElementById('trnStatusBadge').textContent = 'BİTTİ'
+  document.getElementById('trnStatusBadge').style.background = 'rgba(100,100,100,0.4)'
+  document.getElementById('trnDateLabel').textContent = 'Turnuva sona erdi'
+  document.getElementById('trnCountdownLabel').textContent = 'Sonraki turnuvaya'
+  document.getElementById('trnCountdown').textContent = '20:00'
+  document.getElementById('trnJoinBtn').textContent = '📊 Sonuçları Gör'
+  document.getElementById('trnJoinBtn').style.background = 'rgba(255,255,255,0.15)'
+  document.getElementById('trnJoinBtn').onclick = () => loadTrnLeaderboard()
+}
+
+function startCountdown(targetDate) {
+  clearInterval(trnState.countdownInterval)
+  trnState.countdownInterval = setInterval(() => {
+    const diff = Math.max(0, Math.floor((targetDate - new Date()) / 1000))
+    const h = Math.floor(diff / 3600)
+    const m = Math.floor((diff % 3600) / 60)
+    const s = diff % 60
+    document.getElementById('trnCountdown').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0')
+    if (diff === 0) {
+      clearInterval(trnState.countdownInterval)
+      loadTournament()
+    }
+  }, 1000)
+}
+
+function startTournamentTimer() {
+  clearInterval(trnState.timerInterval)
+  trnState.timerInterval = setInterval(() => {
+    trnState.secondsLeft = Math.max(0, trnState.secondsLeft - 1)
+    const h = Math.floor(trnState.secondsLeft / 3600)
+    const m = Math.floor((trnState.secondsLeft % 3600) / 60)
+    const s = trnState.secondsLeft % 60
+    document.getElementById('trnCountdown').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0')
+    if (trnState.secondsLeft === 0) {
+      clearInterval(trnState.timerInterval)
+      renderTournamentFinished()
+    }
+  }, 1000)
+}
+
+async function joinTournament() {
+  if (!currentUser) { showToast('⚠️ Önce giriş yapman lazım!'); return }
+  if (!trnState.tournament) return
+
+  if (!trnState.entry) {
+    const { error } = await sb.from('tournament_entries').insert({
+      tournament_id: trnState.tournament.id,
+      user_id: currentUser.id,
+      total_score: 0,
+      puzzles_solved: 0
+    })
+    if (error) { showToast('❌ Katılım hatası!'); return }
+
+    const { data: entry } = await sb
+      .from('tournament_entries')
+      .select('*')
+      .eq('tournament_id', trnState.tournament.id)
+      .eq('user_id', currentUser.id)
+      .maybeSingle()
+    trnState.entry = entry
+  }
+
+  startTournamentGame()
+}
+
+async function loadTrnLeaderboard() {
+  const lb = document.getElementById('trnLiveLeaderboard')
+  if (!lb || !trnState.tournament) return
+
+  const { data: entries } = await sb
+    .from('tournament_entries')
+    .select('user_id, total_score, puzzles_solved')
+    .eq('tournament_id', trnState.tournament.id)
+    .order('total_score', { ascending: false })
+    .limit(10)
+
+  if (!entries || entries.length === 0) {
+    lb.innerHTML = '<div style="text-align:center;padding:20px;font-size:13px;color:var(--text-muted);">Henüz katılımcı yok</div>'
+    return
+  }
+
+  const ids = entries.map(e => e.user_id)
+  const { data: profiles } = await sb
+    .from('profiles')
+    .select('id, username, avatar')
+    .in('id', ids)
+
+  const medals = ['🥇', '🥈', '🥉']
+
+  lb.innerHTML = entries.map((e, i) => {
+    const profile = profiles?.find(p => p.id === e.user_id)
+    const isMe = e.user_id === currentUser?.id
+    const initials = (profile?.username || 'U').slice(0, 2).toUpperCase()
+    return `
+      <div style="display:flex;align-items:center;padding:10px 14px;${i < entries.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}gap:10px;${isMe ? 'background:var(--accent-light);' : ''}">
+        <div style="width:24px;text-align:center;font-size:${i < 3 ? 16 : 13}px;">${i < 3 ? medals[i] : (i + 1) + '.'}</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6c3fc5,#4a2880);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${profile?.username || 'Kullanıcı'}${isMe ? ' (Sen)' : ''}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${e.puzzles_solved} bulmaca çözüldü</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:14px;font-weight:700;color:#a78bfa;">${(e.total_score || 0).toLocaleString('tr')}</div>
+          <div style="font-size:10px;color:var(--text-muted);">puan</div>
+        </div>
+      </div>`
+  }).join('')
+}
+
+async function startTournamentGame() {
+  if (!trnState.tournament || !trnState.entry) return
+
+  // Turnuva bulmacalarını çek
+  const { data: trn } = await sb
+    .from('tournaments')
+    .select('puzzles')
+    .eq('id', trnState.tournament.id)
+    .single()
+
+  if (!trn?.puzzles) { showToast('❌ Bulmaca yüklenemedi!'); return }
+
+  const puzzleIndex = trnState.currentPuzzleIndex || trnState.entry.puzzles_solved || 0
+  if (puzzleIndex >= trn.puzzles.length) {
+    showToast('🏆 Tüm bulmacaları çözdün!')
+    return
+  }
+
+  const puzzleData = trn.puzzles[puzzleIndex]
+  trnState.currentPuzzleIndex = puzzleIndex
+
+  // Mevcut oyun sistemini kullanarak turnuva bulmacasını başlat
+  G.mode = 'tournament'
+  currentDifficulty = puzzleData.difficulty
+  const cfg = DIFFICULTIES[puzzleData.difficulty] || DIFFICULTIES['medium']
+  G.puzzle = [...puzzleData.puzzle]
+  G.solution = [...puzzleData.solution]
+  G.userGrid = [...puzzleData.puzzle]
+  G.given = [...puzzleData.puzzle].map(v => v !== 0)
+  G.pencilGrid = Array.from({length: 81}, () => Array(9).fill(false))
+  G.errors = 0
+  G.hintsLeft = cfg.hints
+  G.completed = false
+  G.timerSec = 0
+  errors = 0
+  hintsUsed = 0
+  elapsedSeconds = 0
+  gameActive = true
+
+  maxErrors = cfg.maxErrors
+  maxHints = cfg.hints
+
+  document.getElementById('gameTitle').textContent =
+    '⚔️ Turnuva — Bulmaca #' + (puzzleIndex + 1)
+  document.getElementById('diffBadge').className = 'diff-badge ' + puzzleData.difficulty
+  document.getElementById('diffBadge').textContent = cfg.label.toUpperCase()
+
+  renderGrid()
+  startTimer()
+
+  document.getElementById('gameScreen').classList.add('active')
+  document.getElementById('errorsDisplay').textContent = '0/' + maxErrors
+  document.getElementById('hintsDisplay').textContent = maxHints
+}
+
+async function finishTournamentPuzzle(timeSec) {
+  if (!trnState.entry || !trnState.tournament) return
+
+  const cfg = DIFFICULTIES[G.mode || 'medium']
+  const multiplier = cfg?.scoreMultiplier || 4
+
+  // Puan hesapla — hız bonusu var
+  let score = Math.round((10000 / timeSec) * multiplier)
+  if (errors === 0) score = Math.round(score * 1.2)   // hatasız bonus
+  if (hintsUsed === 0) score = Math.round(score * 1.1) // ipucusuz bonus
+
+  const newTotal = (trnState.entry.total_score || 0) + score
+  const newSolved = (trnState.entry.puzzles_solved || 0) + 1
+  trnState.currentPuzzleIndex = newSolved
+  const newBest = Math.min(trnState.entry.best_time || 9999, timeSec)
+
+  await sb.from('tournament_entries').update({
+    total_score: newTotal,
+    puzzles_solved: newSolved,
+    best_time: newBest
+  }).eq('id', trnState.entry.id)
+
+  trnState.entry.total_score = newTotal
+  trnState.entry.puzzles_solved = newSolved
+  trnState.entry.best_time = newBest
+
+  showToast(`+${score.toLocaleString('tr')} puan! 🎉`)
+
+  // Sıralamayı güncelle
+  loadTrnLeaderboard()
+
+  // Kısa bekleyip sonraki bulmacaya geç
+  setTimeout(() => {
+    startTournamentGame()
+  }, 1500)
+}
+
+
 
 function closeTournamentScreen() {
   switchTab('homePanel', null);
@@ -5594,7 +5839,7 @@ function checkWin() {
     return; // ← skor/badge/unlock kısmına hiç girme
   }
   const today = todayStr();
-  const hintsUsed = DIFFICULTIES[G.mode].hints - G.hintsLeft;
+  const hintsUsed = (DIFFICULTIES[G.mode]?.hints || 3) - G.hintsLeft;
   appState.scores.push({ date: today, time: G.timerSec, errors: G.errors, mode: G.mode, hints_used: hintsUsed, hour: new Date().getHours() });
   if (G.mode === 'daily') {
     const yesterday = dateStr(1);
@@ -5607,6 +5852,10 @@ function checkWin() {
     // Supabase'e kaydet
     saveDailyScore(G.timerSec, G.errors, hintsUsed);
     saveGameSession(G.mode);
+  }
+  if (G.mode === 'tournament') {
+    finishTournamentPuzzle(G.timerSec);
+    return;
   }
     // Check for new badges
     const newBadges = getEarnedBadges().filter(b => !appState.earnedBadges || !appState.earnedBadges.includes(b.id));
@@ -8166,6 +8415,7 @@ function highlightSameNumbers() {
     });
 }
 </script>
+<button onclick="openTournamentScreen()" style="position:fixed;bottom:100px;right:16px;z-index:999;background:#6c3fc5;color:#fff;border:none;border-radius:20px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;">⚔️ Turnuva</button>
 
 </body>
 </html>
