@@ -35,6 +35,27 @@
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
 }
 
+/* ── PROFİL RESPONSIVE ── */
+@media (max-height: 650px) {
+  .profile-hero { padding: 16px 16px 14px; }
+  .profile-avatar-ring { width: 72px; height: 72px; margin-bottom: 8px; }
+  .profile-avatar-ring-inner { font-size: 36px; }
+  .profile-hero-name { font-size: 20px; }
+  .profile-xp-wrap { padding: 8px 12px; margin-bottom: 10px; }
+  .profile-stats-grid { gap: 6px; }
+  .profile-stat-val { font-size: 22px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #profilePanel > div:last-child {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .profile-hero { flex: 0 0 200px; min-height: 100%; border-radius: 0; }
+  .profile-stats-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+}
+
 body.dark {
   --bg: #12100e;
   --surface: #1e1a16;
@@ -1230,14 +1251,14 @@ body.dark .btn-reject { border-color:var(--border-strong); }
       <button onclick="showFriendsScreen()" style="background:linear-gradient(145deg,#fff8f0,#fdf0e0);border:1.5px solid #f0ddc4;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:0 2px 8px rgba(193,127,62,0.1);">👥</button>
       <button onclick="switchTab('settingsPanel',null)" style="background:linear-gradient(145deg,#fff8f0,#fdf0e0);border:1.5px solid #f0ddc4;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:0 2px 8px rgba(193,127,62,0.1);">⚙️</button>
     </div>
-    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;padding:16px 0 120px;-webkit-overflow-scrolling:touch;background:var(--bg);">
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;padding:16px 0 max(env(safe-area-inset-bottom),80px);-webkit-overflow-scrolling:touch;background:var(--bg);">
 
       <!-- Hero -->
       <div style="padding:20px 18px 18px;background:linear-gradient(145deg,#fff8f0,#fdf3e7);border-bottom:1.5px solid #f0ddc4;position:relative;">
         <div style="position:absolute;right:-20px;top:-20px;font-size:100px;opacity:0.06;pointer-events:none;user-select:none;line-height:1;">🧩</div>
         <div style="display:flex;align-items:center;gap:14px;">
           <div style="position:relative;flex-shrink:0;">
-            <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#f5e6d0,#e8c99a);border:2.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(193,127,62,0.25);" id="profileAvatarDisplay"></div>
+            <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#f5e6d0,#e8c99a);border:2.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(193,127,62,0.25);overflow:hidden;" id="profileAvatarDisplay"></div>
           </div>
           <div style="flex:1;min-width:0;">
             <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#1a1612;font-weight:700;line-height:1.1;" id="statsUsername">Misafir</div>
@@ -6822,7 +6843,7 @@ function updateProfilePanel() {
   const streakEl = document.getElementById('statsStreak');
   if (avatarEl) {
     if (appState.avatarPhoto) {
-      avatarEl.innerHTML = `<img src="${appState.avatarPhoto}" style="width:100%;height:100%;object-fit:cover;" />`;
+      avatarEl.innerHTML = `<img src="${appState.avatarPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
     } else {
       avatarEl.innerHTML = appState.avatar || '🧩';
     }
@@ -6924,6 +6945,20 @@ function updateNumpadPencilState() {
 // ═══════════════════════════════════════════════
 
 loadState();
+(function checkStreakOnOpen() {
+  const today     = todayStr();
+  const yesterday = dateStr(1);
+  const last      = appState.lastPlayedDate;
+  if (last && last !== today && last !== yesterday) {
+    appState.streak = 0;
+    saveState();
+  }
+  // Şu anki seri en iyiden büyükse düzelt
+  if ((appState.streak || 0) > (appState.bestStreak || 0)) {
+    appState.bestStreak = appState.streak;
+    saveState();
+  }
+})();
 initDarkMode();
 initSettings();
 updateHomeScreen();
