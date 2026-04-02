@@ -109,6 +109,45 @@ body {
 /* Swipe dots — kaldırıldı, eski JS referansları için DOM'da kalır */
 #swipeDots { display:none !important; }
 
+/* ── Ana menü mod kartları (gradient + diyagonal doku) ── */
+.home-mod-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22), 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+.home-mod-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+.home-mod-card > svg,
+.home-mod-card > div,
+.home-mod-card > span {
+  z-index: 1;
+}
+.home-mod-card--daily {
+  background: linear-gradient(140deg, #1a4fbb 0%, #1e3a8a 60%, #172554 100%);
+}
+.home-mod-card--duel {
+  background: linear-gradient(140deg, #1e3a8a 0%, #172554 60%, #0f1f42 100%);
+}
+.home-mod-card--journey {
+  background: linear-gradient(140deg, #163580 0%, #0e2460 60%, #091840 100%);
+}
+.home-mod-card--tournament {
+  background: linear-gradient(140deg, #0d1f5c 0%, #091540 60%, #060e2a 100%);
+}
+
 /* ── 3D BUTON & KART EFEKTLERİ ── */
 .mod-card {
   transition: transform 0.12s ease, box-shadow 0.12s ease !important;
@@ -396,7 +435,7 @@ body {
 .cell:nth-child(n+46):nth-child(-n+54) { border-bottom:2.5px solid #94a3b8; }
 .cell:nth-child(n+73):nth-child(-n+81) { border-bottom:none; }
 
-.cell.given { background:#eff6ff; cursor:default; }
+.cell.given { background:#ffffff; cursor:default; }
 .cell.selected { background:#dbeafe !important; }
 .cell.highlight { background:#f1f5f9; }
 .cell.same-num { background:#e0f2fe; }
@@ -603,7 +642,7 @@ body.dark .cell { background:#1e293b; border-color:#334155; }
 body.dark .cell:nth-child(3n) { border-right-color:#64748b; }
 body.dark .cell:nth-child(n+19):nth-child(-n+27) { border-bottom-color:#64748b; }
 body.dark .cell:nth-child(n+46):nth-child(-n+54) { border-bottom-color:#64748b; }
-body.dark .cell.given { background:#172554; }
+body.dark .cell.given { background:#1e293b; }
 body.dark .cell.selected { background:#1e3a5f !important; }
 body.dark .cell.highlight { background:#334155; }
 body.dark .cell.same-num { background:#1e3a5f; }
