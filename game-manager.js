@@ -529,6 +529,41 @@ function _showContinueModal(mode, saved) {
   showModal('continueModal');
 }
 
+function _savedGameIsResumable(mode, saved) {
+  if (!saved || !saved.solution || !saved.solution.length) return false;
+  if (mode === 'daily') {
+    const today = todayStr();
+    const dailyDone = appState.scores.some(s => s.date === today && s.mode === 'daily');
+    if (dailyDone) return false;
+    if (saved.savedDate !== today) return false;
+  }
+  return true;
+}
+
+function getResumableSavedMode() {
+  const sg = appState.savedGames || {};
+  const preferred = appState.lastSavedGameMode;
+  if (preferred && _savedGameIsResumable(preferred, sg[preferred])) return preferred;
+  for (const mode of Object.keys(sg)) {
+    if (_savedGameIsResumable(mode, sg[mode])) return mode;
+  }
+  return null;
+}
+
+function resumeLastSavedGame() {
+  const mode = getResumableSavedMode();
+  if (!mode) {
+    showToast('Devam edecek yarım bulmaca yok.');
+    return;
+  }
+  const saved = appState.savedGames[mode];
+  document.getElementById('swipeDots').style.display = 'none';
+  const nav = document.querySelector('.bottom-nav');
+  if (nav) nav.style.display = 'none';
+  closeLevelsSheet();
+  _resumeGame(saved);
+}
+
 function _resumeGame(saved) {
   const mode = saved.mode || G.mode;
   stopTimer();
@@ -724,65 +759,6 @@ function checkWin() {
 
   G.completed = true;
   stopTimer();
-  // Journey level tamamlandıysa ilerle
-  if (window._activeJourneyLevel) {
-    const jl = window._activeJourneyLevel;
-    const cur = getJourneyProgress();
-    if (jl === cur + 1) {
-      localStorage.setItem('journey_progress', jl);
-      setTimeout(() => showToast('🗺️ Bölüm ' + jl + ' tamamlandı! ' + (jl % 20 === 0 ? '🎉 Yeni chapter açıldı!' : '')), 2000);
-      updateJourneyHomeBtn();
-      // Hatasız / ipucusuz journey sayaçları
-      if (G.errors === 0) {
-        appState.journeyPerfect = (appState.journeyPerfect || 0) + 1;
-      }
-      const hintsUsed = DIFFICULTIES[G.mode].hints - G.hintsLeft;
-      if (hintsUsed === 0) {
-        appState.journeyNoHint = (appState.journeyNoHint || 0) + 1;
-      }
-      // Yeni journey rozeti kazanıldı mı?
-      const newJrnBadges = getEarnedBadges().filter(b => b.id.startsWith('jrn_') && (!appState.earnedBadges || !appState.earnedBadges.includes(b.id)));
-      if (!appState.earnedBadges) appState.earnedBadges = [];
-      newJrnBadges.forEach(b => {
-        appState.earnedBadges.push(b.id);
-        setTimeout(() => showToast('🎖️ Yeni rozet: ' + b.name + ' ' + b.icon), 2500);
-      });
-      saveState();
-    }
-    window._activeJourneyLevel = null;
-  }
-
-  // Journey modunda skor/badge/unlock sistemi çalışmasın
-  if (window._activeJourneyLevel) {
-    const jl = window._activeJourneyLevel;
-    const cur = getJourneyProgress();
-    if (jl === cur + 1) {
-      localStorage.setItem('journey_progress', jl);
-      setTimeout(() => showToast('🗺️ Bölüm ' + jl + ' tamamlandı!' + (jl % 20 === 0 ? ' 🎉 Yeni chapter açıldı!' : '')), 2000);
-      updateJourneyHomeBtn();
-    }
-    window._activeJourneyLevel = null;
-    // Normal akışa devam etme
-    setTimeout(() => {
-      const cfg = DIFFICULTIES[G.mode];
-      document.getElementById('winEmoji').textContent = '🗺️';
-      document.getElementById('winTitle').textContent = 'Bölüm Tamamlandı!';
-      document.getElementById('winSub').textContent = jl + '. bölümü ' + formatTime(G.timerSec) + '\'de çözdün!';
-      document.getElementById('winTime').textContent = formatTime(G.timerSec);
-      document.getElementById('winErrors').textContent = G.errors;
-      document.getElementById('winHints').textContent = (cfg.hints || 3) - G.hintsLeft;
-      document.getElementById('winRank').textContent = '';
-      const recordBadge = document.getElementById('winRecordBadge');
-      if (recordBadge) recordBadge.style.display = 'none';
-      showModal('winModal');
-      launchConfetti();
-      if (appState.savedGames && appState.savedGames[G.mode]) {
-        delete appState.savedGames[G.mode];
-        saveState();
-      }
-    }, 500);
-    return; // ← skor/badge/unlock kısmına hiç girme
-  }
   const today = todayStr();
   const hintsUsed = (DIFFICULTIES[G.mode]?.hints || 3) - G.hintsLeft;
   appState.scores.push({ date: today, time: G.timerSec, errors: G.errors, mode: G.mode, hints_used: hintsUsed, hour: new Date().getHours() });
@@ -833,33 +809,16 @@ function checkWin() {
     document.getElementById('winTitle').textContent = G.errors === 0 ? 'Mükemmel! 🏆' : 'Tebrikler!';
     document.getElementById('winSub').textContent = `${cfg.label} bulmacayı ${formatTime(G.timerSec)}'de çözdün!`;
     document.getElementById('winTime').textContent = formatTime(G.timerSec);
-    // Hata sayısını yaz
-document.getElementById('winErrors').textContent = G.errors;
+    document.getElementById('winErrors').textContent = String(G.errors);
+    document.getElementById('winHints').textContent = String((cfg.hints || 3) - G.hintsLeft);
 
-// Hata noktalarını çiz
-const dots = document.getElementById('winErrorDots');
-if (dots) {
-  dots.innerHTML = '';
-  const maxErr = DIFFICULTIES[G.mode]?.maxErrors ?? 3;
-  for (let i = 0; i < maxErr; i++) {
-    const d = document.createElement('div');
-    d.style.cssText = `width:8px;height:8px;border-radius:50%;background:${i < G.errors ? 'var(--danger)' : 'var(--border)'};`;
-    dots.appendChild(d);
-  }
-}
-    document.getElementById('winHints').textContent = (cfg.hints || 3) - G.hintsLeft;
-    document.getElementById('winRank').textContent = '#' + calcRank(G.timerSec);
-
-    // Kişisel rekor kontrolü
-    const prevBest = appState.scores
-      .filter(s => s.mode === G.mode && s.time < G.timerSec)
-      .length === 0 && appState.scores.filter(s => s.mode === G.mode).length > 0;
     const scores = appState.scores.filter(s => s.mode === G.mode);
     const isRecord = scores.length > 1 && G.timerSec === Math.min(...scores.map(s => s.time));
     const recordBadge = document.getElementById('winRecordBadge');
-    if (recordBadge) recordBadge.style.display = isRecord ? 'block' : 'none';
+    if (recordBadge) recordBadge.style.display = isRecord ? 'flex' : 'none';
 
-    showModal('winModal');
+    const winEl = document.getElementById('winScreen');
+    if (winEl) winEl.style.display = 'flex';
     launchConfetti();
 
     // Kayıtlı oyunu temizle
@@ -882,15 +841,36 @@ function showRulesModal() {
   showModal('rulesModal');
 }
 
+function hideGameOverScreen() {
+  const el = document.getElementById('gameOverScreen');
+  if (el) el.style.display = 'none';
+}
+
+function hideWinScreen() {
+  const el = document.getElementById('winScreen');
+  if (el) el.style.display = 'none';
+}
+
 function showGameOverModal() {
   stopTimer();
   G.gameLost = true;
   G.completed = true;
-  document.getElementById('goTime').textContent = formatTime(G.timerSec);
-  document.getElementById('goHints').textContent = G.hintsLeft;
+  const cfg = (typeof DIFFICULTIES !== 'undefined' && DIFFICULTIES[G.mode]) || {};
+  const maxErr = cfg.maxErrors != null ? cfg.maxErrors : 3;
+  const nameEl = document.getElementById('gsDiffName');
+  if (nameEl) nameEl.textContent = G.mode === 'daily' ? 'Günün Bulmacası' : (cfg.label || G.mode);
+  const sub = document.getElementById('gsSubtitle');
+  if (sub) sub.textContent = `Hata limitine ulaşıldı (${G.errors}/${maxErr}).`;
+  const t = document.getElementById('gsTime');
+  if (t) t.textContent = formatTime(G.timerSec);
+  const h = document.getElementById('gsHints');
+  if (h) h.textContent = String(G.hintsLeft);
+  const e = document.getElementById('gsErrors');
+  if (e) e.textContent = `${G.errors}/${maxErr}`;
   const watchBtn = document.getElementById('gameOverWatchBtn');
   if (watchBtn) watchBtn.style.display = G.extraErrorUsed ? 'none' : 'flex';
-  showModal('gameOverModal');
+  const screen = document.getElementById('gameOverScreen');
+  if (screen) screen.style.display = 'flex';
   if (appState.savedGames && appState.savedGames[G.mode]) {
     delete appState.savedGames[G.mode];
     saveState();

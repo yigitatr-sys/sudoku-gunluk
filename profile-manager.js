@@ -68,17 +68,6 @@ const BADGES = [
   { id:'trn_weekly_3',    icon:'🌟', name:'Taht Sahibi',       desc:'3 haftalık şampiyonayı kazan',                    check: s => (s.tournamentWeeklyWins||0) >= 3 },
   { id:'trn_speed',       icon:'⚡', name:'Hız Ustası',        desc:'Turnuvada en hızlı bitiren ol',                   check: s => (s.tournamentSpeedWins||0) >= 1 },
   { id:'trn_perfect',     icon:'✨', name:'Turnuva Efsanesi',  desc:'Turnuvayı hatasız ve ipucusuz kazan',             check: s => (s.tournamentPerfect||0) >= 1 },
-  // ── MACERA (JOURNEY) ──
-  { id:'jrn_first',      icon:'🗺️', name:'İlk Adım',           desc:'Macera\'da ilk bölümü tamamla',                   check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 1 },
-  { id:'jrn_10',         icon:'🌲', name:'Orman Yolcusu',       desc:'Macera\'da 10 bölüm tamamla',                     check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 10 },
-  { id:'jrn_ch1',        icon:'🏕️', name:'Ormanı Geçtim',      desc:'Yeşil Orman chapter\'ını bitir (20 bölüm)',       check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 20 },
-  { id:'jrn_ch2',        icon:'🕯️', name:'Karanlıktan Çıktım', desc:'Karanlık Mağara chapter\'ını bitir (40 bölüm)',   check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 40 },
-  { id:'jrn_ch3',        icon:'🏰', name:'Kale Fatihi',         desc:'Antik Kale chapter\'ını bitir (60 bölüm)',        check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 60 },
-  { id:'jrn_ch4',        icon:'🌋', name:'Ejderha Katili',      desc:'Ejderha Dağı chapter\'ını bitir (80 bölüm)',      check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 80 },
-  { id:'jrn_ch5',        icon:'⚡', name:'Efsane',              desc:'Tüm 100 bölümü tamamla',                          check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 100 },
-  { id:'jrn_half',       icon:'🧭', name:'Yarı Yol',            desc:'50. bölüme ulaş',                                 check: () => parseInt(localStorage.getItem('journey_progress')||'0') >= 50 },
-  { id:'jrn_perfect5',   icon:'🌟', name:'Macera Ustası',       desc:'Journey\'de 5 bölümü hatasız tamamla',            check: s => (s.journeyPerfect||0) >= 5 },
-  { id:'jrn_nohint10',   icon:'🎓', name:'Rehbersiz Kahraman',  desc:'Journey\'de 10 bölümü ipucu kullanmadan bitir',   check: s => (s.journeyNoHint||0) >= 10 },
 ];
 
 function getEarnedBadges() {
@@ -108,7 +97,6 @@ function renderBadges() {
     { title: 'HIZ',           ids: ['speed_10min','speed_5min','speed_3min','speed_2min'] },
     { title: 'MÜKEMMELLİK',   ids: ['no_errors','no_errors_3','no_errors_10','no_hints','no_hints_5','perfect_game','speed_perfect'] },
     { title: 'TURNUVA',       ids: ['trn_first','trn_top10','trn_podium','trn_daily_win','trn_daily_3','trn_weekly_win','trn_weekly_3','trn_speed','trn_perfect'] },
-    { title: 'MACERA',        ids: ['jrn_first','jrn_10','jrn_half','jrn_ch1','jrn_ch2','jrn_ch3','jrn_ch4','jrn_ch5','jrn_perfect5','jrn_nohint10'] },
   ];
 
   const svgEarned = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';

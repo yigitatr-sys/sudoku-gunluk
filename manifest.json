@@ -1,7 +1,7 @@
 {
   "name": "Sudoku Günlük",
   "short_name": "Sudoku",
-  "description": "Günlük Sudoku — Macera, Düello ve daha fazlası",
+  "description": "Günlük Sudoku — Düello, turnuva ve sıralama",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

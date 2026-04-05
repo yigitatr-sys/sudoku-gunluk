@@ -151,11 +151,11 @@
     <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;width:100%;background:linear-gradient(to bottom,#4a8ff7 0%,#7db3fa 28%,#bdd7ff 52%,#deeaff 70%,#f0f5ff 100%);">
 
       <div class="home-top-bar">
-        <time id="homeTopDate" class="home-top-date" datetime=""></time>
+        <span class="home-brand" aria-label="Sudoku Günlük">Sudoku</span>
         <div class="home-streak-anchor">
-          <button type="button" id="homeStreakBtn" class="home-streak-btn" aria-expanded="false" aria-controls="homeStreakPanel" aria-label="Seri bilgisi" onclick="toggleHomeStreakPanel(event)">
+          <button type="button" id="homeStreakBtn" class="home-streak-btn home-streak-btn--inactive" aria-expanded="false" aria-controls="homeStreakPanel" aria-label="Seri bilgisi" onclick="toggleHomeStreakPanel(event)">
             <span class="home-streak-btn__glyph" aria-hidden="true">🔥</span>
-            <span id="homeStreakCount" class="home-streak-btn__count">0</span>
+            <span id="homeStreakCount" class="home-streak-btn__count" hidden>0</span>
           </button>
           <div id="homeStreakBackdrop" class="home-streak-backdrop" hidden aria-hidden="true" onclick="closeHomeStreakPanel()"></div>
           <div id="homeStreakPanel" class="home-streak-panel" role="region" aria-labelledby="homeStreakPanelTitle" hidden>
@@ -184,9 +184,14 @@
             <rect x="58" y="58" width="17" height="17" rx="3" fill="white" opacity="0.18"/>
           </svg>
           <div class="home-challenge-card__body">
-            <h2 id="dailyChallengeTitle" class="home-challenge-card__title">Günlük Mücadele</h2>
-            <p id="dailyStatus" class="home-challenge-card__status" aria-live="polite"></p>
-            <span id="homeDailyCta" class="home-challenge-card__cta"><span class="home-challenge-card__cta-text">Oyna</span><span class="home-challenge-card__cta-arrow" aria-hidden="true">→</span></span>
+            <div class="home-challenge-card__body-inner">
+              <div class="home-challenge-card__copy">
+                <time id="homeChallengeDate" class="home-challenge-card__date" datetime=""></time>
+                <h2 id="dailyChallengeTitle" class="home-challenge-card__title">Günlük Mücadele</h2>
+                <p id="dailyStatus" class="home-challenge-card__status" aria-live="polite"></p>
+              </div>
+              <span id="homeDailyCta" class="home-challenge-card__cta"><span class="home-challenge-card__cta-text">Oyna</span><span class="home-challenge-card__cta-arrow" aria-hidden="true">→</span></span>
+            </div>
           </div>
         </button>
       </div>
@@ -1669,23 +1674,22 @@ function _csFresh() {
     <span class="nav-tab-label">Düello</span>
   </button>
   <button class="nav-tab" id="navLb" onclick="showPanel('lbPanel')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="2" y1="20.25" x2="22" y2="20.25"/>
+      <path d="M5.25 20v-6h3.5v6"/>
+      <path d="M10.25 20V9h3.5v11"/>
+      <path d="M15.25 20v-8h3.5v8"/>
+    </svg>
+    <span class="nav-tab-label">Sıralama</span>
+  </button>
+  <button class="nav-tab" id="navTournament" onclick="showPanel('tournamentPanel')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
       <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
       <path d="M4 22h16"/>
       <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
       <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
       <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
-    </svg>
-    <span class="nav-tab-label">Sıralama</span>
-  </button>
-  <button class="nav-tab" id="navTournament" onclick="showPanel('tournamentPanel')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-      <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
-      <path d="M12 11v8"/>
-      <path d="M8 21h8"/>
     </svg>
     <span class="nav-tab-label">Turnuva</span>
   </button>

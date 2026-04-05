@@ -13,21 +13,6 @@ const FAKE_USERS = [
 ];
 
 // ═══════════════════════════════════════════════
-//  STORAGE
-
-async function calcRank(time) {
-  const today = todayStr();
-  const entries = await getRealLbEntries(today);
-  const sorted = entries.map(e => e.time).sort((a, b) => a - b);
-  if (appState.username) {
-    const myEntry = entries.find(e => e.isMe);
-    if (!myEntry) sorted.push(time);
-  }
-  sorted.sort((a, b) => a - b);
-  return sorted.indexOf(time) + 1;
-}
-
-// ═══════════════════════════════════════════════
 //  LEADERBOARD
 // ═══════════════════════════════════════════════
 
@@ -95,31 +80,90 @@ async function buildRealTotalPoints(days) {
   const fromDate = dateStr(days - 1);
   const { data, error } = await sb
     .from('daily_scores')
-    .select('time_seconds, user_id, date, profiles(username)')
+    .select('time_seconds, user_id, date, profiles(username, avatar_url)')
     .gte('date', fromDate)
     .order('date', { ascending: false });
   if (error || !data) return [];
 
   const totals = {};
-  // Günlere göre grupla
   const byDate = {};
   data.forEach(row => {
     if (!byDate[row.date]) byDate[row.date] = [];
     byDate[row.date].push(row);
   });
-  // Her gün için sırala ve puan ver
   Object.values(byDate).forEach(rows => {
     rows.sort((a, b) => a.time_seconds - b.time_seconds);
     const total = rows.length;
     rows.forEach((row, idx) => {
+      const uid = row.user_id;
       const name = row.profiles?.username || 'Anonim';
       const isMe = row.user_id === currentUser?.id;
       const pts = calcDailyPoints(idx + 1, total);
-      if (!totals[name]) totals[name] = { name, ini: name.slice(0,2).toUpperCase(), points: 0, isMe };
-      totals[name].points += pts;
+      if (!totals[uid]) {
+        totals[uid] = {
+          userId: uid,
+          name,
+          ini: (name || 'AN').slice(0, 2).toUpperCase(),
+          points: 0,
+          isMe,
+          avatarUrl: row.profiles?.avatar_url || null,
+        };
+      }
+      totals[uid].points += pts;
+      if (!totals[uid].avatarUrl && row.profiles?.avatar_url) totals[uid].avatarUrl = row.profiles.avatar_url;
+      totals[uid].isMe = totals[uid].isMe || isMe;
     });
   });
   return Object.values(totals).sort((a, b) => b.points - a.points);
+}
+
+function clearLbSticky(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'none';
+  el.innerHTML = '';
+}
+
+function lbStickyRowHtml(rank, entry, valueLabel) {
+  const av = entry.avatarUrl
+    ? `<div class="lb-sticky-me__avatar" style="background-image:url(${entry.avatarUrl});background-size:cover;background-position:center;"></div>`
+    : `<div class="lb-sticky-me__avatar">${entry.ini}</div>`;
+  return `<div class="lb-sticky-me__inner" onclick="showDuelProfile('${entry.userId}')" role="button" tabindex="0">
+    <span class="lb-sticky-me__rank">#${rank}</span>
+    ${av}
+    <span class="lb-sticky-me__name">Sen</span>
+    <span class="lb-sticky-me__val">${valueLabel}</span>
+  </div>`;
+}
+
+function updateLbStickyToday(entries) {
+  clearLbSticky('lbStickyToday');
+  if (!entries?.length || !currentUser?.id) return;
+  const idx = entries.findIndex(e => e.isMe);
+  if (idx < 0) return;
+  const rank = idx + 1;
+  if (rank <= 6) return;
+  const e = entries[idx];
+  if (!e.userId) return;
+  const el = document.getElementById('lbStickyToday');
+  if (!el) return;
+  el.innerHTML = lbStickyRowHtml(rank, e, formatTime(e.time));
+  el.style.display = 'flex';
+}
+
+function updateLbStickyRanked(panelId, ranked, firstScreenMaxRank) {
+  clearLbSticky(panelId);
+  if (!ranked?.length || !currentUser?.id) return;
+  const idx = ranked.findIndex(e => e.isMe);
+  if (idx < 0) return;
+  const rank = idx + 1;
+  if (rank <= firstScreenMaxRank) return;
+  const e = ranked[idx];
+  if (!e.userId) return;
+  const el = document.getElementById(panelId);
+  if (!el) return;
+  el.innerHTML = lbStickyRowHtml(rank, e, `${e.points} puan`);
+  el.style.display = 'flex';
 }
 
 // ═══════════════════════════════════════════════
@@ -174,55 +218,63 @@ async function renderLbForDate(d) {
   if (!podiumEl || !listEl) return;
   podiumEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted)">Yükleniyor...</div>';
   listEl.innerHTML = '';
+  clearLbSticky('lbStickyToday');
   try {
-  const entries = await getRealLbEntries(d);
-  const top3 = entries.slice(0, 3);
-  const rest = entries.slice(3);
-  const order = [1, 0, 2], classes = ['second','first','third'], crowns = ['🥈','🥇','🥉'];
+    const entries = await getRealLbEntries(d);
+    const top3 = entries.slice(0, 3);
+    const rest = entries.slice(3);
+    const order = [1, 0, 2], classes = ['second','first','third'], crowns = ['🥈','🥇','🥉'];
 
-  if (entries.length === 0) {
-    podiumEl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Henüz kimse çözmedi</div>';
-    listEl.innerHTML = '';
-    return;
-  }
+    if (entries.length === 0) {
+      podiumEl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Henüz kimse çözmedi</div>';
+      listEl.innerHTML = '';
+      return;
+    }
 
-  podiumEl.innerHTML = order.map((oi, vi) => {
-    const e = top3[oi]; if (!e) return '';
-    return `<div class="podium-item ${classes[vi]}">
+    podiumEl.innerHTML = order.map((oi, vi) => {
+      const e = top3[oi]; if (!e) return '';
+      return `<div class="podium-item ${classes[vi]}">
       <div class="podium-crown">${crowns[vi]}</div>
       <div class="podium-avatar" onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;${e.avatarUrl ? `background-image:url(${e.avatarUrl});background-size:cover;background-position:center;` : ''}">${e.avatarUrl ? '' : e.ini}</div>
-      <div class="podium-name">${e.name}</div>
+      <div class="podium-name" onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;">${e.name}</div>
       <div class="podium-time">${formatTime(e.time)}</div>
       <div class="podium-bar"></div>
     </div>`;
-  }).join('');
+    }).join('');
 
-  document.getElementById('lbList').innerHTML = rest.length === 0
-    ? '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">Daha fazla oyuncu yok</div>'
-    : rest.map((e, i) => `
+    listEl.innerHTML = rest.length === 0
+      ? '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">Daha fazla oyuncu yok</div>'
+      : rest.map((e, i) => `
       <div class="lb-list-row${e.isMe ? ' me' : ''}" onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;">
         <span class="lb-list-rank">${i+4}</span>
         <div class="lb-list-avatar" style="${e.avatarUrl ? `background-image:url(${e.avatarUrl});background-size:cover;` : ''}">${e.avatarUrl ? '' : e.ini}</div>
         <div class="lb-list-name">${e.name}${e.isMe ? '<small>Sen</small>' : ''}</div>
         <div class="lb-list-time">${formatTime(e.time)}</div>
       </div>`).join('');
-  } catch(e) {
+
+    updateLbStickyToday(entries);
+  } catch (e) {
     console.error('renderLbForDate hatası:', e);
     podiumEl.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Bağlantı hatası — tekrar dene</div>';
     listEl.innerHTML = '';
+    clearLbSticky('lbStickyToday');
   }
 }
 
 async function renderLbWeek() {
+  clearLbSticky('lbStickyWeek');
   document.getElementById('lbListWeek').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted)">Yükleniyor...</div>';
   const ranked = await buildRealTotalPoints(7);
   document.getElementById('lbListWeek').innerHTML = renderRankedList(ranked);
+  updateLbStickyRanked('lbStickyWeek', ranked, 8);
 }
 
 async function renderLbAllTime() {
+  clearLbSticky('lbStickyAllTime');
   document.getElementById('lbListAllTime').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted)">Yükleniyor...</div>';
   const ranked = await buildRealTotalPoints(365);
   document.getElementById('lbListAllTime').innerHTML = renderRankedList(ranked);
+  updateLbStickyRanked('lbStickyAllTime', ranked, 8);
 }
 
 function renderRankedList(ranked) {
@@ -231,9 +283,11 @@ function renderRankedList(ranked) {
   return ranked.map((e, i) => {
     const rank = i + 1;
     const medal = rank <= 3 ? `<span style="font-size:18px;">${medalIcons[rank-1]}</span>` : `<span class="lb-list-rank">${rank}</span>`;
-    return `<div class="lb-list-row${e.isMe ? ' me' : ''}">
+    const avStyle = e.avatarUrl ? `background-image:url(${e.avatarUrl});background-size:cover;background-position:center;` : '';
+    const click = e.userId ? `onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;"` : '';
+    return `<div class="lb-list-row${e.isMe ? ' me' : ''}" ${click}>
       <div style="width:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${medal}</div>
-      <div class="lb-list-avatar">${e.ini}</div>
+      <div class="lb-list-avatar" style="${avStyle}">${e.avatarUrl ? '' : e.ini}</div>
       <div class="lb-list-name">${e.name}${e.isMe ? '<small>Sen</small>' : ''}</div>
       <div class="lb-list-score">${e.points} puan</div>
     </div>`;
@@ -259,10 +313,12 @@ async function renderLbPreview() {
       : (localPlay?.time ? formatTime(localPlay.time) : '—');
     const myRankStr     = myRank ? `#${myRank}` : '—';
     const myIni         = (appState.username || (currentUser?.email?.slice(0,2)) || 'SE').toUpperCase().slice(0,2);
+    const senUid = myEntryInList?.userId || currentUser?.id;
+    const senClick = senUid ? `onclick="showDuelProfile('${senUid}')" style="cursor:pointer;"` : '';
     const senRowHtml    = `
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1.5px dashed var(--border);background:rgba(59,130,246,0.05);">
+      <div ${senClick} style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1.5px dashed var(--border);background:rgba(59,130,246,0.05);">
         <div style="font-size:12px;font-weight:700;color:var(--accent);width:22px;text-align:center;font-family:'DM Serif Display',serif;">${myRankStr}</div>
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${myIni}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;${myEntryInList?.avatarUrl ? `background-image:url(${myEntryInList.avatarUrl});background-size:cover;` : ''}">${myEntryInList?.avatarUrl ? '' : myIni}</div>
         <div style="flex:1;font-size:13px;font-weight:700;color:var(--accent-dark);">Sen</div>
         <div style="font-family:'DM Serif Display',serif;font-size:15px;color:var(--accent);font-weight:600;">${myTimeStr}</div>
       </div>`;
@@ -273,9 +329,9 @@ async function renderLbPreview() {
     }
 
     el.innerHTML = entries.slice(0, 3).map((e, i) => `
-      <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;${i < 2 ? 'border-bottom:1px solid var(--border);' : ''}${e.isMe ? 'background:var(--accent-light);' : ''}">
+      <div onclick="showDuelProfile('${e.userId}')" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:11px 16px;${i < 2 ? 'border-bottom:1px solid var(--border);' : ''}${e.isMe ? 'background:var(--accent-light);' : ''}">
         <div style="font-size:18px;width:22px;text-align:center;">${medals[i]}</div>
-        <div style="width:32px;height:32px;border-radius:50%;background:${e.isMe ? 'var(--accent)' : 'var(--surface2)'};border:2px solid ${e.isMe ? 'var(--accent)' : 'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${e.isMe ? '#fff' : 'var(--text)'};flex-shrink:0;">${e.ini}</div>
+        <div style="width:32px;height:32px;border-radius:50%;background:${e.isMe ? 'var(--accent)' : 'var(--surface2)'};border:2px solid ${e.isMe ? 'var(--accent)' : 'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${e.isMe ? '#fff' : 'var(--text)'};flex-shrink:0;${e.avatarUrl ? `background-image:url(${e.avatarUrl});background-size:cover;` : ''}">${e.avatarUrl ? '' : e.ini}</div>
         <div style="flex:1;font-size:13px;font-weight:${e.isMe ? '700' : '500'};color:${e.isMe ? 'var(--accent-dark)' : 'var(--text)'};">${e.name}${e.isMe ? ' 👈' : ''}</div>
         <div style="font-family:'DM Serif Display',serif;font-size:15px;color:${colors[i]};font-weight:600;">${formatTime(e.time)}</div>
       </div>`).join('') + senRowHtml;

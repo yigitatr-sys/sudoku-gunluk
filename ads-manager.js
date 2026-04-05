@@ -45,7 +45,11 @@ function grantReward() {
     G.errors = 2;
     G.completed = false;
     G.gameLost = false;
-    hideModal('gameOverModal');
+    if (typeof hideGameOverScreen === 'function') hideGameOverScreen();
+    else {
+      const gos = document.getElementById('gameOverScreen');
+      if (gos) gos.style.display = 'none';
+    }
     if (G.timerInterval === null) startTimer();
     renderGrid();
     updateStats();

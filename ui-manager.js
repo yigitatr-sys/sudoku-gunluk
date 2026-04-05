@@ -220,7 +220,17 @@ function updateHomeStreakPanelNumbers() {
   if (cur) cur.textContent = n;
   if (best) best.textContent = appState.bestStreak ?? 0;
   const badge = document.getElementById('homeStreakCount');
-  if (badge) badge.textContent = String(n);
+  const streakBtn = document.getElementById('homeStreakBtn');
+  if (badge && streakBtn) {
+    badge.textContent = String(n);
+    if (n <= 0) {
+      badge.hidden = true;
+      streakBtn.classList.add('home-streak-btn--inactive');
+    } else {
+      badge.hidden = false;
+      streakBtn.classList.remove('home-streak-btn--inactive');
+    }
+  }
 }
 
 function toggleHomeStreakPanel(e) {
@@ -278,10 +288,10 @@ async function refreshHomeDailyRankMessage(dateStr) {
 
 function updateHomeScreen() {
   const today = todayStr();
-  const topDate = document.getElementById('homeTopDate');
-  if (topDate) {
-    topDate.textContent = formatDate(today);
-    topDate.setAttribute('datetime', today);
+  const challengeDate = document.getElementById('homeChallengeDate');
+  if (challengeDate) {
+    challengeDate.textContent = formatDate(today);
+    challengeDate.setAttribute('datetime', today);
   }
   updateHomeStreakPanelNumbers();
 
@@ -306,7 +316,7 @@ function updateHomeScreen() {
     document.getElementById('dailyStatus').textContent = 'Devam et ve sıralamaya gir';
     if (dailyCard) { dailyCard.style.opacity = '1'; dailyCard.style.cursor = 'pointer'; }
     if (dailyBtn) dailyBtn.disabled = false;
-    if (ctaText) ctaText.textContent = 'Devam et';
+    if (ctaText) ctaText.textContent = 'Devam';
   } else {
     document.getElementById('dailyStatus').textContent = 'Hemen çöz ve sıralamaya gir';
     if (dailyCard) { dailyCard.style.opacity = '1'; dailyCard.style.cursor = 'pointer'; }

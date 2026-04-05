@@ -1710,7 +1710,7 @@ body.dark #duelPanel .duel-light__friend-create:active {
   color: #fff;
 }
 
-/* Ana sayfa — üst bar (tarih + seri) */
+/* Ana sayfa — üst bar (marka + seri) */
 .home-top-bar {
   display: flex;
   align-items: center;
@@ -1721,13 +1721,15 @@ body.dark #duelPanel .duel-light__friend-create:active {
   position: relative;
   z-index: 4;
 }
-.home-top-date {
+.home-brand {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.94);
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(15, 40, 90, 0.2);
+  font-size: clamp(18px, 4.6vw, 22px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(15, 40, 90, 0.25);
+  flex-shrink: 0;
 }
 .home-streak-anchor {
   position: relative;
@@ -1760,6 +1762,11 @@ body.dark #duelPanel .duel-light__friend-create:active {
   font-size: 20px;
   line-height: 1;
   flex-shrink: 0;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+.home-streak-btn--inactive .home-streak-btn__glyph {
+  opacity: 0.42;
+  filter: grayscale(0.85);
 }
 .home-streak-btn__count {
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -1881,20 +1888,16 @@ body.dark .home-streak-panel__row strong {
   max-width: 420px;
   min-height: 102px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.19);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow:
-    0 4px 0 rgba(6, 12, 40, 0.38),
-    0 18px 44px rgba(13, 27, 74, 0.42),
-    0 10px 28px rgba(21, 101, 192, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  box-shadow: none;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   padding: 0;
   text-align: left;
-  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  transition: filter 0.14s ease;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 40%, transparent 100%),
     radial-gradient(ellipse 85% 65% at 12% 8%, rgba(255, 255, 255, 0.11) 0%, transparent 52%),
@@ -1929,11 +1932,8 @@ body.dark .home-streak-panel__row strong {
 }
 
 .home-challenge-card:active {
-  transform: translateY(3px);
-  box-shadow:
-    0 1px 0 rgba(6, 12, 40, 0.45),
-    0 10px 28px rgba(13, 27, 74, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: none;
+  filter: brightness(0.96);
 }
 
 .home-challenge-card.home-mod-card > .home-challenge-card__grid-deco {
@@ -1950,32 +1950,65 @@ body.dark .home-streak-panel__row strong {
 .home-challenge-card.home-mod-card > .home-challenge-card__body {
   position: relative;
   z-index: 3;
-  padding: 10px 14px 12px;
+  padding: 12px 8px 14px 16px;
   max-width: 100%;
 }
 
+.home-challenge-card__body-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.home-challenge-card__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+}
+
+.home-challenge-card__date {
+  display: block;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.76);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  margin: 0;
+}
+
 .home-challenge-card__title {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: 17px;
-  font-weight: 400;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
   color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  margin: 0 0 5px;
+  letter-spacing: 0.02em;
+  line-height: 1.22;
+  margin: 0;
 }
 
 .home-challenge-card__status {
-  font-size: 10px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.42;
   color: rgba(255, 255, 255, 0.9);
-  margin: 0 0 5px;
-  min-height: 1.4em;
-  padding: 5px 8px;
-  border-radius: 9px;
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .home-challenge-card__status:empty {
@@ -1984,23 +2017,49 @@ body.dark .home-streak-panel__row strong {
 
 .home-challenge-card__cta {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
-  margin-top: 0;
-  padding: 7px 16px 7px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
+  justify-content: center;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  gap: 2px;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  margin-left: auto;
+  padding: 0;
+  border-radius: 50%;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.08;
+  text-align: center;
   color: #fff;
   background: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  align-self: center;
+  transition: background 0.12s ease, filter 0.12s ease;
+}
+
+.home-challenge-card:active .home-challenge-card__cta {
+  filter: brightness(0.94);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.home-challenge-card__cta-text {
+  display: block;
+  max-width: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .home-challenge-card__cta-arrow {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
-  margin-top: 1px;
+  margin-top: 0;
+  font-weight: 700;
 }
 
 /* Ana sayfa — öğretici (orta) + yeni oyun / devam et (alt) */
@@ -2028,21 +2087,36 @@ body.dark .home-streak-panel__row strong {
   box-sizing: border-box;
 }
 
+/* 9x9 dekor grid: ~%88 genişlik, kare; çizgi kalınlığı viewBox ile ölçeklenir */
 .home-tutorial-composite .home-watermark {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(96vw, calc(252px * 1.55));
-  height: min(96vw, calc(252px * 1.55));
-  max-width: 400px;
-  max-height: 400px;
+  width: min(88vw, calc(100vw - 32px));
+  aspect-ratio: 1 / 1;
+  height: auto;
+  max-width: min(88vw, 520px);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   z-index: 0;
   overflow: visible;
+}
+
+@media (max-width: 380px) {
+  .home-tutorial-composite .home-watermark {
+    width: min(90vw, calc(100vw - 24px));
+    max-width: min(90vw, 480px);
+  }
+}
+
+@media (min-width: 430px) {
+  .home-tutorial-composite .home-watermark {
+    width: min(86vw, 520px);
+    max-width: min(86vw, 540px);
+  }
 }
 
 .home-tutorial-composite .home-watermark__svg {
@@ -2053,6 +2127,7 @@ body.dark .home-streak-panel__row strong {
   opacity: 0.1;
   flex-shrink: 0;
   display: block;
+  object-fit: contain;
 }
 
 .home-tutorial-composite .home-tutorial-center {
@@ -2071,7 +2146,7 @@ body.dark .home-streak-panel__row strong {
 .home-actions-footer {
   flex-shrink: 0;
   width: 100%;
-  max-width: 252px;
+  max-width: min(100%, 360px);
   position: relative;
   z-index: 2;
   padding-bottom: 6px;
@@ -2145,7 +2220,8 @@ body.dark .home-streak-panel__row strong {
 .home-action-btns {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 11px;
   width: 100%;
 }
 
@@ -2154,7 +2230,9 @@ body.dark .home-streak-panel__row strong {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
+  width: 72%;
+  max-width: 320px;
+  box-sizing: border-box;
   border: none;
   border-radius: 12px;
   padding: 11px 18px;
@@ -2164,18 +2242,18 @@ body.dark .home-streak-panel__row strong {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+  box-shadow: none;
+  transition: background 0.15s ease, filter 0.12s ease, opacity 0.15s ease, border-color 0.15s ease;
 }
 
 .home-action-btn--primary {
   color: #fff;
   background: linear-gradient(135deg, #2952c8, #4a8ff7);
-  box-shadow: 0 5px 0 #1d3fa8, 0 8px 20px rgba(41, 82, 200, 0.28);
 }
 
 .home-action-btn--primary:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 #1d3fa8, 0 2px 8px rgba(41, 82, 200, 0.12);
+  filter: brightness(0.92);
+  background: linear-gradient(135deg, #243eaa, #3b7fd9);
 }
 
 .home-action-btn--secondary {
@@ -2183,7 +2261,6 @@ body.dark .home-streak-panel__row strong {
   background: rgba(255, 255, 255, 0.5);
   border: 2px solid #1565c0;
   border-radius: 12px;
-  box-shadow: 0 2px 0 rgba(13, 71, 161, 0.14), 0 6px 16px rgba(21, 101, 192, 0.14);
 }
 
 .home-action-btn--secondary svg {
@@ -2193,15 +2270,13 @@ body.dark .home-streak-panel__row strong {
 }
 
 .home-action-btn--secondary:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 rgba(13, 71, 161, 0.12), 0 3px 10px rgba(21, 101, 192, 0.1);
+  filter: brightness(0.97);
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .home-action-btn--secondary:disabled {
   opacity: 0.48;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: 0 1px 0 rgba(13, 71, 161, 0.08);
   color: rgba(13, 71, 161, 0.45);
   border-color: rgba(21, 101, 192, 0.35);
 }

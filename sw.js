@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sudoku-v13'; // Bottom nav + cache-first strateji
+const CACHE_NAME = 'sudoku-v14'; // Macera kaldırıldı
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -13,7 +13,6 @@ const STATIC_ASSETS = [
   './profile-manager.js',
   './tournament-manager.js',
   './game-manager.js',
-  './journey-manager.js',
   './duel-manager.js',
   './ui-manager.js',
   './manifest.json',

@@ -20,8 +20,9 @@ let trnState = {
 }
 
 async function openTournamentScreen() {
-  switchTab('tournamentScreen', null)
-  await loadTournament()
+  if (typeof showPanel === 'function') showPanel('tournamentPanel');
+  else if (typeof switchBottomNav === 'function') switchBottomNav('tournament');
+  await loadTournament();
 }
 
 async function loadTournament() {
@@ -34,8 +35,12 @@ async function loadTournament() {
     .maybeSingle()
 
   if (!trn) {
-    renderTournamentUpcoming()
-    return
+    const pEl = document.getElementById('trnParticipants');
+    const rEl = document.getElementById('trnMyRank');
+    if (pEl) pEl.textContent = '0';
+    if (rEl) rEl.textContent = '—';
+    renderTournamentUpcoming();
+    return;
   }
 
   trnState.tournament = trn
@@ -59,13 +64,16 @@ async function loadTournament() {
   document.getElementById('trnParticipants').textContent = count || 0
 
   // Sıralama
+  const rankEl = document.getElementById('trnMyRank');
   if (trnState.entry) {
     const { data: rank } = await sb
       .from('tournament_entries')
       .select('user_id')
       .eq('tournament_id', trn.id)
-      .gt('total_score', trnState.entry.total_score)
-    document.getElementById('trnMyRank').textContent = '#' + ((rank?.length || 0) + 1)
+      .gt('total_score', trnState.entry.total_score);
+    if (rankEl) rankEl.textContent = '#' + ((rank?.length || 0) + 1);
+  } else if (rankEl) {
+    rankEl.textContent = '—';
   }
 
   const now = new Date()
@@ -320,7 +328,8 @@ async function finishTournamentPuzzle(timeSec) {
 
 
 function closeTournamentScreen() {
-  switchTab('homePanel', null);
+  if (typeof showPanel === 'function') showPanel('homePanel');
+  else switchTab('homePanel', null);
 }
 
 function showLbInfo() {
@@ -344,10 +353,7 @@ function closeLbInfo(e) {
 function switchTrnTab(tab) {
   ['daily','weekly','alltime'].forEach(t => {
     const btn = document.getElementById('trnTab' + t.charAt(0).toUpperCase() + t.slice(1));
-    if (btn) {
-      btn.style.background = t === tab ? 'linear-gradient(135deg,#6c3fc5,#4a2880)' : 'none';
-      btn.style.color = t === tab ? '#fff' : 'var(--text-muted)';
-    }
+    if (btn) btn.classList.toggle('trn-hub__tab--on', t === tab);
   });
   renderTrnLeaderboard(tab);
 }
@@ -402,8 +408,8 @@ function renderTrnLeaderboard(tab) {
 }
 
 function tournamentNotify() {
-  const btn = document.getElementById('tournamentNotifyBtn');
-  if (btn.dataset.subscribed) return;
+  const btn = document.getElementById('trnJoinBtn');
+  if (!btn || btn.dataset.subscribed) return;
   btn.dataset.subscribed = '1';
   btn.textContent = '✅ Haberdar edileceksin!';
   btn.style.background = 'var(--success)';

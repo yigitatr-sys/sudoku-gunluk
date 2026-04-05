@@ -26,6 +26,11 @@ let duelState = {
   myElo: 0,
   wins: 0,
   losses: 0,
+  /** Aynı lig (ELO aralığı) içindeki sıra, 1 tabanlı; null = bilinmiyor */
+  myLeagueRank: null,
+  leagueRankLoading: false,
+  /** Oda kodu ile açılan maç — ELO / galibiyet sayılmaz */
+  isFriendMatch: false,
 };
 
 async function renderDuelPreview() {
@@ -313,57 +318,12 @@ function openDuelSelfProfile() {
   showDuelProfile(currentUser.id);
 }
 
-/** ELO → seviye UI (100 ELO = 1 seviye; görüntü için; backend aynı kalır) */
+/** ELO → seviye (100 ELO = 1 seviye; görüntü için; backend aynı kalır) */
 function duelEloToLevelUI(elo) {
   const XP_PER_LEVEL = 100;
   const e = Math.max(0, Number(elo) || 0);
   const level = Math.floor(e / XP_PER_LEVEL);
-  const xpIn = e % XP_PER_LEVEL;
-  const nextAt = (level + 1) * XP_PER_LEVEL;
-  const xpRemain = Math.max(0, nextAt - e);
-  const pct = Math.min(100, Math.round((xpIn / XP_PER_LEVEL) * 100));
-  return { level, xpRemain, pct, xpIn, xpPerLevel: XP_PER_LEVEL };
-}
-
-const DUEL_HEX_SEG_COUNT = 12;
-
-function duelHexVerts(cx, cy, R) {
-  const v = [];
-  for (let i = 0; i < 6; i++) {
-    const th = (-Math.PI / 2) + (i * Math.PI) / 3;
-    v.push([cx + R * Math.cos(th), cy + R * Math.sin(th)]);
-  }
-  return v;
-}
-
-function duelEnsureHexSegments(groupEl) {
-  if (!groupEl || groupEl.querySelector('path')) return;
-  const verts = duelHexVerts(100, 100, 86);
-  for (let e = 0; e < 6; e++) {
-    const a = verts[e];
-    const b = verts[(e + 1) % 6];
-    const mx = (a[0] + b[0]) / 2;
-    const my = (a[1] + b[1]) / 2;
-    const mk = (x, y) => x.toFixed(2) + ' ' + y.toFixed(2);
-    const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p1.setAttribute('d', 'M ' + mk(a[0], a[1]) + ' L ' + mk(mx, my));
-    p1.setAttribute('class', 'duel-hex__edge');
-    groupEl.appendChild(p1);
-    const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p2.setAttribute('d', 'M ' + mk(mx, my) + ' L ' + mk(b[0], b[1]));
-    p2.setAttribute('class', 'duel-hex__edge');
-    groupEl.appendChild(p2);
-  }
-}
-
-function duelSetHexSegments(groupEl, pct) {
-  duelEnsureHexSegments(groupEl);
-  if (!groupEl) return;
-  const filled = Math.min(DUEL_HEX_SEG_COUNT, Math.max(0, Math.floor(Number(pct) / (100 / DUEL_HEX_SEG_COUNT))));
-  const paths = groupEl.querySelectorAll('.duel-hex__edge');
-  paths.forEach((p, i) => {
-    p.classList.toggle('duel-hex__edge--on', i < filled);
-  });
+  return { level };
 }
 
 function duelRenderHeaderAvatar() {
@@ -401,7 +361,12 @@ function closeDuelScreen() {
 }
 
 async function loadLeagueStats() {
-  if (!currentUser || !sb) return;
+  if (!currentUser || !sb) {
+    duelState.myLeagueRank = null;
+    duelState.leagueRankLoading = false;
+    renderDuelRankBadgeDom();
+    return;
+  }
   const { data } = await sb.from('league_stats').select('*').eq('user_id', currentUser.id).single();
   if (data) {
     duelState.myElo = data.elo || 0;
@@ -412,38 +377,80 @@ async function loadLeagueStats() {
     await sb.from('league_stats').insert({ user_id: currentUser.id, elo: 0, wins: 0, losses: 0 });
     duelState.myElo = 0; duelState.wins = 0; duelState.losses = 0;
   }
+  await refreshDuelLeagueRank();
+}
+
+/** Mevcut ELO lig aralığında league_stats sıralı listesinden kullanıcı sırası */
+async function refreshDuelLeagueRank() {
+  duelState.leagueRankLoading = true;
+  renderDuelRankBadgeDom();
+  if (!currentUser || !sb || typeof getLeague !== 'function') {
+    duelState.myLeagueRank = null;
+    duelState.leagueRankLoading = false;
+    renderDuelRankBadgeDom();
+    return;
+  }
+  try {
+    const league = getLeague(duelState.myElo || 0);
+    const { data: rows, error } = await sb
+      .from('league_stats')
+      .select('user_id')
+      .gte('elo', league.min)
+      .lte('elo', league.max)
+      .order('elo', { ascending: false });
+    if (error) throw error;
+    const idx = (rows || []).findIndex((r) => r.user_id === currentUser.id);
+    duelState.myLeagueRank = idx >= 0 ? idx + 1 : null;
+  } catch (e) {
+    console.warn('refreshDuelLeagueRank:', e);
+    duelState.myLeagueRank = null;
+  }
+  duelState.leagueRankLoading = false;
+  renderDuelRankBadgeDom();
+}
+
+function renderDuelRankBadgeDom() {
+  const mount = document.getElementById('duelRankBadgeMount');
+  if (!mount) return;
+  mount.textContent = '';
+  mount.classList.remove('duel-light__rank-badge-mount--loading', 'duel-light__rank-badge-mount--empty');
+
+  if (!currentUser) return;
+
+  if (duelState.leagueRankLoading) {
+    mount.classList.add('duel-light__rank-badge-mount--loading');
+    mount.textContent = '…';
+    return;
+  }
+
+  const raw = duelState.myLeagueRank;
+  if (raw == null || typeof createDuelRankBadge !== 'function') {
+    mount.classList.add('duel-light__rank-badge-mount--empty');
+    mount.textContent = '—';
+    return;
+  }
+
+  const displayRank = Math.min(50, Math.max(1, raw));
+  const badge = createDuelRankBadge(displayRank, {
+    size: 'lg',
+    className: 'duel-light__rank-badge-svg',
+    ariaLabel: raw > 50 ? 'Lig sırası ' + raw + ' (rozet 1–50)' : 'Lig sırası ' + raw,
+  });
+  mount.appendChild(badge);
 }
 
 function updateDuelScreenUI() {
   const elo = duelState.myElo;
-  const { level, xpRemain, pct, xpIn, xpPerLevel } = duelEloToLevelUI(elo);
+  const { level } = duelEloToLevelUI(elo);
 
   duelRenderHeaderAvatar();
   const lvlBadge = document.getElementById('duelHeaderLevelBadge');
   if (lvlBadge) lvlBadge.textContent = 'Lvl. ' + level;
 
-  const emblemLvl = document.getElementById('duelEmblemLevelText');
-  if (emblemLvl) emblemLvl.textContent = 'Lvl. ' + level;
-
-  const frac = document.getElementById('duelXpFraction');
-  if (frac) frac.textContent = xpIn + ' / ' + xpPerLevel + ' XP';
-
-  duelSetHexSegments(document.getElementById('duelHexSegmentGroup'), pct);
-
-  const hint = document.getElementById('duelLevelXpHint');
-  if (hint) hint.textContent = 'Sıradaki seviyeye ' + xpRemain + ' XP kaldı';
-
-  let energy = 5;
-  try {
-    const s = localStorage.getItem('duel_energy');
-    if (s !== null && s !== '') energy = Math.max(0, parseInt(s, 10) || 0);
-  } catch (e) {}
-  const enEl = document.getElementById('duelEnergyValue');
-  if (enEl) enEl.textContent = String(energy);
-
   const badge = document.getElementById('playerLeagueBadge');
   if (badge) badge.textContent = 'SVY ' + level;
   updateProfilePanel();
+  renderDuelRankBadgeDom();
 }
 
 async function loadRecentDuels() {
@@ -613,7 +620,10 @@ function generateSudokuPuzzle(givens) {
 async function createDuel() {
   try {
     if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
-    
+
+    cancelMatchmaking();
+    duelState.isFriendMatch = true;
+
     showToast('⏳ Oda oluşturuluyor, lütfen bekle...');
     await new Promise(resolve => setTimeout(resolve, 50)); 
 
@@ -672,6 +682,15 @@ console.log("INSERT sonucu:", { data, error, status: res.status });
 
 async function joinDuelByCode() {
   try {
+    const gameSc = document.getElementById('duelGameScreen');
+    if (gameSc && gameSc.style.display === 'flex') {
+      showToast('Önce mevcut maçı bitir');
+      return;
+    }
+    const ov = document.getElementById('matchmakingOverlay');
+    if (ov && ov.style.display === 'flex') cancelMatchmaking();
+    if (duelState.duelId) cancelDuel();
+
     const inputEl = document.getElementById('duelCodeInput');
     if (!inputEl) return;
     const code = inputEl.value.trim().toUpperCase();
@@ -696,7 +715,9 @@ await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + data.id, {
 
     const { data: p } = await sb.from('profiles').select('username').eq('id', data.player1_id).single();
     duelState.opponentName = p?.username || 'Rakip';
+    duelState.isFriendMatch = true;
 
+    inputEl.value = '';
     startDuelGame();
   } catch (err) {
     showToast('❌ Katılma Hatası: ' + err.message);
@@ -706,8 +727,61 @@ await fetch(SUPABASE_URL + '/rest/v1/duels?id=eq.' + data.id, {
 
 let matchmakingInterval = null;
 let botFallbackTimer = null;
+/** Sıralı eşleşmede rakip yoksa bu süre sonunda bot (mevcut davranış). */
+const DUEL_BOT_FALLBACK_MS = 15000;
+const DUEL_BOT_FALLBACK_SEC = Math.round(DUEL_BOT_FALLBACK_MS / 1000);
+let matchmakingElapsedInterval = null;
+
+function clearMatchmakingElapsedTick() {
+  if (matchmakingElapsedInterval) {
+    clearInterval(matchmakingElapsedInterval);
+    matchmakingElapsedInterval = null;
+  }
+}
+
+function formatMatchmakingClock(totalSec) {
+  const s = Math.max(0, Math.floor(totalSec));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return m > 0 ? m + ':' + String(r).padStart(2, '0') : r + ' sn';
+}
+
+function updateMatchmakingHint(elapsedSec) {
+  const hintEl = document.getElementById('matchOverlayHint');
+  const timeEl = document.getElementById('matchOverlayElapsed');
+  if (timeEl) timeEl.textContent = 'Süre: ' + formatMatchmakingClock(elapsedSec);
+  if (!hintEl) return;
+  const left = Math.max(0, DUEL_BOT_FALLBACK_SEC - elapsedSec);
+  if (left > 0) {
+    hintEl.textContent = 'Gerçek rakip aranıyor. ' + left + ' sn içinde eşleşme olmazsa ligine uygun bir bot ile tamamlanır.';
+  } else {
+    hintEl.textContent = 'Bot veya rakip eşleşmesi tamamlanıyor…';
+  }
+}
+
+const MATCH_OPP_RING_IDLE = 'position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(255,255,255,0.15);animation:matchSpin 3s linear infinite reverse;';
+
+function resetMatchmakingOverlayVisuals() {
+  const dots = document.getElementById('matchOverlayDots');
+  if (dots) dots.style.display = 'flex';
+  const oppRing = document.getElementById('matchOpponentRing');
+  if (oppRing) oppRing.setAttribute('style', MATCH_OPP_RING_IDLE);
+  const st = document.getElementById('matchOverlayStatus');
+  if (st) {
+    st.style.color = '';
+    st.style.letterSpacing = '';
+  }
+  const vs = document.getElementById('matchOverlayVS');
+  if (vs) {
+    vs.style.color = 'rgba(255,255,255,0.15)';
+    vs.style.transform = '';
+    vs.style.textShadow = '';
+    vs.style.animation = '';
+  }
+}
 
 function showMatchFound(opponentName, opponentElo) {
+  clearMatchmakingElapsedTick();
   // Durum yazısı
   document.getElementById('matchOverlayStatus').textContent = 'EŞLEŞİLDİ!';
   document.getElementById('matchOverlayStatus').style.color = '#4ade80';
@@ -855,10 +929,11 @@ function startBotFallback(duelId) {
     duelState.botSpeed     = bot.speed;
 
     showMatchFound(bot.name, bot.elo);
-  }, 15000); // 15 sn — hızlı, "her zaman bot var" hissi
+  }, DUEL_BOT_FALLBACK_MS);
 }
 
 function cancelMatchmaking() {
+  clearMatchmakingElapsedTick();
   try {
     if (duelState.duelId) sb.from('duels').delete().eq('id', duelState.duelId).then(() => {}).catch(() => {});
     if (duelState.realtimeChannel) try { sb.removeChannel(duelState.realtimeChannel); } catch(e) {}
@@ -871,6 +946,7 @@ function cancelMatchmaking() {
   matchmakingInterval = null;
   if (botFallbackTimer) { clearTimeout(botFallbackTimer); botFallbackTimer = null; }
   duelState.isBot = false;
+  duelState.isFriendMatch = false;
   if (duelState.botSimInterval) { clearInterval(duelState.botSimInterval); duelState.botSimInterval = null; }
 
   const ov = document.getElementById('matchmakingOverlay');
@@ -892,12 +968,16 @@ function cancelMatchmaking() {
 
   const cancelBtn = document.getElementById('cancelMatchmakeBtn');
   if (cancelBtn) cancelBtn.style.display = 'none';
+
+  resetMatchmakingOverlayVisuals();
 }
 
 async function startMatchmaking() {
   try {
     if (!currentUser) { showToast('⚠️ Düello için giriş yapman gerekiyor!'); return; }
-    
+
+    cancelMatchmaking();
+
     const btn = document.getElementById('matchmakeBtn');
     btn.disabled = true;
     btn.classList.add('duel-light__match-btn--busy');
@@ -923,6 +1003,13 @@ document.getElementById('matchOverlayOpponentName').textContent = 'Aranıyor...'
 document.getElementById('matchOverlayOpponentName').style.color = 'rgba(255,255,255,0.3)';
 document.getElementById('matchOverlayOpponentElo').textContent = '— ELO';
 document.getElementById('matchOverlayVS').style.color = 'rgba(255,255,255,0.15)';
+
+    let mmSec = 0;
+    updateMatchmakingHint(0);
+    matchmakingElapsedInterval = setInterval(() => {
+      mmSec++;
+      updateMatchmakingHint(mmSec);
+    }, 1000);
     
     const anims = ['⚔️','🔍','⏳','🎯'];
     let ai = 0;
@@ -1376,66 +1463,100 @@ setTimeout(() => {
   }
 }, 1000);
 
- // ELO güncelle — dinamik puan sistemi
-  let eloChange;
-  if (won) {
-    // Kazanma: süreye göre 18-25 arası
-    // 0-120sn → 25, 120-300sn → 25'ten 18'e iner, 300sn+ → 18
-    const t = duelState.timerSec || 0;
-    if (t <= 120) {
-      eloChange = 25;
-    } else if (t >= 300) {
-      eloChange = 18;
+  const countsForLadder = !duelState.isBot && !duelState.isFriendMatch;
+  let eloChange = 0;
+  let newElo = duelState.myElo;
+
+  if (countsForLadder) {
+    if (won) {
+      const t = duelState.timerSec || 0;
+      if (t <= 120) {
+        eloChange = 25;
+      } else if (t >= 300) {
+        eloChange = 18;
+      } else {
+        eloChange = Math.round(25 - ((t - 120) / 180) * 7);
+      }
     } else {
-      // 120-300 arası smooth düşüş
-      eloChange = Math.round(25 - ((t - 120) / 180) * 7);
+      const maxErr = duelState.maxErrors || 3;
+      const errRatio = Math.min(duelState.errors / maxErr, 1);
+      eloChange = -Math.round(8 + errRatio * 7);
     }
-  } else {
-    // Kaybetme: hata sayısına göre 8-15 arası
-    // 0 hata → -8, 3 hata → -15
-    const maxErr = duelState.maxErrors || 3;
-    const errRatio = Math.min(duelState.errors / maxErr, 1);
-    eloChange = -Math.round(8 + errRatio * 7);
+    newElo = Math.max(0, duelState.myElo + eloChange);
+
+    await sb.from('league_stats').upsert({
+      user_id: currentUser.id,
+      elo: newElo,
+      wins: duelState.wins + (won ? 1 : 0),
+      losses: duelState.losses + (won ? 0 : 1),
+    }, { onConflict: 'user_id' });
+
+    duelState.myElo = newElo;
+    if (won) duelState.wins++; else duelState.losses++;
+    await refreshDuelLeagueRank();
   }
-  const newElo = Math.max(0, duelState.myElo + eloChange);
 
-  await sb.from('league_stats').upsert({
-    user_id: currentUser.id,
-    elo: newElo,
-    wins: duelState.wins + (won ? 1 : 0),
-    losses: duelState.losses + (won ? 0 : 1),
-  }, { onConflict: 'user_id' });
+  const persistRow = duelState.duelId && !duelState.isBot;
+  if (persistRow) {
+    await sb.from('duels').update({ status: 'finished', winner_id: won ? currentUser.id : duelState.opponentId, finished_at: new Date().toISOString() }).eq('id', duelState.duelId);
+    await sb.from('duel_players').upsert({
+      duel_id: duelState.duelId,
+      user_id: currentUser.id,
+      elo_change: countsForLadder ? eloChange : 0,
+    }, { onConflict: 'duel_id,user_id' });
+  }
 
-  duelState.myElo = newElo;
-  if (won) duelState.wins++; else duelState.losses++;
-
-  // Düello bitişini kaydet
-  await sb.from('duels').update({ status: 'finished', winner_id: won ? currentUser.id : duelState.opponentId, finished_at: new Date().toISOString() }).eq('id', duelState.duelId);
-
-  // ELO değişimini duel_players'a kaydet
-  await sb.from('duel_players').upsert({
-    duel_id: duelState.duelId,
-    user_id: currentUser.id,
-    elo_change: eloChange,
-  }, { onConflict: 'duel_id,user_id' });
-
-  // Sonuç modalı
   setTimeout(() => showDuelResult(won, eloChange, newElo), 500);
 }
 
 function showDuelResult(won, eloChange, newElo) {
+  const opp = duelState.opponentName || 'Rakip';
+  const isBot = duelState.isBot;
+  const isFriend = duelState.isFriendMatch;
   document.getElementById('duelResultIcon').textContent = won ? '🏆' : '😔';
   document.getElementById('duelResultTitle').textContent = won ? 'Kazandın!' : 'Kaybettin';
-  document.getElementById('duelResultMsg').textContent = won ? 'Tebrikler! Rakibini geçtin.' : 'Bir dahaki sefere!';
+  let msg = won
+    ? ('Tebrikler — ' + opp + ' önünde bitirdin.')
+    : ('Bu sefer ' + opp + ' öndeydi. Tekrar dene!');
+  if (isFriend) {
+    msg = won
+      ? ('Arkadaş maçı — ' + opp + ' karşısında kazandın. ELO değişmedi.')
+      : ('Arkadaş maçı — bu sefer ' + opp + ' öndeydi. ELO değişmedi.');
+  } else if (isBot) {
+    msg = won
+      ? ('Botu geçtin. Sıralı maçta ELO’n güncellendi (' + opp + ').')
+      : (opp + ' bu turda hızlıydı. İstersen hemen yeni rakip ara — gerçek oyuncu veya bot.');
+  }
+  document.getElementById('duelResultMsg').textContent = msg;
+  const grid = document.getElementById('duelResultStatsGrid');
+  const ladderEls = document.querySelectorAll('.duel-result-ladder-only');
+  if (grid) {
+    if (isFriend) {
+      grid.style.gridTemplateColumns = '1fr';
+      ladderEls.forEach((el) => { el.style.display = 'none'; });
+    } else {
+      grid.style.gridTemplateColumns = '1fr 1fr 1fr';
+      ladderEls.forEach((el) => { el.style.display = ''; });
+    }
+  }
   document.getElementById('duelResultEloChange').textContent = (eloChange > 0 ? '+' : '') + eloChange;
-  document.getElementById('duelResultEloChange').style.color = eloChange > 0 ? '#22c55e' : '#ef4444';
+  document.getElementById('duelResultEloChange').style.color = eloChange > 0 ? '#22c55e' : (eloChange < 0 ? '#ef4444' : 'var(--text-muted)');
   document.getElementById('duelResultNewElo').textContent = newElo;
   document.getElementById('duelResultTime').textContent = formatTime(duelState.timerSec || 0);
+  const errNote = document.getElementById('duelResultErrorsNote');
+  if (errNote) {
+    const e = duelState.errors || 0;
+    errNote.textContent = e > 0 ? ('Hata: ' + e + ' / ' + (duelState.maxErrors || 3)) : 'Hatasız tur';
+    errNote.style.display = 'block';
+  }
   showModal('duelResultModal');
 }
 
-function closeDuelResult() {
+function closeDuelResult(andThen) {
   hideModal('duelResultModal');
+  const grid = document.getElementById('duelResultStatsGrid');
+  if (grid) grid.style.gridTemplateColumns = '1fr 1fr 1fr';
+  document.querySelectorAll('.duel-result-ladder-only').forEach((el) => { el.style.display = ''; });
   const screen = document.getElementById('duelGameScreen');
   if (screen) screen.style.display = 'none';
   
@@ -1452,6 +1573,7 @@ function closeDuelResult() {
   duelState.errors = 0;
   duelState.timerSec = 0;
   duelState.isBot = false;
+  duelState.isFriendMatch = false;
   duelState.botSpeed = null;
   if (duelState.timerInterval) { clearInterval(duelState.timerInterval); duelState.timerInterval = null; }
   if (duelState.botSimInterval) { clearInterval(duelState.botSimInterval); duelState.botSimInterval = null; }
@@ -1459,13 +1581,17 @@ function closeDuelResult() {
   if (botFallbackTimer) { clearTimeout(botFallbackTimer); botFallbackTimer = null; }
 
   openDuelScreen();
+  if (typeof andThen === 'function') setTimeout(andThen, 60);
 }
 
 function cancelDuel() {
+  if (duelState.pollInterval) { clearInterval(duelState.pollInterval); duelState.pollInterval = null; }
+  if (botFallbackTimer) { clearTimeout(botFallbackTimer); botFallbackTimer = null; }
   if (duelState.duelId) sb.from('duels').delete().eq('id', duelState.duelId);
   if (duelState.realtimeChannel) sb.removeChannel(duelState.realtimeChannel);
   hideModal('duelWaitModal');
   duelState.duelId = null;
+  duelState.isFriendMatch = false;
 }
 
 function copyDuelCode() {
