@@ -24,28 +24,26 @@ function hideStreakPopup() {
 // ═══════════════════════════════════════════════
 
 const BOTTOM_TAB_CFG = {
-  home:        { panel: 'homePanel',        btnId: 'navHome'    },
-  duel:        { panel: 'tournamentScreen', btnId: 'navDuel'    },
-  leaderboard: { panel: 'lbPanel',          btnId: 'navLb'      },
-  macera:      { panel: null,               btnId: 'navMacera'  },
-  profile:     { panel: 'profilePanel',     btnId: 'navProfile' },
+  home:        { panel: 'homePanel',        btnId: 'navHome'        },
+  duel:        { panel: 'duelPanel',        btnId: 'navDuel'        },
+  tournament:  { panel: 'tournamentPanel',  btnId: 'navTournament'  },
+  leaderboard: { panel: 'lbPanel',          btnId: 'navLb'          },
+  profile:     { panel: 'profilePanel',     btnId: 'navProfile'     },
 };
 
 let _activeBottomTab = 'home';
 
 function switchBottomNav(tabKey) {
+  if (tabKey !== 'home') closeHomeStreakPanel();
   // Tüm nav butonlarını pasif yap
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   const cfg = BOTTOM_TAB_CFG[tabKey];
   if (cfg) document.getElementById(cfg.btnId)?.classList.add('active');
 
-  // Macera: sadece journey overlay'i aç, panel değişikliği yok
-  if (tabKey === 'macera') {
-    showJourneyScreen();
-    return;
-  }
-
   if (!cfg || !cfg.panel) return;
+
+  document.getElementById('settingsPanel')?.classList.remove('active');
+  document.getElementById('friendsPanel')?.classList.remove('active');
 
   // Aktif ana paneli bul (friends/settings overlay panelleri hariç — lbPanel artık normal tab)
   const overlayIds = ['friendsPanel', 'settingsPanel'];
@@ -65,9 +63,17 @@ function switchBottomNav(tabKey) {
 function _onTabActivated(tabKey) {
   if (tabKey === 'home')        updateHomeScreen();
   if (tabKey === 'duel') {
-    if (typeof loadTournament === 'function') loadTournament();
     if (typeof loadLeagueStats === 'function' && typeof updateDuelScreenUI === 'function') {
       loadLeagueStats().then(() => updateDuelScreenUI());
+    }
+  }
+  if (tabKey === 'tournament') {
+    if (typeof loadTournament === 'function') {
+      loadTournament().then(() => {
+        if (typeof switchTrnTab === 'function') switchTrnTab('daily');
+      }).catch(() => {
+        if (typeof switchTrnTab === 'function') switchTrnTab('daily');
+      });
     }
   }
   if (tabKey === 'leaderboard') { if (typeof renderLeaderboard === 'function') renderLeaderboard(); }
@@ -79,8 +85,7 @@ function showPanel(panelId) {
   const panelMap = {
     'homePanel':       'home',
     'duelPanel':       'duel',
-    'tournamentPanel': 'duel',
-    'journeyPanel':    'macera',
+    'tournamentPanel': 'tournament',
     'lbPanel':         'leaderboard',
     'profilePanel':    'profile',
   };
@@ -102,7 +107,7 @@ function switchTab(panelId, btn) {
   if (panelId === 'lbPanel')           { openLbScreen(); return; }
   if (panelId === 'homePanel')         { switchBottomNav('home'); return; }
   if (panelId === 'profilePanel')      { switchBottomNav('profile'); return; }
-  if (panelId === 'tournamentScreen')  { switchBottomNav('duel'); return; }
+  if (panelId === 'tournamentScreen' || panelId === 'tournamentPanel') { switchBottomNav('tournament'); return; }
   // Genel durum: direkt göster
   const prev = document.querySelector('.tab-panel.active');
   const next = document.getElementById(panelId);
@@ -120,6 +125,10 @@ function showScreen(id) {
 
 function exitGame() {
   if (typeof resetPauseUi === 'function') resetPauseUi();
+  const gos = document.getElementById('gameOverScreen');
+  if (gos) gos.style.display = 'none';
+  const ws = document.getElementById('winScreen');
+  if (ws) ws.style.display = 'none';
   document.getElementById('swipeDots').style.display = 'flex';
   const nav = document.querySelector('.bottom-nav');
   if (nav) nav.style.display = 'flex';
@@ -140,6 +149,7 @@ function exitGame() {
       extraErrorUsed: G.extraErrorUsed,
       extraHintUsed:  G.extraHintUsed,
     };
+    appState.lastSavedGameMode = G.mode;
     saveState();
   }
   document.getElementById('gameScreen').classList.remove('active');
@@ -203,26 +213,105 @@ function closeLevelsSheet(e) {
   setTimeout(() => { sheet.style.display = 'none'; }, 300);
 }
 
+function updateHomeStreakPanelNumbers() {
+  const cur = document.getElementById('homeStreakPopCurrent');
+  const best = document.getElementById('homeStreakPopBest');
+  const n = appState.streak ?? 0;
+  if (cur) cur.textContent = n;
+  if (best) best.textContent = appState.bestStreak ?? 0;
+  const badge = document.getElementById('homeStreakCount');
+  if (badge) badge.textContent = String(n);
+}
+
+function toggleHomeStreakPanel(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('homeStreakPanel');
+  const back = document.getElementById('homeStreakBackdrop');
+  const btn = document.getElementById('homeStreakBtn');
+  if (!panel || !back || !btn) return;
+  const isOpen = !panel.hasAttribute('hidden');
+  if (isOpen) {
+    closeHomeStreakPanel();
+    return;
+  }
+  updateHomeStreakPanelNumbers();
+  panel.removeAttribute('hidden');
+  back.removeAttribute('hidden');
+  btn.setAttribute('aria-expanded', 'true');
+  panel.setAttribute('aria-hidden', 'false');
+  back.setAttribute('aria-hidden', 'false');
+}
+
+function closeHomeStreakPanel() {
+  const panel = document.getElementById('homeStreakPanel');
+  const back = document.getElementById('homeStreakBackdrop');
+  const btn = document.getElementById('homeStreakBtn');
+  if (panel) {
+    panel.setAttribute('hidden', '');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+  if (back) {
+    back.setAttribute('hidden', '');
+    back.setAttribute('aria-hidden', 'true');
+  }
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+async function refreshHomeDailyRankMessage(dateStr) {
+  const el = document.getElementById('dailyStatus');
+  if (!el) return;
+  const stillDone = appState.scores.some(s => s.date === dateStr && s.mode === 'daily');
+  if (!stillDone) return;
+  if (typeof getRealLbEntries !== 'function' || typeof sb === 'undefined' || !sb) {
+    el.textContent = 'Tebrikler! Bugünkü sudokunu tamamladın.';
+    return;
+  }
+  try {
+    const entries = await getRealLbEntries(dateStr);
+    const idx = entries.findIndex(e => e.isMe);
+    if (idx >= 0) el.textContent = `${idx + 1}. oldun, tebrikler`;
+    else el.textContent = 'Tebrikler! Bugünkü sudokunu tamamladın.';
+  } catch (err) {
+    el.textContent = 'Tebrikler! Bugünkü sudokunu tamamladın.';
+  }
+}
+
 function updateHomeScreen() {
   const today = todayStr();
-  document.getElementById('homeStreak').textContent = appState.streak;
-  document.getElementById('dailyDate').textContent = formatDate(today);
+  const topDate = document.getElementById('homeTopDate');
+  if (topDate) {
+    topDate.textContent = formatDate(today);
+    topDate.setAttribute('datetime', today);
+  }
+  updateHomeStreakPanelNumbers();
 
   // Daily status
   const ds = appState.scores.find(s => s.date === today && s.mode === 'daily');
   const dailySaved = appState.savedGames && appState.savedGames['daily'];
   const dailyInProgress = dailySaved && dailySaved.savedDate === today;
   const dailyCard = document.querySelector('.daily-card');
+  const dailyBtn = document.getElementById('dailyChallengeBtn');
+  const ctaText = dailyBtn && dailyBtn.querySelector('.home-challenge-card__cta-text');
+  if (dailyCard) {
+    dailyCard.classList.toggle('home-challenge-card--plain', !!dailyInProgress);
+    dailyCard.classList.toggle('home-challenge-card--done', !!ds);
+  }
 
   if (ds) {
-    document.getElementById('dailyStatus').textContent = `✅ Tamamlandı — ${formatTime(ds.time)}`;
-    if (dailyCard) { dailyCard.style.opacity = '0.7'; dailyCard.style.cursor = 'default'; }
+    document.getElementById('dailyStatus').textContent = 'Sıralama yükleniyor…';
+    refreshHomeDailyRankMessage(today);
+    if (dailyCard) { dailyCard.style.opacity = '0.88'; dailyCard.style.cursor = 'default'; }
+    if (dailyBtn) dailyBtn.disabled = true;
   } else if (dailyInProgress) {
-    document.getElementById('dailyStatus').textContent = '▶️ Devam ediyor — kaldığın yerden devam et';
+    document.getElementById('dailyStatus').textContent = 'Devam et ve sıralamaya gir';
     if (dailyCard) { dailyCard.style.opacity = '1'; dailyCard.style.cursor = 'pointer'; }
+    if (dailyBtn) dailyBtn.disabled = false;
+    if (ctaText) ctaText.textContent = 'Devam et';
   } else {
     document.getElementById('dailyStatus').textContent = 'Hemen çöz ve sıralamaya gir';
     if (dailyCard) { dailyCard.style.opacity = '1'; dailyCard.style.cursor = 'pointer'; }
+    if (dailyBtn) dailyBtn.disabled = false;
+    if (ctaText) ctaText.textContent = 'Oyna';
   }
 
   document.getElementById('registerPrompt').style.display = appState.supabaseId ? 'none' : 'block';
@@ -263,6 +352,13 @@ function updateHomeScreen() {
     const subEl = btn.querySelector('.diff-sub');
     if (subEl) subEl.remove();
   });
+
+  const resumeBtn = document.getElementById('homeResumeBtn');
+  if (resumeBtn) {
+    const ok = typeof getResumableSavedMode === 'function' && getResumableSavedMode();
+    resumeBtn.disabled = !ok;
+    resumeBtn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+  }
 
   renderLbPreview(); renderDuelPreview();
 }

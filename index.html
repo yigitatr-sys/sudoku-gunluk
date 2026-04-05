@@ -14,7 +14,6 @@
 <title>Sudoku Günlük</title>
 <script src="network-manager.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -53,7 +52,7 @@
         <div class="ob-feature">
           <div class="ob-feature-icon">📅</div>
           <div>
-            <div class="ob-feature-title">Günlük Bulmaca</div>
+            <div class="ob-feature-title">Günlük Mücadele</div>
             <div class="ob-feature-desc">Her gün yeni bir bulmaca, herkes aynı soruyu çözer.</div>
           </div>
         </div>
@@ -151,155 +150,121 @@
   <div class="tab-panel active" id="homePanel">
     <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;width:100%;background:linear-gradient(to bottom,#4a8ff7 0%,#7db3fa 28%,#bdd7ff 52%,#deeaff 70%,#f0f5ff 100%);">
 
-      <!-- ── Yatay kaydırmalı kartlar ── -->
-      <div style="overflow-x:auto;display:flex;gap:12px;padding:20px 18px 28px;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;flex-shrink:0;background:transparent;">
-
-        <!-- Günlük Bulmaca -->
-        <button class="home-mod-card home-mod-card--daily" onclick="startGame('daily')" style="flex:0 0 130px;height:165px;border-radius:20px;border:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0;text-align:left;transition:transform 0.12s ease,box-shadow 0.12s ease;" ontouchstart="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" ontouchend="this.style.transform='';this.style.boxShadow=''" onmousedown="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" onmouseup="this.style.transform='';this.style.boxShadow=''" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-          <svg style="position:absolute;right:-6px;bottom:-6px;" width="86" height="86" viewBox="0 0 86 86" fill="none">
-            <rect x="6" y="6" width="74" height="74" rx="9" stroke="white" stroke-width="2.5" opacity="0.25"/>
-            <line x1="6" y1="31" x2="80" y2="31" stroke="white" stroke-width="2" opacity="0.2"/>
-            <line x1="6" y1="55" x2="80" y2="55" stroke="white" stroke-width="2" opacity="0.2"/>
-            <line x1="31" y1="6" x2="31" y2="80" stroke="white" stroke-width="2" opacity="0.2"/>
-            <line x1="55" y1="6" x2="55" y2="80" stroke="white" stroke-width="2" opacity="0.2"/>
-            <rect x="10" y="10" width="17" height="17" rx="3" fill="white" opacity="0.22"/>
-            <rect x="34" y="34" width="17" height="17" rx="3" fill="white" opacity="0.28"/>
-            <rect x="58" y="10" width="17" height="17" rx="3" fill="white" opacity="0.16"/>
-            <rect x="10" y="58" width="17" height="17" rx="3" fill="white" opacity="0.18"/>
-            <rect x="58" y="58" width="17" height="17" rx="3" fill="white" opacity="0.22"/>
-          </svg>
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,0.38) 0%,transparent 100%);">
-            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:3px;">Günlük Bulmaca</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.72);">Her gün yeni</div>
+      <div class="home-top-bar">
+        <time id="homeTopDate" class="home-top-date" datetime=""></time>
+        <div class="home-streak-anchor">
+          <button type="button" id="homeStreakBtn" class="home-streak-btn" aria-expanded="false" aria-controls="homeStreakPanel" aria-label="Seri bilgisi" onclick="toggleHomeStreakPanel(event)">
+            <span class="home-streak-btn__glyph" aria-hidden="true">🔥</span>
+            <span id="homeStreakCount" class="home-streak-btn__count">0</span>
+          </button>
+          <div id="homeStreakBackdrop" class="home-streak-backdrop" hidden aria-hidden="true" onclick="closeHomeStreakPanel()"></div>
+          <div id="homeStreakPanel" class="home-streak-panel" role="region" aria-labelledby="homeStreakPanelTitle" hidden>
+            <div id="homeStreakPanelTitle" class="home-streak-panel__title">Seri</div>
+            <div class="home-streak-panel__rows">
+              <div class="home-streak-panel__row"><span>Güncel</span><strong id="homeStreakPopCurrent">0</strong></div>
+              <div class="home-streak-panel__row"><span>Rekor</span><strong id="homeStreakPopBest">0</strong></div>
+            </div>
           </div>
-          <span id="dailyDate" style="display:none;"></span>
-          <span id="dailyStatus" style="display:none;"></span>
-        </button>
+        </div>
+      </div>
 
-        <!-- Düello -->
-        <button class="home-mod-card home-mod-card--duel" onclick="showPanel('duelPanel')" style="flex:0 0 130px;height:165px;border-radius:20px;border:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0;text-align:left;transition:transform 0.12s ease,box-shadow 0.12s ease;" ontouchstart="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" ontouchend="this.style.transform='';this.style.boxShadow=''" onmousedown="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" onmouseup="this.style.transform='';this.style.boxShadow=''" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-          <svg style="position:absolute;right:-2px;bottom:-4px;" width="98" height="76" viewBox="0 0 98 76" fill="none">
-            <circle cx="23" cy="16" r="11" fill="white" opacity="0.18"/>
-            <path d="M10 34 C10 27 36 27 36 34 L39 74 L7 74 Z" fill="white" opacity="0.16"/>
-            <circle cx="75" cy="16" r="11" fill="white" opacity="0.18"/>
-            <path d="M62 34 C62 27 88 27 88 34 L91 74 L59 74 Z" fill="white" opacity="0.16"/>
-            <path d="M46 2 L41 22 L50 18 L46 38 L57 16 L48 20 Z" fill="white" opacity="0.38"/>
+      <!-- ── Günlük mücadele (mod: daily; tarih & durum updateHomeScreen) ── -->
+      <div class="home-challenge-wrap">
+        <button type="button" id="dailyChallengeBtn" class="home-mod-card home-mod-card--daily home-challenge-card daily-card" onclick="startGame('daily')" aria-labelledby="dailyChallengeTitle">
+          <svg class="home-challenge-card__grid-deco" width="80" height="80" viewBox="0 0 86 86" fill="none" aria-hidden="true">
+            <rect x="6" y="6" width="74" height="74" rx="9" stroke="white" stroke-width="2.5" opacity="0.2"/>
+            <line x1="6" y1="31" x2="80" y2="31" stroke="white" stroke-width="2" opacity="0.15"/>
+            <line x1="6" y1="55" x2="80" y2="55" stroke="white" stroke-width="2" opacity="0.15"/>
+            <line x1="31" y1="6" x2="31" y2="80" stroke="white" stroke-width="2" opacity="0.15"/>
+            <line x1="55" y1="6" x2="55" y2="80" stroke="white" stroke-width="2" opacity="0.15"/>
+            <rect x="10" y="10" width="17" height="17" rx="3" fill="white" opacity="0.18"/>
+            <rect x="34" y="34" width="17" height="17" rx="3" fill="white" opacity="0.24"/>
+            <rect x="58" y="10" width="17" height="17" rx="3" fill="white" opacity="0.12"/>
+            <rect x="10" y="58" width="17" height="17" rx="3" fill="white" opacity="0.14"/>
+            <rect x="58" y="58" width="17" height="17" rx="3" fill="white" opacity="0.18"/>
           </svg>
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,0.38) 0%,transparent 100%);">
-            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:3px;">Düello</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.72);">1v1 Gerçek Zamanlı</div>
-          </div>
-        </button>
-
-        <!-- Macera -->
-        <button id="journeyHomeBtn" class="home-mod-card home-mod-card--journey" onclick="showPanel('journeyPanel')" style="flex:0 0 130px;height:165px;border-radius:20px;border:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0;text-align:left;transition:transform 0.12s ease,box-shadow 0.12s ease;" ontouchstart="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" ontouchend="this.style.transform='';this.style.boxShadow=''" onmousedown="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" onmouseup="this.style.transform='';this.style.boxShadow=''" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-          <svg style="position:absolute;right:-4px;bottom:-4px;" width="100" height="76" viewBox="0 0 100 76" fill="none">
-            <polygon points="50,4 18,72 82,72" fill="white" opacity="0.16"/>
-            <polygon points="22,22 2,72 46,72" fill="white" opacity="0.22"/>
-            <polygon points="78,22 54,72 100,72" fill="white" opacity="0.18"/>
-            <polygon points="50,4 39,28 61,28" fill="white" opacity="0.3"/>
-            <circle cx="50" cy="11" r="4" fill="white" opacity="0.4"/>
-          </svg>
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,0.38) 0%,transparent 100%);">
-            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:3px;">Macera</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.72);">100 Bölümlük Yolculuk</div>
+          <div class="home-challenge-card__body">
+            <h2 id="dailyChallengeTitle" class="home-challenge-card__title">Günlük Mücadele</h2>
+            <p id="dailyStatus" class="home-challenge-card__status" aria-live="polite"></p>
+            <span id="homeDailyCta" class="home-challenge-card__cta"><span class="home-challenge-card__cta-text">Oyna</span><span class="home-challenge-card__cta-arrow" aria-hidden="true">→</span></span>
           </div>
         </button>
-
-        <!-- Turnuva -->
-        <button class="home-mod-card home-mod-card--tournament" onclick="showPanel('tournamentPanel')" style="flex:0 0 130px;height:165px;border-radius:20px;border:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;padding:0;text-align:left;transition:transform 0.12s ease,box-shadow 0.12s ease;" ontouchstart="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" ontouchend="this.style.transform='';this.style.boxShadow=''" onmousedown="this.style.transform='translateY(3px)';this.style.boxShadow='0 1px 0 rgba(0,0,0,0.22),0 2px 6px rgba(0,0,0,0.12)'" onmouseup="this.style.transform='';this.style.boxShadow=''" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-          <svg style="position:absolute;right:4px;bottom:-2px;" width="78" height="90" viewBox="0 0 78 90" fill="none">
-            <path d="M16 8 L62 8 L62 42 C62 62 16 62 16 42 Z" fill="white" opacity="0.18"/>
-            <path d="M16 20 C3 20 3 42 16 42" stroke="white" stroke-width="4.5" fill="none" opacity="0.22" stroke-linecap="round"/>
-            <path d="M62 20 C75 20 75 42 62 42" stroke="white" stroke-width="4.5" fill="none" opacity="0.22" stroke-linecap="round"/>
-            <rect x="34" y="62" width="10" height="14" fill="white" opacity="0.2"/>
-            <rect x="22" y="76" width="34" height="8" rx="4" fill="white" opacity="0.2"/>
-            <path d="M39 18 L41.5 25 L49 25 L43 29.5 L45.5 37 L39 32 L32.5 37 L35 29.5 L29 25 L36.5 25 Z" fill="white" opacity="0.32"/>
-          </svg>
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px 14px;background:linear-gradient(to top,rgba(0,0,0,0.38) 0%,transparent 100%);">
-            <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:3px;">Turnuva</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.72);">Aktif Turnuva</div>
-          </div>
-        </button>
-
-      </div><!-- /yatay kartlar -->
+      </div>
 
       <!-- ── İçerik Alanı ── -->
-      <div style="background:transparent;flex:1;display:flex;flex-direction:column;align-items:center;padding:0 24px 32px;position:relative;overflow:hidden;">
-
-        <!-- Dekoratif arka plan: Sudoku ızgara watermark -->
-        <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);pointer-events:none;opacity:0.07;flex-shrink:0;" width="270" height="270" viewBox="0 0 270 270" fill="none">
-          <rect x="4" y="4" width="262" height="262" rx="8" stroke="#1e40af" stroke-width="3.5"/>
-          <!-- İnce dikey çizgiler -->
-          <line x1="33" y1="4" x2="33" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="62" y1="4" x2="62" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <!-- Kalın dikey (3'lük blok sınırları) -->
-          <line x1="91" y1="4" x2="91" y2="266" stroke="#1e40af" stroke-width="3"/>
-          <line x1="120" y1="4" x2="120" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="149" y1="4" x2="149" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="178" y1="4" x2="178" y2="266" stroke="#1e40af" stroke-width="3"/>
-          <line x1="207" y1="4" x2="207" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="236" y1="4" x2="236" y2="266" stroke="#1e40af" stroke-width="1.2"/>
-          <!-- İnce yatay çizgiler -->
-          <line x1="4" y1="33" x2="266" y2="33" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="4" y1="62" x2="266" y2="62" stroke="#1e40af" stroke-width="1.2"/>
-          <!-- Kalın yatay (3'lük blok sınırları) -->
-          <line x1="4" y1="91" x2="266" y2="91" stroke="#1e40af" stroke-width="3"/>
-          <line x1="4" y1="120" x2="266" y2="120" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="4" y1="149" x2="266" y2="149" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="4" y1="178" x2="266" y2="178" stroke="#1e40af" stroke-width="3"/>
-          <line x1="4" y1="207" x2="266" y2="207" stroke="#1e40af" stroke-width="1.2"/>
-          <line x1="4" y1="236" x2="266" y2="236" stroke="#1e40af" stroke-width="1.2"/>
-          <!-- Rastgele dolu hücreler — sudoku hissi -->
-          <rect x="5"   y="5"   width="27" height="27" rx="3" fill="#1e40af" opacity="0.55"/>
-          <rect x="34"  y="63"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
-          <rect x="92"  y="92"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.6"/>
-          <rect x="121" y="5"   width="27" height="27" rx="3" fill="#1e40af" opacity="0.35"/>
-          <rect x="179" y="34"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.45"/>
-          <rect x="208" y="92"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
-          <rect x="5"   y="121" width="27" height="27" rx="3" fill="#1e40af" opacity="0.3"/>
-          <rect x="150" y="179" width="27" height="27" rx="3" fill="#1e40af" opacity="0.5"/>
-          <rect x="63"  y="208" width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
-          <rect x="237" y="150" width="27" height="27" rx="3" fill="#1e40af" opacity="0.35"/>
-          <rect x="208" y="237" width="27" height="27" rx="3" fill="#1e40af" opacity="0.45"/>
-          <rect x="34"  y="150" width="27" height="27" rx="3" fill="#1e40af" opacity="0.3"/>
-        </svg>
+      <div style="background:transparent;flex:1;display:flex;flex-direction:column;align-items:center;padding:0 24px 18px;position:relative;overflow:hidden;">
 
         <!-- Yumuşak ışık halkası — sağ üst -->
         <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,0.22) 0%,transparent 68%);pointer-events:none;"></div>
         <!-- Yumuşak ışık halkası — sol alt -->
         <div style="position:absolute;bottom:20px;left:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.14) 0%,transparent 68%);pointer-events:none;"></div>
 
-        <!-- Orta: Nasıl oynanır? — kartlar ile buton arasında dikey ortalanmış -->
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;position:relative;z-index:1;">
-          <button onclick="openSudokuTutorial()" style="background:none;border:none;font-size:13px;color:#4b6cb7;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:'DM Sans',sans-serif;letter-spacing:0.2px;">Nasıl oynanır?</button>
+        <div class="home-lower-anchor">
+          <div class="home-tutorial-composite">
+          <div class="home-watermark" aria-hidden="true">
+            <svg class="home-watermark__svg" width="270" height="270" viewBox="0 0 270 270" fill="none">
+              <rect x="4" y="4" width="262" height="262" rx="8" stroke="#1e40af" stroke-width="3.5"/>
+              <line x1="33" y1="4" x2="33" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="62" y1="4" x2="62" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="91" y1="4" x2="91" y2="266" stroke="#1e40af" stroke-width="3"/>
+              <line x1="120" y1="4" x2="120" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="149" y1="4" x2="149" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="178" y1="4" x2="178" y2="266" stroke="#1e40af" stroke-width="3"/>
+              <line x1="207" y1="4" x2="207" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="236" y1="4" x2="236" y2="266" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="33" x2="266" y2="33" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="62" x2="266" y2="62" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="91" x2="266" y2="91" stroke="#1e40af" stroke-width="3"/>
+              <line x1="4" y1="120" x2="266" y2="120" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="149" x2="266" y2="149" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="178" x2="266" y2="178" stroke="#1e40af" stroke-width="3"/>
+              <line x1="4" y1="207" x2="266" y2="207" stroke="#1e40af" stroke-width="1.2"/>
+              <line x1="4" y1="236" x2="266" y2="236" stroke="#1e40af" stroke-width="1.2"/>
+              <rect x="5"   y="5"   width="27" height="27" rx="3" fill="#1e40af" opacity="0.55"/>
+              <rect x="34"  y="63"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
+              <rect x="92"  y="92"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.6"/>
+              <rect x="121" y="5"   width="27" height="27" rx="3" fill="#1e40af" opacity="0.35"/>
+              <rect x="179" y="34"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.45"/>
+              <rect x="208" y="92"  width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
+              <rect x="5"   y="121" width="27" height="27" rx="3" fill="#1e40af" opacity="0.3"/>
+              <rect x="150" y="179" width="27" height="27" rx="3" fill="#1e40af" opacity="0.5"/>
+              <rect x="63"  y="208" width="27" height="27" rx="3" fill="#1e40af" opacity="0.4"/>
+              <rect x="237" y="150" width="27" height="27" rx="3" fill="#1e40af" opacity="0.35"/>
+              <rect x="208" y="237" width="27" height="27" rx="3" fill="#1e40af" opacity="0.45"/>
+              <rect x="34"  y="150" width="27" height="27" rx="3" fill="#1e40af" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="home-tutorial-center">
+            <button type="button" class="home-tutorial-entry" onclick="openSudokuTutorial()">
+              <span class="home-tutorial-entry__icon" aria-hidden="true">i</span>
+              <span class="home-tutorial-entry__text">
+                <span class="home-tutorial-entry__title">Nasıl oynanır?</span>
+                <span class="home-tutorial-entry__sub">Sudoku kurallarını öğren</span>
+              </span>
+            </button>
+          </div>
+          </div>
+          <div class="home-actions-footer">
+            <div class="home-action-btns">
+              <button type="button" class="home-action-btn home-action-btn--primary" onclick="openLevelsSheet()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><polygon points="5,3 19,12 5,21"/></svg>
+                Yeni oyun
+              </button>
+              <button type="button" id="homeResumeBtn" class="home-action-btn home-action-btn--secondary" onclick="resumeLastSavedGame()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                Devam et
+              </button>
+            </div>
+          </div>
         </div>
-
-        <!-- Alt: Seviye Seç butonu -->
-        <button onclick="openLevelsSheet()"
-          style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2952c8,#4a8ff7);border:none;border-radius:14px;padding:14px 32px;color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 5px 0 #1d3fa8,0 8px 20px rgba(41,82,200,0.28);transition:transform 0.12s ease,box-shadow 0.12s ease;position:relative;z-index:1;"
-          ontouchstart="this.style.transform='translateY(4px)';this.style.boxShadow='0 1px 0 #1d3fa8,0 2px 8px rgba(41,82,200,0.1)'"
-          ontouchend="this.style.transform='';this.style.boxShadow='0 5px 0 #1d3fa8,0 8px 20px rgba(41,82,200,0.28)'"
-          onmousedown="this.style.transform='translateY(4px)';this.style.boxShadow='0 1px 0 #1d3fa8,0 2px 8px rgba(41,82,200,0.1)'"
-          onmouseup="this.style.transform='';this.style.boxShadow='0 5px 0 #1d3fa8,0 8px 20px rgba(41,82,200,0.28)'"
-          onmouseleave="this.style.transform='';this.style.boxShadow='0 5px 0 #1d3fa8,0 8px 20px rgba(41,82,200,0.28)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-          Oyna
-        </button>
 
         <!-- Gizli eski elemanlar — JS bu ID'lere erişir -->
         <div style="display:none;" aria-hidden="true">
-          <span id="homeStreak">0</span>
-          <span id="dailyDate2"></span>
           <svg id="homeMiniAvatar" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
           <div id="miniLbSlider" onscroll="onMiniLbScroll()"><div id="homeDuelPreview"></div></div>
           <div id="miniLbDots"><div id="miniDot0"></div><div id="miniDot1"></div></div>
           <div id="homeLbPreview"></div>
           <span id="playerLeagueBadge"></span>
-          <span id="journeyBtnBadge"></span>
-          <div id="journeyBtnDesc"></div>
-          <div id="journeyBtnProgress"></div>
-          <div id="journeyBtnProgressText"></div>
           <div id="registerPrompt"><button class="primary-btn" onclick="showRegisterModal()">🏆 Sıralamaya Katıl</button></div>
         </div>
 
@@ -311,7 +276,7 @@
   <div class="tab-panel" id="lbPanel">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#ffffff;border-bottom:1.5px solid #eeeeee;flex-shrink:0;">
       <button onclick="showPanel('homePanel')" style="background:#ffffff;border:1.5px solid #eeeeee;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;touch-action:manipulation;box-shadow:0 2px 8px rgba(59,130,246,0.08);">←</button>
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#1a1612;">🏆 Sıralama</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#1a1612;">Sıralama</div>
       <button onclick="showLbInfo()" style="background:#ffffff;border:1.5px solid #eeeeee;border-radius:50%;width:34px;height:34px;font-size:13px;cursor:pointer;color:#6b7280;touch-action:manipulation;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(59,130,246,0.08);">?</button>
     </div>
     <div style="display:flex;background:#ffffff;border-bottom:1.5px solid #eeeeee;padding:0 16px;flex-shrink:0;">
@@ -319,21 +284,30 @@
       <button class="lb-main-tab"        id="tabWeek"    onclick="switchLbTab('week')"   >Bu Hafta</button>
       <button class="lb-main-tab"        id="tabAllTime" onclick="switchLbTab('alltime')">Tüm Zamanlar</button>
     </div>
-    <div id="lbPanelToday"   class="lb-panel" style="overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;">
+    <div id="lbPanelToday"   class="lb-panel lb-panel--stack" style="flex:1;min-height:0;display:none;flex-direction:column;">
       <div class="date-tabs" id="dateTabs" style="position:sticky;top:0;z-index:2;flex-shrink:0;"></div>
-      <div class="lb-content"><div class="lb-podium" id="lbPodium"></div><div class="lb-list" id="lbList"></div></div>
-    </div>
-    <div id="lbPanelWeek"    class="lb-panel" style="display:none;overflow-y:auto;flex:1;min-height:0;">
-      <div class="lb-content">
-        <div style="padding:4px 0 12px;text-align:center;font-size:11px;color:var(--text-muted);letter-spacing:1px;">SON 7 GÜNÜN TOPLAM PUANI</div>
-        <div class="lb-list" id="lbListWeek"></div>
+      <div class="lb-panel__scroll">
+        <div class="lb-content"><div class="lb-podium" id="lbPodium"></div><div class="lb-list" id="lbList"></div></div>
       </div>
+      <div id="lbStickyToday" class="lb-sticky-me" style="display:none" aria-live="polite"></div>
     </div>
-    <div id="lbPanelAllTime" class="lb-panel" style="display:none;overflow-y:auto;flex:1;min-height:0;">
-      <div class="lb-content">
-        <div style="padding:4px 0 12px;text-align:center;font-size:11px;color:var(--text-muted);letter-spacing:1px;">TÜM ZAMANLAR TOPLAM PUANI</div>
-        <div class="lb-list" id="lbListAllTime"></div>
+    <div id="lbPanelWeek"    class="lb-panel lb-panel--stack" style="display:none;flex:1;min-height:0;flex-direction:column;">
+      <div class="lb-panel__scroll">
+        <div class="lb-content">
+          <div style="padding:4px 0 12px;text-align:center;font-size:11px;color:var(--text-muted);letter-spacing:1px;">SON 7 GÜNÜN TOPLAM PUANI</div>
+          <div class="lb-list" id="lbListWeek"></div>
+        </div>
       </div>
+      <div id="lbStickyWeek" class="lb-sticky-me" style="display:none" aria-live="polite"></div>
+    </div>
+    <div id="lbPanelAllTime" class="lb-panel lb-panel--stack" style="display:none;flex:1;min-height:0;flex-direction:column;">
+      <div class="lb-panel__scroll">
+        <div class="lb-content">
+          <div style="padding:4px 0 12px;text-align:center;font-size:11px;color:var(--text-muted);letter-spacing:1px;">TÜM ZAMANLAR TOPLAM PUANI</div>
+          <div class="lb-list" id="lbListAllTime"></div>
+        </div>
+      </div>
+      <div id="lbStickyAllTime" class="lb-sticky-me" style="display:none" aria-live="polite"></div>
     </div>
   </div>
 
@@ -717,7 +691,7 @@
     </div>
   </div>
 
-<div id="tournamentScreen" class="tab-panel">
+<div id="duelPanel" class="tab-panel">
 
   <!-- ══ Düello — açık tema, tek aksiyon: hızlı eşleştirme ══ -->
   <div id="duelScreen" class="duel-light">
@@ -733,93 +707,81 @@
       </button>
 
       <h1 class="duel-light__heading">Düello</h1>
-
-      <div class="duel-light__resource" title="Enerji">
-        <span class="duel-light__resource-icon" aria-hidden="true">⚡</span>
-        <span id="duelEnergyValue" class="duel-light__resource-num">5</span>
-      </div>
     </header>
 
     <div class="duel-light__main">
       <div class="duel-light__emblem-zone">
-        <div id="duelLevelEmblem" class="duel-hex" role="img" aria-label="Seviye madalyonu">
-          <svg class="duel-hex__svg" viewBox="0 0 200 200" aria-hidden="true">
-            <defs>
-              <linearGradient id="duelHexMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#faf6ed"/>
-                <stop offset="22%" stop-color="#c4a574"/>
-                <stop offset="42%" stop-color="#e8dcc8"/>
-                <stop offset="52%" stop-color="#94a3b8"/>
-                <stop offset="68%" stop-color="#d4af37"/>
-                <stop offset="100%" stop-color="#57534e"/>
-              </linearGradient>
-              <linearGradient id="duelHexCrystal" x1="25%" y1="0%" x2="75%" y2="100%">
-                <stop offset="0%" stop-color="#f0f9ff"/>
-                <stop offset="30%" stop-color="#7dd3fc"/>
-                <stop offset="55%" stop-color="#a5f3fc"/>
-                <stop offset="100%" stop-color="#0284c7"/>
-              </linearGradient>
-              <linearGradient id="duelHexCrystalDeep" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#075985"/>
-                <stop offset="100%" stop-color="#38bdf8"/>
-              </linearGradient>
-              <linearGradient id="duelHexCrystalShine" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
-                <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
-                <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <polygon class="duel-hex__metal" points="100,10 178,55 178,145 100,190 22,145 22,55" fill="url(#duelHexMetal)"/>
-            <polygon class="duel-hex__crystal-deep" points="100,36 156,68 156,132 100,164 44,132 44,68" fill="url(#duelHexCrystalDeep)" opacity="0.4"/>
-            <polygon class="duel-hex__crystal" points="100,38 154,69 154,131 100,162 46,131 46,69" fill="url(#duelHexCrystal)"/>
-            <g class="duel-hex__facets" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.85" opacity="0.65">
-              <path d="M100 38 L100 162"/>
-              <path d="M46 69 L154 131"/>
-              <path d="M154 69 L46 131"/>
-            </g>
-            <path class="duel-hex__shine" d="M100 44 L132 62 L100 78 L68 62 Z" fill="url(#duelHexCrystalShine)" opacity="0.85"/>
-            <g id="duelHexSegmentGroup" class="duel-hex__segment-layer"></g>
-          </svg>
-          <div class="duel-hex__lvl">
-            <span id="duelEmblemLevelText" class="duel-hex__lvl-text">Lvl. 0</span>
-          </div>
+        <div class="duel-light__rank-row">
+          <span class="duel-light__rank-row-label">Lig sırası</span>
+          <div id="duelRankBadgeMount" class="duel-light__rank-badge-mount" aria-live="polite"></div>
         </div>
-        <p id="duelXpFraction" class="duel-hex__frac">0 / 100 XP</p>
-        <p id="duelLevelXpHint" class="duel-hex__hint">Sıradaki seviyeye 100 XP kaldı</p>
       </div>
 
-      <div class="duel-light__spacer"></div>
-
-      <div class="duel-light__cta-wrap">
-        <button type="button" id="matchmakeBtn" class="duel-light__match-btn" onclick="startMatchmaking()">
-          <span id="matchmakeBtnTitle" class="duel-light__match-btn-label">RAKİP BUL</span>
-        </button>
-        <button type="button" id="cancelMatchmakeBtn" class="duel-light__cancel-mm" onclick="cancelMatchmaking()" style="display:none;">Vazgeç</button>
+      <div class="duel-light__bottom-stack">
+        <div class="duel-light__cta-wrap">
+          <button type="button" id="matchmakeBtn" class="duel-light__match-btn" onclick="startMatchmaking()">
+            <span id="matchmakeBtnTitle" class="duel-light__match-btn-label">RAKİP BUL</span>
+          </button>
+          <button type="button" id="cancelMatchmakeBtn" class="duel-light__cancel-mm" onclick="cancelMatchmaking()" style="display:none;">Vazgeç</button>
+        </div>
+        <details class="duel-light__friend-details duel-light__friend-details--bottom">
+          <summary class="duel-light__friend-summary">
+            <span>Arkadaş kodu</span>
+            <span class="duel-light__friend-hint">ELO sayılmaz</span>
+          </summary>
+          <div class="duel-light__friend-inner">
+            <button type="button" class="duel-light__friend-create" onclick="createDuel()">Oda aç · kod paylaş</button>
+            <div class="duel-light__friend-join">
+              <input type="text" id="duelCodeInput" class="duel-light__friend-input input-field" maxlength="6" placeholder="KOD" autocomplete="off" autocapitalize="characters" inputmode="text" aria-label="Düello oda kodu">
+              <button type="button" class="duel-light__friend-join-btn" onclick="joinDuelByCode()">Katıl</button>
+            </div>
+          </div>
+        </details>
       </div>
     </div>
 
     <div id="matchmakingStatus" class="duel-light__hidden" aria-hidden="true"></div>
   </div>
 
+</div>
+
+  <!-- ══ Turnuva — canlı yayın & salon ══ -->
+  <div id="tournamentPanel" class="tab-panel trn-hub">
+    <div class="trn-hub__hero">
+      <div class="trn-hub__hero-top">
+        <span id="trnStatusBadge" class="trn-hub__badge">YAKINDA</span>
+        <div class="trn-hub__stats">
+          <div class="trn-hub__stat"><span class="trn-hub__stat-num" id="trnParticipants">0</span><span class="trn-hub__stat-lbl">katılımcı</span></div>
+          <div class="trn-hub__stat"><span class="trn-hub__stat-num" id="trnMyRank">—</span><span class="trn-hub__stat-lbl">sıran</span></div>
+        </div>
+      </div>
+      <h2 class="trn-hub__title">Günlük Turnuva</h2>
+      <p class="trn-hub__date" id="trnDateLabel">Her gün 20:00 - 21:00</p>
+      <div class="trn-hub__countdown-wrap">
+        <span class="trn-hub__count-lbl" id="trnCountdownLabel">Başlamasına</span>
+        <div class="trn-hub__countdown" id="trnCountdown">00:00:00</div>
+      </div>
+      <button type="button" class="trn-hub__cta" id="trnJoinBtn">🔔 Başlayınca Bildir</button>
+    </div>
+    <div class="trn-hub__section">
+      <div class="trn-hub__section-title">Canlı sıralama</div>
+      <div class="trn-hub__live-card" id="trnLiveLeaderboard">
+        <div class="trn-hub__empty">Turnuva açıldığında burada anlık liste görünür.</div>
+      </div>
+    </div>
+    <div class="trn-hub__section">
+      <div class="trn-hub__section-title">Şampiyonlar salonu</div>
+      <div class="trn-hub__tabs">
+        <button type="button" class="trn-hub__tab trn-hub__tab--on" id="trnTabDaily" onclick="switchTrnTab('daily')">Günlük</button>
+        <button type="button" class="trn-hub__tab" id="trnTabWeekly" onclick="switchTrnTab('weekly')">Haftalık</button>
+        <button type="button" class="trn-hub__tab" id="trnTabAlltime" onclick="switchTrnTab('alltime')">Tüm zamanlar</button>
+      </div>
+      <div class="trn-hub__hall-card" id="trnLeaderboard"></div>
+    </div>
+  </div>
 
 </div>
 <!-- /appShell -->
-
-<!-- ══════════════════ JOURNEY EKRANI ══════════════════ -->
-<div id="journeyScreen" style="display:none;position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:200;flex-direction:column;overflow:hidden;background:#0a2010;">
-  <div id="journeyBg" style="position:absolute;inset:0;z-index:0;pointer-events:none;"></div>
-  <div id="journeyPxHeader" style="position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;background:rgba(0,0,0,0.55);border-bottom:3px solid rgba(0,0,0,0.4);">
-    <button onclick="hideJourneyScreen()" class="px-back-btn">← GERİ</button>
-    <div class="px-header-title">
-      <div id="journeyHeaderChapter" class="px-ch-label" style="color:#86efac;">🌲 CHAPTER 1</div>
-      <div id="journeyHeaderName" class="px-ch-name" style="color:#4ade80;">YEŞİL ORMAN</div>
-    </div>
-    <span id="journeyHeaderProgress" class="px-prog-num" style="color:#4ade80;">0/100</span>
-  </div>
-  <div class="px-map-area" style="padding:0;">
-    <div id="journeyMapContent" style="padding:8px 16px 40px;"></div>
-  </div>
-</div>
 
 <!-- ══════════════════ ROZETLER TAM EKRAN ══════════════════ -->
 <div id="badgesScreen" style="display:none;position:fixed;inset:0;z-index:60;background:#f8faff;flex-direction:column;max-width:480px;margin:0 auto;">
@@ -878,102 +840,70 @@
   </div>
 </div>
 
-<!-- Win Modal -->
-<div class="modal-overlay win-modal" id="winModal">
-  <div class="modal" style="padding: 0; overflow: hidden; border-radius: 26px 26px 0 0;">
+<!-- ══════════════════ KAZANMA (tam ekran, kaybetme ile aynı çizgi — reklam yok) ══════════════════ -->
+<div id="winScreen" style="display:none;position:fixed;inset:0;z-index:77;background:#ffffff;flex-direction:column;align-items:stretch;max-width:480px;margin:0 auto;overflow-y:auto;">
 
-    <!-- Rekor şeridi — JS ile display:flex yapılacak -->
-    <div id="winRecordBadge" style="display:none; background: linear-gradient(90deg, #3b82f6, #60a5fa); padding: 10px 24px; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #fff; text-transform: uppercase;">
-      🏅 Yeni Kişisel Rekor
+  <div id="winRecordBadge" style="display:none;flex-shrink:0;width:100%;box-sizing:border-box;background:linear-gradient(90deg,#3b82f6,#60a5fa);padding:10px 24px;text-align:center;font-size:11px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;">
+    🏅 Yeni Kişisel Rekor
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;width:100%;box-sizing:border-box;min-height:min-content;">
+
+    <div id="winEmoji" style="font-size:56px;margin-bottom:12px;line-height:1;flex-shrink:0;">🎉</div>
+    <div id="winTitle" style="font-family:'DM Serif Display',serif;font-size:26px;color:#1a1612;font-weight:700;margin-bottom:6px;text-align:center;">Tebrikler!</div>
+    <div id="winSub" style="font-size:13px;color:#8a7060;margin-bottom:24px;text-align:center;max-width:320px;line-height:1.45;"></div>
+
+    <div style="width:100%;background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.08);margin-bottom:24px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+          <div id="winTime" style="font-family:'DM Serif Display',serif;font-size:17px;color:#1a1612;line-height:1;">—</div>
+          <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Geçen süre</div>
+        </div>
+        <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+          <div id="winErrors" style="font-family:'DM Serif Display',serif;font-size:17px;color:#c0392b;line-height:1;">—</div>
+          <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Hata</div>
+        </div>
+        <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+          <div id="winHints" style="font-family:'DM Serif Display',serif;font-size:17px;color:#2563eb;line-height:1;">—</div>
+          <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Kullanılan ipucu</div>
+        </div>
+      </div>
     </div>
 
-    <div style="padding: 28px 24px 40px;">
-      <div class="modal-handle" style="margin-bottom: 24px;"></div>
-
-      <!-- Başlık -->
-      <div style="text-align: center; margin-bottom: 28px;">
-        <div id="winEmoji" style="font-size: 36px; margin-bottom: 10px;">🎉</div>
-        <div id="winTitle" style="font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); line-height: 1;">Tebrikler!</div>
-        <div id="winSub" style="font-size: 13px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.3px;">Bulmacayı başarıyla çözdün</div>
-      </div>
-
-      <!-- Süre — büyük ve merkezi -->
-      <div style="text-align: center; margin-bottom: 24px; padding: 20px; background: var(--surface2); border-radius: 18px; border: 1px solid var(--border);">
-        <div id="winTime" style="font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--accent); line-height: 1;">—</div>
-        <div style="font-size: 9px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 6px;">Toplam Süre</div>
-      </div>
-
-      <!-- Hata ve İpucu — yan yana iki satır -->
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px;">
-
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
-          <div style="font-size: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;">Hata</div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <div id="winErrorDots" style="display: flex; gap: 5px;"></div>
-            <div id="winErrors" style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--danger);"></div>
-          </div>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
-          <div style="font-size: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;">Kullanılan İpucu</div>
-          <div id="winHints" style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-soft);">—</div>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
-          <div style="font-size: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;">Sıralama</div>
-          <div id="winRank" style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text);">—</div>
-        </div>
-
-      </div>
-
-      <!-- Butonlar -->
-      <button class="primary-btn" onclick="hideModal('winModal');exitGame();">Ana Menüye Dön</button>
-      <button onclick="G.mode === 'tournament' ? (hideModal('winModal')) : (hideModal('winModal'),startGame(G.mode));" style="background: none; border: none; width: 100%; padding: 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px;">Yeni Bulmaca →</button>
-
-    </div>
+    <button type="button" onclick="hideWinScreen();exitGame();" style="width:100%;padding:16px;background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:16px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 16px rgba(59,130,246,0.35);margin-bottom:12px;font-family:'DM Sans',sans-serif;">Ana menüye dön</button>
+    <button type="button" onclick="hideWinScreen(); if (G.mode !== 'tournament') startGame(G.mode);" style="width:100%;padding:14px;background:rgba(255,255,255,0.55);border:1.5px solid rgba(59,130,246,0.15);border-radius:16px;color:#8a7060;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:'DM Sans',sans-serif;">Yeni bulmaca</button>
   </div>
 </div>
 
-<!-- Game Over Modal -->
-<div class="modal-overlay" id="gameOverModal">
-  <div class="modal" style="text-align: center; padding: 28px 24px 40px;">
-    <div class="modal-handle" style="margin-bottom: 24px;"></div>
+<!-- ══════════════════ OYUN BİTTİ (tam ekran, devam ekranı ile aynı çizgi) ══════════════════ -->
+<div id="gameOverScreen" style="display:none;position:fixed;inset:0;z-index:76;background:#ffffff;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;max-width:480px;margin:0 auto;overflow-y:auto;">
 
-    <!-- Başlık — sessiz ve soluk -->
-    <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.6;">💔</div>
-    <div style="font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); margin-bottom: 6px;">Oyun Bitti</div>
-    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 28px;">3 hata yaptın, bulmaca kapandı</div>
+  <div style="font-size:56px;margin-bottom:12px;line-height:1;flex-shrink:0;">💔</div>
+  <div id="gsDiffName" style="font-family:'DM Serif Display',serif;font-size:26px;color:#1a1612;font-weight:700;margin-bottom:6px;text-align:center;"></div>
+  <div id="gsSubtitle" style="font-size:13px;color:#8a7060;margin-bottom:24px;text-align:center;max-width:320px;line-height:1.45;"></div>
 
-    <!-- 3 hata noktası -->
-    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 28px;">
-      <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--danger); opacity: 0.9;"></div>
-      <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--danger); opacity: 0.9;"></div>
-      <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--danger); opacity: 0.9;"></div>
-    </div>
-
-    <!-- İstatistikler — 2 satır -->
-    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; text-align: left;">
-
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
-        <div style="font-size: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;">Geçen Süre</div>
-        <div id="goTime" style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text);">—</div>
+  <div style="width:100%;background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 16px rgba(0,0,0,0.08);margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+        <div id="gsTime" style="font-family:'DM Serif Display',serif;font-size:17px;color:#1a1612;line-height:1;">—</div>
+        <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Geçen süre</div>
       </div>
-
-      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
-        <div style="font-size: 12px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 600;">Kalan İpucu</div>
-        <div id="goHints" style="font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-soft);">—</div>
+      <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+        <div id="gsErrors" style="font-family:'DM Serif Display',serif;font-size:17px;color:#c0392b;line-height:1;">—</div>
+        <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Hata</div>
       </div>
-
+      <div style="text-align:center;background:#faf7f4;border-radius:12px;padding:12px 8px;">
+        <div id="gsHints" style="font-family:'DM Serif Display',serif;font-size:17px;color:#2563eb;line-height:1;">—</div>
+        <div style="font-size:9px;color:#a08070;letter-spacing:1px;margin-top:4px;text-transform:uppercase;">Kalan ipucu</div>
+      </div>
     </div>
-
-    <!-- Video hakkı butonu -->
-    <button id="gameOverWatchBtn" onclick="showRewardedAdModal('error')" style="width: 100%; padding: 15px; background: var(--accent-light); color: var(--accent-dark); border: 1.5px solid var(--accent); border-radius: 13px; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-bottom: 10px;">
-      📺 Video İzle → +1 Hak Kazan
-    </button>
-    <button class="primary-btn" onclick="hideModal('gameOverModal');exitGame();">Ana Menüye Dön</button>
-    <button onclick="hideModal('gameOverModal');startGame(G.mode);" style="background: none; border: none; width: 100%; padding: 14px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px;">Tekrar Dene →</button>
-
   </div>
+
+  <button type="button" id="gameOverWatchBtn" onclick="showRewardedAdModal('error')" style="width:100%;padding:15px;background:rgba(59,130,246,0.12);color:#1d4ed8;border:1.5px solid rgba(59,130,246,0.45);border-radius:16px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">
+    📺 Video izle → +1 hak kazan
+  </button>
+  <button type="button" onclick="hideGameOverScreen();exitGame();" style="width:100%;padding:16px;background:linear-gradient(135deg,#3b82f6,#60a5fa);border:none;border-radius:16px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 16px rgba(59,130,246,0.35);margin-bottom:12px;font-family:'DM Sans',sans-serif;">Ana menüye dön</button>
+  <button type="button" onclick="hideGameOverScreen();startGame(G.mode);" style="width:100%;padding:14px;background:rgba(255,255,255,0.55);border:1.5px solid rgba(59,130,246,0.15);border-radius:16px;color:#8a7060;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:'DM Sans',sans-serif;">Tekrar dene</button>
 </div>
 
 <!-- Continue Game Modal -->
@@ -1076,7 +1006,9 @@
   <div id="matchParticles" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
 
   <!-- Üst yazı -->
-  <div id="matchOverlayStatus" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;margin-bottom:56px;animation:matchFadeIn 0.5s ease forwards;"></div>
+  <div id="matchOverlayStatus" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;animation:matchFadeIn 0.5s ease forwards;"></div>
+  <div id="matchOverlayElapsed" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);margin:0 16px 8px;text-align:center;animation:matchFadeIn 0.5s ease forwards;"></div>
+  <div id="matchOverlayHint" style="font-size:12px;line-height:1.45;color:rgba(255,255,255,0.38);margin:0 20px 24px;text-align:center;max-width:300px;animation:matchFadeIn 0.5s ease forwards;"></div>
 
   <!-- Oyuncular -->
   <div style="display:flex;align-items:center;justify-content:center;width:100%;padding:0 28px;gap:0;">
@@ -1115,9 +1047,7 @@
   </div>
 
   <!-- İptal butonu -->
-  <button onclick="cancelMatchmaking()" style="margin-top:64px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 40px;font-size:13px;cursor:pointer;color:rgba(255,255,255,0.35);touch-action:manipulation;transition:all 0.2s;animation:matchFadeIn 0.5s ease 0.3s both;" onmousedown="this.style.background='rgba(255,255,255,0.1)'" onmouseup="this.style.background='rgba(255,255,255,0.05)'">İptal Et</button>
-
-</div>
+  <button onclick="cancelMatchmaking()" style="margin-top:48px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 40px;font-size:13px;cursor:pointer;color:rgba(255,255,255,0.35);touch-action:manipulation;transition:all 0.2s;animation:matchFadeIn 0.5s ease 0.3s both;" onmousedown="this.style.background='rgba(255,255,255,0.1)'" onmouseup="this.style.background='rgba(255,255,255,0.05)'">İptal Et</button>
 
 </div>
 
@@ -1204,22 +1134,27 @@
     <div class="modal-handle"></div>
     <div id="duelResultIcon" style="font-size:80px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(255,215,0,0.5));line-height:1;">🏆</div>
     <div id="duelResultTitle" class="modal-title" style="font-size:28px;font-family:'DM Serif Display',serif;"></div>
-    <div id="duelResultMsg" style="font-size:14px;color:var(--text-muted);margin:10px 0 28px;"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px;">
+    <div id="duelResultMsg" style="font-size:14px;color:var(--text-muted);margin:10px 0 8px;"></div>
+    <div id="duelResultErrorsNote" style="font-size:12px;font-weight:600;color:var(--text-soft);margin:0 0 20px;"></div>
+    <div id="duelResultStatsGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px;">
       <div style="background:var(--surface2);border-radius:16px;padding:18px 12px;border:1px solid var(--border);">
-  <div id="duelResultTime" style="font-family:'DM Serif Display',serif;font-size:30px;color:#7dd3fc;">0:00</div>
-  <div style="font-size:11px;color:var(--text-muted);margin-top:4px;letter-spacing:0.5px;">SÜRE</div>
-</div>
-      <div style="background:var(--surface2);border-radius:16px;padding:18px 12px;border:1px solid var(--border);">
+        <div id="duelResultTime" style="font-family:'DM Serif Display',serif;font-size:30px;color:#7dd3fc;">0:00</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;letter-spacing:0.5px;">SÜRE</div>
+      </div>
+      <div class="duel-result-ladder-only" style="background:var(--surface2);border-radius:16px;padding:18px 12px;border:1px solid var(--border);">
         <div id="duelResultEloChange" style="font-family:'DM Serif Display',serif;font-size:30px;color:#22c55e;">+25</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;letter-spacing:0.5px;">ELO DEĞİŞİMİ</div>
       </div>
-      <div style="background:var(--surface2);border-radius:16px;padding:18px 12px;border:1px solid var(--border);">
+      <div class="duel-result-ladder-only" style="background:var(--surface2);border-radius:16px;padding:18px 12px;border:1px solid var(--border);">
         <div id="duelResultNewElo" style="font-family:'DM Serif Display',serif;font-size:30px;color:var(--accent);">0</div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:4px;letter-spacing:0.5px;">YENİ ELO</div>
       </div>
     </div>
-    <button onclick="closeDuelResult()" style="width:100%;background:var(--accent);border:none;border-radius:14px;padding:16px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(59,130,246,0.4);">Tamam</button>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+      <button type="button" onclick="closeDuelResult(() => startMatchmaking())" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:14px;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;">Yeni rakip bul</button>
+      <button type="button" onclick="closeDuelResult(() => openDuelLeaderboard())" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:14px;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;">Lig sıralaması</button>
+      <button type="button" onclick="closeDuelResult()" style="width:100%;background:var(--accent);border:none;border-radius:14px;padding:16px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(59,130,246,0.4);">Tamam</button>
+    </div>
   </div>
 </div>
 
@@ -1513,9 +1448,10 @@ window._supabaseOffline = false;
 <script src="profile-manager.js"></script>
 <script src="tournament-manager.js"></script>
 <script src="game-manager.js"></script>
-<script src="journey-manager.js"></script>
+<script src="duel-rank-badge.js"></script>
 <script src="duel-manager.js"></script>
 <script src="ui-manager.js"></script>
+<script src="interactive-tutorial.js"></script>
 <script>
 
 
@@ -1537,6 +1473,7 @@ let appState = {
   notifications: false,
   hideTimer: false,
   savedGames: {},
+  lastSavedGameMode: null,
 };
 
 // game state — single source of truth
@@ -1584,7 +1521,6 @@ initDarkMode();
 initSettings();
 updateHomeScreen();
 updateProfilePanel();
-document.getElementById('dailyDate').textContent = formatDate(todayStr());
 showSplash();
 setTimeout(() => checkOnboarding(), 1500);
 initSupabase();
@@ -1692,308 +1628,27 @@ function _csFresh() {
 </div>
 
 <!-- ══════════════════ ALT NAVİGASYON ══════════════════ -->
-<!-- ══════════════════ SUDOKU ÖĞRETİCİ (yalnızca oyun kuralları) ══════════════════ -->
-<div id="tutorialModal" style="display:none;position:fixed;inset:0;z-index:90;background:rgba(15,23,42,0.5);align-items:center;justify-content:center;padding:20px 16px;flex-direction:column;" onclick="if(event.target===this)closeSudokuTutorial()">
-  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:380px;max-height:min(92vh,640px);position:relative;box-shadow:0 24px 64px rgba(0,0,0,0.22);display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
-    <button type="button" onclick="closeSudokuTutorial()" style="position:absolute;top:12px;right:12px;z-index:2;background:#f1f5f9;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">
+<!-- ══════════════════ İnteraktif sudoku öğretici (4×4 → 6×6) ══════════════════ -->
+<div id="interactiveTutorialModal" class="it-overlay" style="display:none;" onclick="if(event.target===this)closeInteractiveTutorial()">
+  <div class="it-sheet" onclick="event.stopPropagation()">
+    <button type="button" class="it-close" onclick="closeInteractiveTutorial()" aria-label="Kapat">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div style="padding:20px 20px 12px;border-bottom:1px solid #f1f5f9;">
-      <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:1.2px;margin-bottom:6px;">SUDOKU</div>
-      <h2 id="tutorialStepTitle" style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;font-weight:700;color:#0f172a;margin:0;line-height:1.2;">Nasıl oynanır?</h2>
+    <div class="it-sheet-head">
+      <span id="itPhaseLabel" class="it-phase">Demo 4×4</span>
+      <h2 class="it-sheet-title">Nasıl oynanır?</h2>
     </div>
-    <div style="padding:14px 20px;overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;">
-      <p id="tutorialStepText" style="font-size:14px;color:#475569;line-height:1.65;margin:0 0 14px;"></p>
-      <div id="tutorialGridWrap" style="display:none;margin:0 auto 8px;width:100%;max-width:280px;"></div>
-      <div id="tutorialQuiz" style="display:none;margin-top:8px;">
-        <div style="font-size:13px;font-weight:600;color:#334155;margin-bottom:10px;">Bu boş kutuya hangi rakam gelmeli?</div>
-        <div id="tutorialQuizBtns" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"></div>
-        <p id="tutorialQuizFeedback" style="font-size:13px;margin:12px 0 0;text-align:center;min-height:20px;"></p>
+    <div class="it-sheet-body">
+      <div id="itGrid" class="it-grid"></div>
+      <div id="itNumpad" class="it-numpad"></div>
+      <div class="it-coach">
+        <h3 id="itCoachTitle" class="it-coach-title"></h3>
+        <p id="itCoachText" class="it-coach-text"></p>
+        <button type="button" id="itCoachBtn" class="it-coach-btn"></button>
       </div>
-    </div>
-    <div style="padding:14px 20px 18px;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;background:#fafafa;">
-      <div id="tutorialDots" style="flex:1;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;"></div>
-      <button type="button" id="tutorialBtnPrev" onclick="tutorialPrev()" style="padding:10px 14px;border-radius:12px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;">Geri</button>
-      <button type="button" id="tutorialBtnNext" onclick="tutorialNext()" style="padding:10px 18px;border-radius:12px;border:none;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 14px rgba(37,99,235,0.35);">İleri</button>
     </div>
   </div>
 </div>
-<script>
-(function(){
-  var _tutorialStep = 0;
-  var _quizDone = false;
-  /* Demo: tek satırda 1–9 eksik 5 — satır kuralı örneği */
-  var DEMO_ROW = [1,2,3,4,null,6,7,8,9];
-  var STEPS = [
-    {
-      title: 'Sudoku nedir?',
-      text: '9×9 kareden oluşan bir bulmacadır. Amaç: her boş kutuya 1 ile 9 arasında bir rakam yazarak tüm ızgarayı doldurmak. Şimdi tek kuralı üç parçada göreceğiz: satır, sütun ve 3×3 kutu.',
-      mode: 'none'
-    },
-    {
-      title: 'Satır kuralı',
-      text: 'Her yatay satırda 1, 2, … 9 rakamlarından her biri tam bir kez bulunmalı. Aynı satırda bir rakamı iki kez kullanamazsın.',
-      mode: 'row'
-    },
-    {
-      title: 'Sütun kuralı',
-      text: 'Her dikey sütunda da aynı kural geçerli: 1’den 9’a her rakam yalnızca bir kez.',
-      mode: 'col'
-    },
-    {
-      title: '3×3 kutu kuralı',
-      text: 'Tahta dokuz büyük kutuya ayrılmıştır. Her kutunun içinde yine 1–9’un hepsi birer kez olmalı.',
-      mode: 'box'
-    },
-    {
-      title: 'Başlangıç rakamları',
-      text: 'Oyun başında bazı kutular dolu gelir; bunlar sabittir ve değiştirilmez. Sen yalnızca boş kutuları doldurursun.',
-      mode: 'given'
-    },
-    {
-      title: 'Küçük bir kontrol',
-      text: 'Aşağıdaki satırda tek bir rakam eksik. Sudoku kuralına göre hangisi olmalı?',
-      mode: 'quiz'
-    }
-  ];
-
-  function closeSudokuTutorial() {
-    document.getElementById('tutorialModal').style.display = 'none';
-  }
-
-  function openSudokuTutorial() {
-    _tutorialStep = 0;
-    _quizDone = false;
-    document.getElementById('tutorialModal').style.display = 'flex';
-    renderTutorial();
-  }
-
-  function buildDots() {
-    var el = document.getElementById('tutorialDots');
-    el.innerHTML = STEPS.map(function(_, i) {
-      return '<span style="width:7px;height:7px;border-radius:50%;background:' + (i === _tutorialStep ? '#2563eb' : '#cbd5e1') + ';transition:background .2s;"></span>';
-    }).join('');
-  }
-
-  function cellBorderClass(r, c) {
-    var cls = 'tutorial-cell';
-    if (c % 3 === 0) cls += ' tc-bL';
-    if (r % 3 === 0) cls += ' tc-bT';
-    if (c === 8) cls += ' tc-bR';
-    if (r === 8) cls += ' tc-bB';
-    return cls;
-  }
-
-  function renderGrid(mode) {
-    var wrap = document.getElementById('tutorialGridWrap');
-    if (mode === 'none' || mode === 'quiz') {
-      wrap.style.display = 'none';
-      wrap.innerHTML = '';
-      return;
-    }
-    wrap.style.display = 'block';
-    var givensMap = { '00':5,'08':9,'40':3,'44':7,'80':1 };
-    var html = '<div class="tutorial-sudoku-grid">';
-    var demoVal = function(r, c) {
-      if (mode === 'row') {
-        if (r !== 4) return { v: (c + r) % 9 + 1, g: true };
-        return { v: DEMO_ROW[c], g: DEMO_ROW[c] != null };
-      }
-      if (mode === 'col') {
-        if (c !== 4) {
-          var x = (r + c * 3) % 9 + 1;
-          return { v: x, g: true };
-        }
-        return { v: DEMO_ROW[r], g: DEMO_ROW[r] != null };
-      }
-      if (mode === 'box') {
-        var br = Math.floor(r / 3), bc = Math.floor(c / 3);
-        if (br !== 1 || bc !== 1) return { v: (r * 7 + c * 11) % 9 + 1, g: true };
-        var lr = r - 3, lc = c - 3;
-        var idx = lr * 3 + lc;
-        var seq = [1,2,3,4,null,6,7,8,9];
-        var v = seq[idx];
-        return { v: v, g: v != null };
-      }
-      if (mode === 'given') {
-        var k = r + '' + c;
-        if (givensMap[k] != null) return { v: givensMap[k], g: true };
-        return { v: null, g: false };
-      }
-      return { v: null, g: false };
-    };
-    var highlight = function(r, c) {
-      if (mode === 'row') return r === 4;
-      if (mode === 'col') return c === 4;
-      if (mode === 'box') return r >= 3 && r <= 5 && c >= 3 && c <= 5;
-      if (mode === 'given') return givensMap[r + '' + c] != null;
-      return false;
-    };
-    for (var r = 0; r < 9; r++) {
-      for (var c = 0; c < 9; c++) {
-        var d = demoVal(r, c);
-        var hi = (mode === 'given') ? d.g : highlight(r, c);
-        var dim = !hi && mode !== 'given';
-        var val = d.v != null ? d.v : '';
-        var fg = d.g ? '#1e293b' : '#64748b';
-        var bg = d.g ? '#f8fafc' : '#fff';
-        if (hi && mode !== 'given') bg = 'rgba(37,99,235,0.12)';
-        if (hi && mode === 'given') bg = 'rgba(37,99,235,0.08)';
-        html += '<div class="' + cellBorderClass(r, c) + '" style="font-size:11px;font-weight:700;color:' + fg + ';background:' + bg + ';opacity:' + (dim ? '0.35' : '1') + ';">' + (val !== '' ? val : '') + '</div>';
-      }
-    }
-    html += '</div>';
-    wrap.innerHTML = html;
-  }
-
-  function quizRowCellClass(c) {
-    var cls = 'tutorial-cell';
-    if (c % 3 === 0) cls += ' tc-bL';
-    cls += ' tc-bT';
-    if (c === 8) cls += ' tc-bR';
-    cls += ' tc-bB';
-    return cls;
-  }
-
-  function renderQuiz() {
-    var q = document.getElementById('tutorialQuiz');
-    var fb = document.getElementById('tutorialQuizFeedback');
-    var btns = document.getElementById('tutorialQuizBtns');
-    q.style.display = 'block';
-    fb.textContent = '';
-    fb.style.color = '#64748b';
-    var choices = [4, 5, 6];
-    btns.innerHTML = choices.map(function(n) {
-      return '<button type="button" class="tutorial-quiz-btn" data-n="' + n + '" style="min-width:52px;padding:12px 16px;border-radius:12px;border:2px solid #e2e8f0;background:#fff;font-size:18px;font-weight:800;color:#334155;cursor:pointer;touch-action:manipulation;">' + n + '</button>';
-    }).join('');
-    btns.querySelectorAll('.tutorial-quiz-btn').forEach(function(btn) {
-      btn.onclick = function() {
-        if (_quizDone) return;
-        var n = parseInt(btn.getAttribute('data-n'), 10);
-        if (n === 5) {
-          _quizDone = true;
-          fb.textContent = 'Doğru! Bu satırda 5 eksikti; 1–9’un hepsi bir kez olmalı.';
-          fb.style.color = '#16a34a';
-          btns.querySelectorAll('.tutorial-quiz-btn').forEach(function(b) {
-            b.style.borderColor = '#e2e8f0';
-            b.style.background = '#fff';
-          });
-          btn.style.borderColor = '#22c55e';
-          btn.style.background = '#f0fdf4';
-          var nb = document.getElementById('tutorialBtnNext');
-          nb.textContent = 'Bitir';
-          nb.style.opacity = '1';
-        } else {
-          fb.textContent = 'Bu satırda ' + n + ' zaten var veya başka bir rakam eksik. Tekrar dene.';
-          fb.style.color = '#dc2626';
-        }
-      };
-    });
-    var wrap = document.getElementById('tutorialGridWrap');
-    wrap.style.display = 'block';
-    var html = '<div class="tutorial-quiz-row">';
-    for (var c = 0; c < 9; c++) {
-      var v = DEMO_ROW[c];
-      var isEmpty = v == null;
-      html += '<div class="' + quizRowCellClass(c) + '" style="font-size:13px;font-weight:800;color:' + (isEmpty ? '#2563eb' : '#1e293b') + ';background:' + (isEmpty ? 'rgba(37,99,235,0.15)' : '#f8fafc') + ';animation:' + (isEmpty ? 'tutorialPulse 1.2s ease-in-out infinite' : 'none') + ';">' + (v != null ? v : '?') + '</div>';
-    }
-    html += '</div>';
-    wrap.innerHTML = html;
-  }
-
-  function renderTutorial() {
-    var s = STEPS[_tutorialStep];
-    document.getElementById('tutorialStepTitle').textContent = s.title;
-    document.getElementById('tutorialStepText').textContent = s.text;
-    document.getElementById('tutorialBtnPrev').style.visibility = _tutorialStep === 0 ? 'hidden' : 'visible';
-    var nextBtn = document.getElementById('tutorialBtnNext');
-    if (_tutorialStep === STEPS.length - 1) {
-      nextBtn.textContent = _quizDone ? 'Bitir' : 'Önce seç';
-      nextBtn.style.opacity = _quizDone ? '1' : '0.5';
-    } else {
-      nextBtn.textContent = 'İleri';
-      nextBtn.style.opacity = '1';
-    }
-    document.getElementById('tutorialQuiz').style.display = s.mode === 'quiz' ? 'block' : 'none';
-    if (s.mode === 'quiz') {
-      renderQuiz();
-    } else {
-      document.getElementById('tutorialQuiz').style.display = 'none';
-      renderGrid(s.mode);
-    }
-    buildDots();
-  }
-
-  function tutorialNext() {
-    if (_tutorialStep === STEPS.length - 1) {
-      if (_quizDone) closeSudokuTutorial();
-      return;
-    }
-    _tutorialStep++;
-    if (STEPS[_tutorialStep].mode !== 'quiz') _quizDone = false;
-    renderTutorial();
-  }
-
-  function tutorialPrev() {
-    if (_tutorialStep <= 0) return;
-    _tutorialStep--;
-    _quizDone = false;
-    renderTutorial();
-  }
-
-  window.openSudokuTutorial = openSudokuTutorial;
-  window.closeSudokuTutorial = closeSudokuTutorial;
-  window.tutorialNext = tutorialNext;
-  window.tutorialPrev = tutorialPrev;
-})();
-</script>
-<style>
-.tutorial-sudoku-grid {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  gap: 0;
-  width: 100%;
-  aspect-ratio: 1;
-  max-width: 280px;
-  margin: 0 auto;
-  border: 2px solid #1e293b;
-  border-radius: 8px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.tutorial-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  box-sizing: border-box;
-  border-right: 1px solid #cbd5e1;
-  border-bottom: 1px solid #cbd5e1;
-}
-.tutorial-cell.tc-bL { border-left: 2px solid #1e293b; }
-.tutorial-cell.tc-bT { border-top: 2px solid #1e293b; }
-.tutorial-cell.tc-bR { border-right: 2px solid #1e293b; }
-.tutorial-cell.tc-bB { border-bottom: 2px solid #1e293b; }
-@keyframes tutorialPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(0.97); }
-}
-.tutorial-quiz-row {
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  width: 100%;
-  max-width: 280px;
-  margin: 0 auto;
-  border: 2px solid #1e293b;
-  border-radius: 8px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.tutorial-quiz-row .tutorial-cell {
-  min-height: 32px;
-  aspect-ratio: auto;
-}
-</style>
 
 
 <nav id="bottomNav" class="bottom-nav">
@@ -2024,12 +1679,15 @@ function _csFresh() {
     </svg>
     <span class="nav-tab-label">Sıralama</span>
   </button>
-  <button class="nav-tab" id="navMacera" onclick="showPanel('journeyPanel')">
+  <button class="nav-tab" id="navTournament" onclick="showPanel('tournamentPanel')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+      <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+      <path d="M12 11v8"/>
+      <path d="M8 21h8"/>
     </svg>
-    <span class="nav-tab-label">Macera</span>
+    <span class="nav-tab-label">Turnuva</span>
   </button>
   <button class="nav-tab" id="navProfile" onclick="showPanel('profilePanel')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
